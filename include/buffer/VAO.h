@@ -9,6 +9,7 @@ class VAO
         VAO(); 
 
         void LinkVBO(VBO VBO, GLuint layout); 
+        void configVertexAttributes(GLuint layout, GLsizeiptr stride, GLsizeiptr offset); 
         void Bind(); 
         void Unbind(); 
         void Delete(); 

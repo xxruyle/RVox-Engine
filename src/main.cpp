@@ -1,26 +1,35 @@
 #include <iostream> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
+#include <cmath>
 
 #include "shader/shader.h" 
 #include "buffer/VBO.h"
 #include "buffer/VAO.h" 
 #include "buffer/EBO.h" 
+#include "texture/texture.h"
+
 
 // Vertices coordinates for zelda triforce 
 GLfloat vertices[] = {
-    0.0f, 0.5f, 0.0f, // 0 top middle of top triangle 
-    -0.5f, 0.0f, 0.0f, // 1 bottom left of top triangle  
-    0.5f, 0.0f, 0.0f, // 2 bottom right of top triangle 
-    -1.0f, -0.5f, 0.0f, // 3 bottom left of bottom left triangle 
-    0.0f, -0.5f, 0.0f, // 4 bottom middle of bottom two triangles 
-    1.0f, -0.5f, 0.0f, // 5 bottom right of bottom two triangles 
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 };
+
+GLfloat texCoords[] = {
+    0.0f, 0.0f,  // lower-left corner  
+    1.0f, 0.0f,  // lower-right corner
+    0.5f, 1.0f   // top-center corner
+}; 
+
 GLuint indices[] = {  // note that we start from 0!
-    0, 1, 2,  // top triangle 
-    1, 3, 4,   // bottom left triangle 
-    2, 4, 5 // bottom right triangle 
+    1, 2, 3, 
+    0, 1, 3,  // sole triangle
 };
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
 {
@@ -40,6 +49,8 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) // solid
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
+
+
 
 
 int main() 
@@ -69,9 +80,9 @@ int main()
     glViewport(0,0, 1000, 1000); 
 
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
-    shaderProgram.Activate(); 
+    shaderProgram.Activate();  
     shaderProgram.Delete(); 
-
+    
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -79,15 +90,21 @@ int main()
 
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO VBO1(vertices, sizeof(vertices));
+
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO1(indices, sizeof(indices));
 
 	// Links VBO to VAO
 	VAO1.LinkVBO(VBO1, 0);
-	// Unbind all to prevent accidentally modifying them
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
+    VAO1.configVertexAttributes(0, 8, 0); 
+    VAO1.configVertexAttributes(1, 8, 3*sizeof(GLfloat)); 
+    VAO1.configVertexAttributes(2, 8, 6*sizeof(GLfloat)); 
+
+
+    Texture TEX; 
+    TEX.Bind(); 
+    TEX.setParameters(); 
+    TEX.Generate("res/textures/grass_texture.jpg", 512, 512); 
 
 
     // The main render loop 
@@ -98,18 +115,29 @@ int main()
 
         // rendering commands 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT); 
+
 
         // activating the shader 
         shaderProgram.Activate(); 
+        TEX.Bind(); 
+        VAO1.Bind();
 
-        VAO1.Bind(); 
 
-        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); 
+        // oscillating and testing with uniform 
+        float timeValue = glfwGetTime(); 
+        float offset = sin(timeValue) / 2.0f; 
+        shaderProgram.setFloat("offSet", offset); 
+
+        //glDrawArrays(GL_TRIANGLES, 0, 3); // When not using EBO 
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // When using EBO 
+    
+
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 
     }
+
 
     VAO1.Delete(); 
     VBO1.Delete(); 
@@ -122,3 +150,4 @@ int main()
 
     return 0; 
 }
+

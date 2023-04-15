@@ -8,9 +8,19 @@ VAO::VAO()
 void VAO::LinkVBO(VBO VBO, GLuint layout)
 {
     VBO.Bind(); 
-    glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0); 
+    // position attribute
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
+    //glEnableVertexAttribArray(0);
+    //// color attribute
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof//(GLfloat)));
+    //glEnableVertexAttribArray(1);
+    // VBO.Unbind(); // tutorial says it's not necessary to unbind VAOs or VBOs 
+}
+
+void VAO::configVertexAttributes(GLuint layout, GLsizeiptr stride, GLsizeiptr offset)
+{
+    glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, stride*sizeof(float), (void*)offset); 
     glEnableVertexAttribArray(layout); 
-    VBO.Unbind(); 
 }
 
 void VAO::Bind()
