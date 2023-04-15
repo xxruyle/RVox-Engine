@@ -4,8 +4,9 @@
 
 #include "texture/texture.h" 
 
-Texture::Texture()
+Texture::Texture(GLenum textureUnit)
 {
+    glActiveTexture(textureUnit);
     glGenTextures(1, &ID); 
 }
 
@@ -39,6 +40,11 @@ void Texture::Generate(const char* file_string, int width, int height)
     }
  
     stbi_image_free(data); // free the image memory now that we have generated the texture 
+}
+
+void Texture::Delete()
+{
+    glDeleteTextures(1, &ID); 
 }
 
 

@@ -17,9 +17,9 @@ void VAO::LinkVBO(VBO VBO, GLuint layout)
     // VBO.Unbind(); // tutorial says it's not necessary to unbind VAOs or VBOs 
 }
 
-void VAO::configVertexAttributes(GLuint layout, GLsizeiptr stride, GLsizeiptr offset)
+void VAO::configVertexAttributes(GLuint layout, GLuint size, GLsizeiptr stride, GLsizeiptr offset)
 {
-    glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, stride*sizeof(float), (void*)offset); 
+    glVertexAttribPointer(layout, size, GL_FLOAT, GL_FALSE, stride*sizeof(float), (void*)offset); 
     glEnableVertexAttribArray(layout); 
 }
 

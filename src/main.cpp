@@ -12,7 +12,7 @@
 
 // Vertices coordinates for zelda triforce 
 GLfloat vertices[] = {
-    // positions          // colors           // texture coords
+    // positions          // colors           // // texture coords
      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
@@ -26,8 +26,8 @@ GLfloat texCoords[] = {
 }; 
 
 GLuint indices[] = {  // note that we start from 0!
-    1, 2, 3, 
     0, 1, 3,  // sole triangle
+    1, 2, 3, 
 };
 
 
@@ -96,15 +96,14 @@ int main()
 
 	// Links VBO to VAO
 	VAO1.LinkVBO(VBO1, 0);
-    VAO1.configVertexAttributes(0, 8, 0); 
-    VAO1.configVertexAttributes(1, 8, 3*sizeof(GLfloat)); 
-    VAO1.configVertexAttributes(2, 8, 6*sizeof(GLfloat)); 
+    VAO1.configVertexAttributes(0, 3, 8, 0); // coordinates 
+    VAO1.configVertexAttributes(1, 3, 8, 3*sizeof(GLfloat)); // color 
+    VAO1.configVertexAttributes(2, 2, 8, 6*sizeof(GLfloat)); // texture 
 
-
-    Texture TEX; 
+    Texture TEX(GL_TEXTURE0); 
     TEX.Bind(); 
     TEX.setParameters(); 
-    TEX.Generate("res/textures/grass_texture.jpg", 512, 512); 
+    TEX.Generate("res/textures/log.jpg", 512, 512); 
 
 
     // The main render loop 
@@ -142,6 +141,7 @@ int main()
     VAO1.Delete(); 
     VBO1.Delete(); 
     EBO1.Delete(); 
+    TEX.Delete(); 
     shaderProgram.Delete(); 
 
 
