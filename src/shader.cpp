@@ -90,6 +90,13 @@ void Shader::setFloat(const std::string &name, float value) const
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value); 
 }
 
+void Shader::setMat(const std::string &name, int amount, GLboolean isTransposed, glm::mat4& trans) const 
+{
+    GLuint transformLoc = glGetUniformLocation(ID, name.c_str()); 
+    glUniformMatrix4fv(transformLoc, amount, isTransposed, glm::value_ptr(trans)); 
+}
+
+
 void Shader::Delete() 
 {
     glDeleteProgram(ID); 

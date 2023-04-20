@@ -5,7 +5,7 @@ VAO::VAO()
     glGenVertexArrays(1, &ID); 
 }
 
-void VAO::LinkVBO(VBO VBO, GLuint layout)
+void VAO::LinkVBO(VBO& VBO, GLuint layout)
 {
     VBO.Bind(); 
     // position attribute
