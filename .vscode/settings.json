@@ -44,7 +44,10 @@
         "xutility": "cpp",
         "fstream": "cpp",
         "sstream": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "algorithm": "cpp",
+        "random": "cpp",
+        "vector": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }
