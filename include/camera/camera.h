@@ -1,26 +1,20 @@
 #pragma once 
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cube/cube.h>
 
-class Camera
+
+class Camera 
 {
     private: 
         bool firstMouse = true; 
-        bool isCollided = false; 
         void updateDirectionVectors(); 
-
-        enum eInput {
-            FORWARD, 
-            BACKWARDS,
-            RIGHT, 
-            LEFT, 
-            ZOOM, 
-            SPRINT
-        }; 
 
     public: 
         glm::vec3 mDirection; 
@@ -42,16 +36,21 @@ class Camera
         float mSpeed; 
         float mSensitivity; 
 
+        Cube* mC; // the world of cubes 
+
     
 
-        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity);   
+        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, Cube* c);   
 
         glm::mat4 getViewMatrix(); 
-        void processInput(GLFWwindow* window, float deltaTime);   
+        void processInput(GLFWwindow* window, float deltaTime); // camera movement 
 
-        void processMouseMovement(double xoffset, double yoffset); 
+        void processMouseMovement(double xoffset, double yoffset); // updates pitch and yaw based on mouse movement and updates direction vectors  
+    
 
-        void zoom(double xoffset, double yoffset); 
+        void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
 
-        void checkCollision(float deltaTime); 
+
+        glm::vec3 rayCast(); // casts a vector from camera and searches for cubes  
+        glm::vec3 getBuildLocation(); // returns the side of the cube that the raycast is hitting
 }; 

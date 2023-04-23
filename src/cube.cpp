@@ -27,15 +27,7 @@ void Cube::generatePlane(int randSeed)
         }
     }
 
-    for (int i = 0; i < xs; i++) 
-    {
-        for (int j = 0; j < ys; j++) 
-        {
-            std::cout << noiseData[i][j]; 
-        }
 
-        std::cout << "\n";  
-    }
 
 
     // pushing the positions of each block and making the height map  
@@ -57,6 +49,17 @@ void Cube::generatePlane(int randSeed)
             
         }
     } 
+
+    for (int i = 0; i < xs; i++) 
+    {
+        for (int j = 0; j < ys; j++) 
+        {
+            std::cout << noiseData[i][j]; 
+        }
+
+        std::cout << "\n";  
+    }
+    
 }
 
 void Cube::generateSingle()
@@ -85,6 +88,15 @@ void Cube::getNoise()
             }
         }
     }
+}
 
+void Cube::printCubes() 
+{
+    for (unsigned int i = 0; i < positions.size(); i++)
+    {
+        std::cout << positions[i].x << " " << positions[i].y << " " << positions[i].z << std::endl;
+        
+    }
 
+    std::cout << "Size: " << positions.size() << std::endl; 
 }

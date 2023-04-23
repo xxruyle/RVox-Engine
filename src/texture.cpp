@@ -45,6 +45,13 @@ void Texture::Generate(const char* file_string, int width, int height, GLenum fo
     stbi_image_free(data); // free the image memory now that we have generated the texture 
 }
 
+
+void Texture::Unbind()  
+{
+    glBindTexture(GL_TEXTURE_2D, 0); 
+}
+
+
 void Texture::Delete()
 {
     glDeleteTextures(1, &ID); 

@@ -20,6 +20,7 @@ class Texture
         GLuint ID;  
         Texture(GLenum textureUnit); // initialize the texture object 
         void Bind(GLenum textureUnit); // bind the texture 
+        void Unbind(); 
         void setParameters(GLint param); // set the texture wrapping/filtering options
         void Generate(const char* file_string, int width, int height, GLenum format, bool flip); // load and generate the texture 
         void Delete(); 

@@ -1,6 +1,8 @@
 #pragma once 
 #include <iostream> 
+#include <set>
 #include <vector> 
+#include <tuple>
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 
@@ -13,9 +15,11 @@
 class Cube
 {
     public: 
-        std::vector<glm::vec3> positions = {glm::vec3(0.0f, 0.0f, 0.0f)};  
+        std::vector<glm::vec3> positions;  
+
         void generatePlane(int randSeed); 
         void generateSingle(); 
         void getNoise(); 
+        void printCubes(); 
 
 }; 
