@@ -29,34 +29,17 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f; 
 
 GLfloat vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+
+    // Top
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
 
+
+    // Bottom 
     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
@@ -64,17 +47,45 @@ GLfloat vertices[] = {
     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+
+    // Left 
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+
+    // Right 
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+
+    // Front
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    // Back 
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
 };
 
 
 // initializing camera
-Camera gameCamera(glm::vec3(20.0f, 20.0f, 20.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 7.0f, 0.1f); 
+Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f); 
 
 Cube cube; 
 
@@ -177,7 +188,6 @@ int main()
     glEnable(GL_DEPTH_TEST); 
 
 
-
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
     shaderProgram.Delete(); 
@@ -191,7 +201,7 @@ int main()
 	VBO VBO1(vertices, sizeof(vertices));
 
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
+	// EBO EBO1(indices, sizeof(indices));
 
 	// Links VBO to VAO
 	VAO1.LinkVBO(VBO1, 0);
@@ -205,19 +215,20 @@ int main()
     Texture TEX(GL_TEXTURE0); 
     TEX.Bind(GL_TEXTURE0); 
     TEX.setParameters(GL_REPEAT); 
-    TEX.Generate("res/textures/log.jpg", 512, 512, GL_RGB, true);  // grass texture 
+    TEX.Generate("res/textures/grass.jpg", 512, 512, GL_RGB, true);  // grass texture 
 
-    Texture TEX2(GL_TEXTURE1); // assigned to texture unit 1 
+    /* Texture TEX2(GL_TEXTURE1); // assigned to texture unit 1 
     TEX2.Bind(GL_TEXTURE1); 
     TEX2.setParameters(GL_REPEAT); 
-    TEX2.Generate("res/textures/awesomeface.png", 512, 512, GL_RGBA, true); // second texture 
+    TEX2.Generate("res/textures/awesomeface.png", 512, 512, GL_RGBA, true); // second texture */ 
 
 
     shaderProgram.Activate(); 
     shaderProgram.setInt("texture1", 0); 
     shaderProgram.setInt("texture2", 1); 
 
-    cube.generatePlane(); 
+    // cube.generatePlane(); 
+    cube.generatePlane(rand() % 1000 + 1); 
 
     // FPS Counter 
     double prevTime = 0.0; 
@@ -276,7 +287,7 @@ int main()
         shaderProgram.setFloat("visibility", visible); 
 
         TEX.Bind(GL_TEXTURE0); 
-        TEX2.Bind(GL_TEXTURE1); 
+        // TEX2.Bind(GL_TEXTURE1); 
 
         VAO1.Bind();
         
@@ -284,8 +295,6 @@ int main()
         {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cube.positions[i]);
-            if (i != 0) 
-                model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5)); 
             shaderProgram.setMat("model", 1, GL_FALSE, model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -293,7 +302,7 @@ int main()
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // When using EBO 
 
         // collision checking 
-        gameCamera.checkCollision(deltaTime); 
+        // gameCamera.checkCollision(deltaTime); 
 
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
@@ -303,9 +312,9 @@ int main()
 
     VAO1.Delete(); 
     VBO1.Delete(); 
-    EBO1.Delete(); 
+    // EBO1.Delete(); 
     TEX.Delete(); 
-    TEX2.Delete(); 
+    // TEX2.Delete(); 
     shaderProgram.Delete(); 
 
 

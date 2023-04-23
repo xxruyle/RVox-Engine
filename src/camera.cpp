@@ -54,7 +54,7 @@ void Camera::processInput(GLFWwindow* window, float deltaTime)
     }
          
 
-/*     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) // "sprint"
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) // "sprint"
     {
         mSpeed += 1.0f; 
         if (mSpeed > 30.0f) 
@@ -62,8 +62,8 @@ void Camera::processInput(GLFWwindow* window, float deltaTime)
     }
     else
     {
-        mSpeed = 0.0f; 
-    } */
+        mSpeed = 10.0f; 
+    }
 
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) // resetting the fov
         mFov = 90.0f; 
