@@ -1,7 +1,6 @@
 // stb image 
 #define STB_IMAGE_IMPLEMENTATION
 #include "texture/stb_image.h" 
-
 #include "texture/texture.h" 
 
 Texture::Texture(GLenum textureUnit)
@@ -12,20 +11,42 @@ Texture::Texture(GLenum textureUnit)
 
 
 
-void Texture::Bind(GLenum textureUnit)
+void Texture::Bind(GLenum textureType, GLenum textureUnit)
 {
     glActiveTexture(textureUnit);
-    glBindTexture(GL_TEXTURE_2D, ID); 
+    glBindTexture(textureType, ID); 
 }
 
-void Texture::setParameters(GLint param) 
+
+void Texture::GenerateCubeMap(std::vector<std::string> textures_faces, int width, int height, GLenum format, bool flip)
 {
-    // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, param);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, param);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    int nrChannels; 
+    stbi_set_flip_vertically_on_load(flip);  
+
+    unsigned char* data;
+    for (unsigned int i = 0; i < textures_faces.size(); i++)
+    {
+        data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrChannels, 0); 
+
+        if (data)
+        {
+            // GL_RGBA in 7th parameter if it is in png
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data); // generates textures 
+            std::cout << textures_faces[i].c_str() << std::endl; 
+            stbi_image_free(data);
+        } else {
+            std::cout << "Cubemap tex failed to load at path" << std::endl; 
+            stbi_image_free(data); // free the image memory now that we have generated the texture 
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE); 
 }
+
 
 void Texture::Generate(const char* file_string, int width, int height, GLenum format, bool flip) 
 {
@@ -41,8 +62,15 @@ void Texture::Generate(const char* file_string, int width, int height, GLenum fo
     } else {
         std::cout << "Failed to load texture" << std::endl; 
     }
- 
+
+
+
     stbi_image_free(data); // free the image memory now that we have generated the texture 
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 

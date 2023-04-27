@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <cube/cube.h>
+#include "world/world.h"
 
 
 class Camera 
@@ -36,11 +36,11 @@ class Camera
         float mSpeed; 
         float mSensitivity; 
 
-        Cube* mC; // the world of cubes 
+        World* mWorld; // the world of cubes 
 
     
 
-        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, Cube* c);   
+        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, World* world);   
 
         glm::mat4 getViewMatrix(); 
         void processInput(GLFWwindow* window, float deltaTime); // camera movement 
@@ -51,6 +51,7 @@ class Camera
         void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
 
 
-        glm::vec3 rayCast(); // casts a vector from camera and searches for cubes  
-        glm::vec3 getBuildLocation(); // returns the side of the cube that the raycast is hitting
+        glm::vec3 rayCast(); // casts a vector from camera and gets first cube that the vector hits, returns glm::vec4(origin, xray, yray, zray)  
+        glm::vec3 getVoxelFace(glm::vec3 origin, float xray, float yray, float zray); // returns the side of the cube that the raycast is hitting
+        void deleteVoxel();  
 }; 

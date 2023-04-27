@@ -3,6 +3,7 @@
 //#include <GLEW/glew.h>  // include glew before glfw3
 #include <GLFW/glfw3.h> 
 #include <iostream> 
+#include <vector> 
 #include <string> 
 #include <fstream> 
 #include <sstream> 
@@ -19,9 +20,9 @@ class Texture
     public: 
         GLuint ID;  
         Texture(GLenum textureUnit); // initialize the texture object 
-        void Bind(GLenum textureUnit); // bind the texture 
+        void Bind(GLenum textureType, GLenum textureUnit); // bind the texture 
         void Unbind(); 
-        void setParameters(GLint param); // set the texture wrapping/filtering options
         void Generate(const char* file_string, int width, int height, GLenum format, bool flip); // load and generate the texture 
+        void GenerateCubeMap(std::vector<std::string> textures_faces, int width, int height, GLenum format, bool flip); 
         void Delete(); 
 }; 

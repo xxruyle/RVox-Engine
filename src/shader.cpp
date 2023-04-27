@@ -96,6 +96,12 @@ void Shader::setMat(const std::string &name, int amount, GLboolean isTransposed,
     glUniformMatrix4fv(transformLoc, amount, isTransposed, glm::value_ptr(trans)); 
 }
 
+void Shader::setVec3(const std::string &name, float x, float y, float z) const 
+{
+    GLuint vecLoc = glGetUniformLocation(ID, name.c_str());
+    glUniform3f(vecLoc, x, y, z); 
+}
+
 
 void Shader::Delete() 
 {

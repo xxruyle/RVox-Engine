@@ -1,28 +1,29 @@
-#include <iostream> 
-#include <vector> 
+// opengl and standard library 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
-#include <random>
-#include <time.h> 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <iostream> 
+#include <vector> 
 #include <cmath>
+#include <random>
+#include <time.h> 
 
-
-
+// header files 
 #include "shader/shader.h" 
 #include "buffer/VBO.h"
 #include "buffer/VAO.h" 
 #include "buffer/EBO.h" 
 #include "texture/texture.h"
 #include "camera/camera.h"
-#include "cube/cube.h"
+#include "world/world.h"
 #include "game_time/gameTime.h"
+#include "input/input_handler.h" 
 
 
 
+// global variables 
 const unsigned int SCR_WIDTH = 1400;
 const unsigned int SCR_HEIGHT = 1000;
 
@@ -95,12 +96,19 @@ GLfloat crosshairVertices[] = {
     -0.5f, -0.5f,      0.0f, 0.0f,
 };
 
+std::vector<std::string> cubeMapFaces = {
+    "res/textures/snowblock/right.jpg", 
+    "res/textures/snowblock/left.jpg", 
+    "res/textures/snowblock/top.jpg", 
+    "res/textures/snowblock/bottom.jpg", 
+    "res/textures/snowblock/front.jpg", 
+    "res/textures/snowblock/back.jpg", 
+}; 
 
 // initializing helper classes 
-Cube cube; 
-Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f, &cube); 
+World world; 
+Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f, &world); 
 GameTime gTime;
-
 
 
 GLuint indices[] = {  // note that we start from 0!
@@ -116,38 +124,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 
-float visible = 0.0f;  // visibility of the epic face 
+InputHandler inputHandler(gameCamera, world); 
 
 void processInput(GLFWwindow* window) 
 {
     gameCamera.processInput(window, gTime.deltaTime);  
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true); 
-
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) // wireframe 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) // solid
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 }
+
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) 
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
-    {
-        cube.positions.push_back(gameCamera.rayCast()); 
-    }
+    inputHandler.handleMouseCallbackInput(window, button, action, mods); 
 }
 
 void key_callback(GLFWwindow* window, int button, int scancode, int action, int mods) 
 {
-    if (button == GLFW_KEY_4 && action == GLFW_PRESS)  
-    {
-        cube.printCubes(); 
-    }
-}
+    inputHandler.handleKeyCallbackInput(window, button, action, mods); 
+} 
 
 
 bool firstMouse = true; 
@@ -200,18 +193,22 @@ int main()
     glfwMakeContextCurrent(window); 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // updates window size
 
-    // call back functions 
+    // call back states 
     glfwSetCursorPosCallback(window, mouse_callback); // gets info from mouse 
     glfwSetScrollCallback(window, scroll_callback); 
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback); 
     glfwSetKeyCallback(window, key_callback);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide cursor and capture it 
     gladLoadGL(); // initializing glad 
 
+    Shader lightShaderProgram("res/shaders/lightsource.vert", "res/shaders/lightsource.frag"); 
+    lightShaderProgram.Activate(); 
+
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
-    shaderProgram.Delete(); 
+
+ 
 
 
 	VAO VAO1;
@@ -223,19 +220,29 @@ int main()
     VAO1.Unbind(); 
 
 
+    // VAO for light source 
+    VAO lightVAO; 
+    lightVAO.Bind();
+    lightVAO.LinkVBO(VBO1, 0);  
+    lightVAO.configVertexAttributes(0, 3, 5, 0);  
+    lightVAO.configVertexAttributes(1, 2, 5, 3*sizeof(GLfloat)); // texture
+    lightVAO.Unbind();  
+
     // Grass/block texture  
     Texture TEX(GL_TEXTURE0); 
-    TEX.Bind(GL_TEXTURE0); 
-    TEX.setParameters(GL_REPEAT); 
+    TEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
     TEX.Generate("res/textures/grass.jpg", 512, 512, GL_RGB, true);  
 
-    shaderProgram.Activate(); 
-    shaderProgram.setInt("texture1", 0); 
+    Texture lightTEX(GL_TEXTURE1); 
+    lightTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
+    lightTEX.Generate("res/textures/green.jpg", 512, 512, GL_RGB, true); 
 
+     
+    world.generatePlane(rand() % 3000 + 1); // generating God seed...
 
-    cube.generatePlane(rand() % 1000 + 1); // generating God seed...
+    // world.generateSingle(); 
 
-    // cube.generateSingle(); 
+    glm::vec3 lightPos(0.2f, 30.0f, 2.0f); 
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -247,9 +254,16 @@ int main()
         processInput(window); 
         glClearColor(57.0f/255.0f, 54.0f/255.0f, 70.0f/255.0f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST); 
 
-        // rendering world in 3D 
+
+
+        // rendering cube 
         shaderProgram.Activate(); 
+        shaderProgram.setInt("texture1", 0); // setting texture 
+        shaderProgram.setVec3("objectColor", 1.0f, 0.5f, 0.31f); 
+        shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
         glm::mat4 view; // view matrix 
         glm::mat4 projection = glm::mat4(1.0f);  // projection matrix 
         view = gameCamera.getViewMatrix();  
@@ -258,10 +272,10 @@ int main()
         shaderProgram.setMat("view", 1, GL_FALSE, view); 
         shaderProgram.setMat("projection", 1, GL_FALSE, projection); 
 
-        TEX.Bind(GL_TEXTURE0); 
+        TEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
         VAO1.Bind();
-        glEnable(GL_DEPTH_TEST); 
-        for (auto setF : cube.positions)
+
+        for (auto setF : world.positions)
         {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, setF);
@@ -269,7 +283,25 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // When using EBO 
+
+
+        // rendering light source 
+        lightShaderProgram.Activate(); 
+        lightVAO.Bind(); 
+        lightTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE1); 
+        lightShaderProgram.setInt("lightTexture", 0); // texture setting 
+        lightShaderProgram.setMat("view", 1, GL_FALSE, view); 
+        lightShaderProgram.setMat("projection", 1, GL_FALSE, projection); 
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::mat4(1.0f); 
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.5f)); 
+
+        lightShaderProgram.setMat("model", 1, GL_FALSE, model);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 
@@ -279,7 +311,9 @@ int main()
     VAO1.Delete(); 
     VBO1.Delete(); 
     TEX.Delete(); 
+    lightTEX.Delete(); 
     shaderProgram.Delete(); 
+    lightShaderProgram.Delete(); 
     glfwDestroyWindow(window);
     glfwTerminate(); 
     return 0; 

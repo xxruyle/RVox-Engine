@@ -3,12 +3,16 @@ out vec4 FragColor;
 
 in vec2 TexCoord;
 
-// texture samplers
-uniform sampler2D texture1;
+// texture sample for cube map
+uniform sampler2D texture1; 
+
+// light source color
+uniform vec3 objectColor; 
+uniform vec3 lightColor; 
 
 
 void main()
 {
-	// linearly interpolate between both textures (80% container, 20% awesomeface)
-	FragColor = texture(texture1, TexCoord);
+	FragColor = texture(texture1, TexCoord) * vec4(lightColor * objectColor, 1.0); 
+	// FragColor = vec4(lightColor * objectColor, 1.0);
 }
