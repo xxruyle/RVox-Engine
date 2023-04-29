@@ -20,13 +20,14 @@
 #include "world/world.h"
 #include "game_time/gameTime.h"
 #include "input/input_handler.h" 
+#include "texture/stb_image.h" 
+#include "render/render.h"
 
 
 
 // global variables 
 const unsigned int SCR_WIDTH = 1400;
 const unsigned int SCR_HEIGHT = 1000;
-
 
 
 GLfloat vertices[] = {
@@ -208,30 +209,25 @@ int main()
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
 
- 
-
-
-	VAO VAO1;
-	VAO1.Bind();
 	VBO VBO1(vertices, sizeof(vertices));
-	VAO1.LinkVBO(VBO1, 0);
+
+	VAO VAO1(VBO1); 
+	VAO1.Bind();
     VAO1.configVertexAttributes(0, 3, 5, 0); // coordinates 
-    VAO1.configVertexAttributes(1, 2, 5, 3*sizeof(GLfloat)); // texture
-    VAO1.Unbind(); 
+    // VAO1.configVertexAttributes(1, 2, 5, 3*sizeof(GLfloat)); // texture
 
 
     // VAO for light source 
-    VAO lightVAO; 
+    VAO lightVAO(VBO1);  
     lightVAO.Bind();
-    lightVAO.LinkVBO(VBO1, 0);  
     lightVAO.configVertexAttributes(0, 3, 5, 0);  
     lightVAO.configVertexAttributes(1, 2, 5, 3*sizeof(GLfloat)); // texture
-    lightVAO.Unbind();  
 
     // Grass/block texture  
     Texture TEX(GL_TEXTURE0); 
-    TEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
-    TEX.Generate("res/textures/grass.jpg", 512, 512, GL_RGB, true);  
+    TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
+    TEX.GenerateCubeMap(cubeMapFaces, 512, 512, GL_RGB, false);  
+
 
     Texture lightTEX(GL_TEXTURE1); 
     lightTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
@@ -243,6 +239,8 @@ int main()
     // world.generateSingle(); 
 
     glm::vec3 lightPos(0.2f, 30.0f, 2.0f); 
+
+    Render renderer; 
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -257,32 +255,22 @@ int main()
         glEnable(GL_DEPTH_TEST); 
 
 
-
         // rendering cube 
         shaderProgram.Activate(); 
-        shaderProgram.setInt("texture1", 0); // setting texture 
-        shaderProgram.setVec3("objectColor", 1.0f, 0.5f, 0.31f); 
-        shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        shaderProgram.setInt("cubeMap", 0); // setting texture 
+        shaderProgram.setVec3("objectColor", 1.0f, 1.0f, 1.0f); 
+        shaderProgram.setVec3("lightColor", 1.0f, 0.5f, 1.0f);
 
-        glm::mat4 view; // view matrix 
-        glm::mat4 projection = glm::mat4(1.0f);  // projection matrix 
-        view = gameCamera.getViewMatrix();  
-        projection = glm::perspective(glm::radians(gameCamera.mFov), (float)(SCR_WIDTH/SCR_HEIGHT), 0.1f, 100.0f);
+        renderer.viewProject(gameCamera); 
+        renderer.setShaders(shaderProgram); 
 
-        shaderProgram.setMat("view", 1, GL_FALSE, view); 
-        shaderProgram.setMat("projection", 1, GL_FALSE, projection); 
-
-        TEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
+        TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
         VAO1.Bind();
 
         for (auto setF : world.positions)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, setF);
-            shaderProgram.setMat("model", 1, GL_FALSE, model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            renderer.drawVoxel(shaderProgram, setF); 
         }
-
 
 
         // rendering light source 
@@ -290,18 +278,9 @@ int main()
         lightVAO.Bind(); 
         lightTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE1); 
         lightShaderProgram.setInt("lightTexture", 0); // texture setting 
-        lightShaderProgram.setMat("view", 1, GL_FALSE, view); 
-        lightShaderProgram.setMat("projection", 1, GL_FALSE, projection); 
-
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::mat4(1.0f); 
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.5f)); 
-
-        lightShaderProgram.setMat("model", 1, GL_FALSE, model);
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        
+ 
+        renderer.setShaders(lightShaderProgram); 
+        renderer.drawVoxel(lightShaderProgram, lightPos); 
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 

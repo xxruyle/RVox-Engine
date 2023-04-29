@@ -6,9 +6,8 @@ class VAO
 {
     public: 
         GLuint ID; 
-        VAO(); 
+        VAO(VBO& VBO);  
 
-        void LinkVBO(VBO& VBO, GLuint layout); 
         void configVertexAttributes(GLuint layout, GLuint size, GLsizeiptr stride, GLsizeiptr offset); 
         void Bind(); 
         void Unbind(); 

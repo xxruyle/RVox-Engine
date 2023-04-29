@@ -11,7 +11,7 @@ void GameTime::getFPS(GLFWwindow* window)
     {
         std::string FPS = std::to_string((1.0/timeDiff) * counter);
         std::string ms = std::to_string((timeDiff/ counter) * 1000); 
-        std::string newTitle = "VoxelEngine Alpha - " + FPS + " FPS/ " + ms + "ms"; 
+        std::string newTitle = "VoxelEngine - " + FPS + " FPS/ " + ms + "ms"; 
         glfwSetWindowTitle(window, newTitle.c_str()); 
         prevTime = currentTime; 
         counter = 0; 

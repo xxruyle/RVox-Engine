@@ -10,7 +10,6 @@ Texture::Texture(GLenum textureUnit)
 }
 
 
-
 void Texture::Bind(GLenum textureType, GLenum textureUnit)
 {
     glActiveTexture(textureUnit);

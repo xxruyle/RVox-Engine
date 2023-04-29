@@ -2,10 +2,11 @@
 
 void World::generatePlane(int randSeed)
 {
-    const int xs = 32;
-    const int ys = 32;
-    float amplitudeMultiplier = 50.0f; 
-    float frequency = 0.02f; 
+    positions.clear(); 
+    const int xs = 64;
+    const int ys = 64;
+    float amplitudeMultiplier = 5.0f; // 50 i like 
+    float frequency = 0.016f; // .02 i like 
     
     // Create and configure FastNoise object
     FastNoiseLite noise;
@@ -14,6 +15,11 @@ void World::generatePlane(int randSeed)
     noise.SetFrequency(frequency); 
     noise.SetSeed(randSeed);
 
+    FastNoiseLite mountain; 
+    mountain.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
+    mountain.SetFractalType(FastNoiseLite::FractalType_Ridged); 
+    mountain.SetFrequency(frequency); 
+    mountain.SetSeed(randSeed);
 
 
     // Gather noise data
@@ -23,7 +29,8 @@ void World::generatePlane(int randSeed)
     {
         for (int y = 0; y < ys; y++)
         {
-            noiseData[x][y] = static_cast<int>(((noise.GetNoise((float)x, (float)y) + 1.0f) * amplitudeMultiplier) - 40.0f);
+            // noiseData[x][y] = static_cast<int>(((noise.GetNoise((float)x, (float)y) + 1.0f) * amplitudeMultiplier)); // -40 
+            noiseData[x][y] = static_cast<int>(((1 - std::abs(mountain.GetNoise((float)x, (float)y))) * 20.0f)); 
         }
     }
 
@@ -48,6 +55,8 @@ void World::generatePlane(int randSeed)
         }
     } 
 
+
+
     for (int i = 0; i < xs; i++) 
     {
         for (int j = 0; j < ys; j++) 
@@ -59,7 +68,8 @@ void World::generatePlane(int randSeed)
     }
 
     noiseData[0][0] = 0.0f;  // using the array 
-    
+
+    std::cout << randSeed << std::endl; // printing the seed
 }
 
 void World::generateSingle()
