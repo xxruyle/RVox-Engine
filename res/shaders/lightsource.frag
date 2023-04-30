@@ -1,11 +1,12 @@
 #version 330 core 
 out vec4 FragColor;
 
-in vec2 LightTexCoord; 
+in vec3 LightTexCoord; 
+uniform samplerCube lightCubeMap; 
 
-uniform sampler2D lightTexture; 
+uniform vec3 lightColor; 
 
 void main() 
 {
-    FragColor = texture(lightTexture, LightTexCoord) * vec4(1.0);
+    FragColor = texture(lightCubeMap, LightTexCoord) * vec4(lightColor, 1.0);
 }

@@ -23,6 +23,6 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
         world.printCubes(); 
 
     if (button == GLFW_KEY_G && action == GLFW_PRESS) 
-        world.generatePlane(rand() % 2000 + 1); 
+        world.generateLand(rand() % 2000 + 1, false); 
 }
 

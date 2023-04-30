@@ -31,57 +31,48 @@ const unsigned int SCR_HEIGHT = 1000;
 
 
 GLfloat vertices[] = {
+    // vertices           // normals 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-    // Top
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-    // Bottom 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-    // Left 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-
-    // Right 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    // Front
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    // Back 
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 
 };
 
@@ -105,6 +96,15 @@ std::vector<std::string> cubeMapFaces = {
     "res/textures/snowblock/front.jpg", 
     "res/textures/snowblock/back.jpg", 
 }; 
+
+std::vector<std::string> lampFaces = {
+    "res/textures/redstonelamp/right.png", 
+    "res/textures/redstonelamp/left.png", 
+    "res/textures/redstonelamp/top.png", 
+    "res/textures/redstonelamp/bottom.png", 
+    "res/textures/redstonelamp/front.png", 
+    "res/textures/redstonelamp/back.png", 
+};
 
 // initializing helper classes 
 World world; 
@@ -209,36 +209,37 @@ int main()
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
 
+    // cube 
 	VBO VBO1(vertices, sizeof(vertices));
-
 	VAO VAO1(VBO1); 
 	VAO1.Bind();
-    VAO1.configVertexAttributes(0, 3, 5, 0); // coordinates 
-    // VAO1.configVertexAttributes(1, 2, 5, 3*sizeof(GLfloat)); // texture
+    VAO1.configVertexAttributes(0, 3, 6, 0); // coordinates 
+    VAO1.configVertexAttributes(1, 3, 6, 3*sizeof(GLfloat)); // texture
+    VAO1.Unbind(); 
 
-
+    // lightsource 
     // VAO for light source 
     VAO lightVAO(VBO1);  
     lightVAO.Bind();
-    lightVAO.configVertexAttributes(0, 3, 5, 0);  
-    lightVAO.configVertexAttributes(1, 2, 5, 3*sizeof(GLfloat)); // texture
+    lightVAO.configVertexAttributes(0, 3, 6, 0); 
+    lightVAO.Unbind(); 
 
     // Grass/block texture  
     Texture TEX(GL_TEXTURE0); 
     TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
     TEX.GenerateCubeMap(cubeMapFaces, 512, 512, GL_RGB, false);  
-
+    TEX.Unbind(); 
 
     Texture lightTEX(GL_TEXTURE1); 
-    lightTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
-    lightTEX.Generate("res/textures/green.jpg", 512, 512, GL_RGB, true); 
+    lightTEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
+    // lightTEX.Generate("res/textures/green.jpg", 512, 512, GL_RGB, true); 
+    lightTEX.GenerateCubeMap(lampFaces, 512, 512, GL_RGBA, false); 
+    lightTEX.Unbind(); 
 
      
-    world.generatePlane(rand() % 3000 + 1); // generating God seed...
-
+    world.generateLand(rand() % 3000 + 1, false); // generating God seed...
+    // world.generatePlane();
     // world.generateSingle(); 
-
-    glm::vec3 lightPos(0.2f, 30.0f, 2.0f); 
 
     Render renderer; 
 
@@ -254,12 +255,19 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST); 
 
+        float lightX = 150*sin(5.0f*(float)glfwGetTime()) + 100.0f, lightY = 60*cos(5.0f*(float)glfwGetTime()) + 5.0f, lightZ = 100.0f; 
+        // float lightX = 5.0f, lightY = 5.0f, lightZ = 0.0f; 
+        glm::vec3 lightPos(lightX, lightY, lightZ); 
+
 
         // rendering cube 
         shaderProgram.Activate(); 
         shaderProgram.setInt("cubeMap", 0); // setting texture 
+        shaderProgram.setFloat("ambience", 0.1f); 
         shaderProgram.setVec3("objectColor", 1.0f, 1.0f, 1.0f); 
-        shaderProgram.setVec3("lightColor", 1.0f, 0.5f, 1.0f);
+        shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f); 
+        shaderProgram.setVec3("lightPos", lightX, lightY, lightZ); 
+        shaderProgram.setVec3("viewPos", (float)gameCamera.mPosition.x, (float)gameCamera.mPosition.y, (float)gameCamera.mPosition.z);  
 
         renderer.viewProject(gameCamera); 
         renderer.setShaders(shaderProgram); 
@@ -269,18 +277,22 @@ int main()
 
         for (auto setF : world.positions)
         {
-            renderer.drawVoxel(shaderProgram, setF); 
+            renderer.drawVoxel(shaderProgram, setF, 1.0f); 
         }
+        TEX.Unbind(); 
 
 
         // rendering light source 
         lightShaderProgram.Activate(); 
         lightVAO.Bind(); 
-        lightTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE1); 
-        lightShaderProgram.setInt("lightTexture", 0); // texture setting 
- 
+        lightTEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
+        lightShaderProgram.setInt("lightCubeMap", 1); // texture setting 
+        lightShaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f); 
+        
+    
         renderer.setShaders(lightShaderProgram); 
-        renderer.drawVoxel(lightShaderProgram, lightPos); 
+        renderer.drawVoxel(lightShaderProgram, lightPos, 10.0f); 
+        lightTEX.Unbind(); 
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 

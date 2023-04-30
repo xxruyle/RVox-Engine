@@ -16,12 +16,14 @@ private:
     glm::mat4 view; 
     glm::mat4 projection; 
 
+
 public:
+    glm::mat4 model; 
 
     void viewProject(Camera& camera);   
     void setShaders(Shader& shader); 
 
-    void drawVoxel(Shader& shader, glm::vec3 position); 
+    void drawVoxel(Shader& shader, glm::vec3 position, float scale); 
 
 
 }; 

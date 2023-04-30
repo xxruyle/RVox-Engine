@@ -17,8 +17,9 @@ class World
     public: 
         std::vector<glm::vec3> positions;  
 
-        void generatePlane(int randSeed); 
+        void generateLand(int randSeed, bool printHeights); 
         void generateSingle(); 
+        void generatePlane(); 
         void printCubes(); 
 
 }; 

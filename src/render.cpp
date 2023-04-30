@@ -14,10 +14,11 @@ void Render::setShaders(Shader& shader)
     shader.setMat("projection", 1, GL_FALSE, projection);  
 }
 
-void Render::drawVoxel(Shader& shader, glm::vec3 position)  
+void Render::drawVoxel(Shader& shader, glm::vec3 position, float scale)  
 {
-    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::mat4(1.0f);
     model = glm::translate(model, position);
+    model = glm::scale(model, glm::vec3(scale, scale, scale));  
     shader.setMat("model", 1, GL_FALSE, model); 
     glDrawArrays(GL_TRIANGLES, 0, 36); 
 }

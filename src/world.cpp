@@ -1,12 +1,12 @@
 #include "world/world.h"
 
-void World::generatePlane(int randSeed)
+void World::generateLand(int randSeed, bool printHeights)
 {
     positions.clear(); 
-    const int xs = 64;
-    const int ys = 64;
-    float amplitudeMultiplier = 5.0f; // 50 i like 
-    float frequency = 0.016f; // .02 i like 
+    const int xs = 248;
+    const int ys = 248;
+    float amplitudeMultiplier = 20.0f; // 50 i like 
+    float frequency = 0.02f; // .02 i like 
     
     // Create and configure FastNoise object
     FastNoiseLite noise;
@@ -29,8 +29,8 @@ void World::generatePlane(int randSeed)
     {
         for (int y = 0; y < ys; y++)
         {
-            // noiseData[x][y] = static_cast<int>(((noise.GetNoise((float)x, (float)y) + 1.0f) * amplitudeMultiplier)); // -40 
-            noiseData[x][y] = static_cast<int>(((1 - std::abs(mountain.GetNoise((float)x, (float)y))) * 20.0f)); 
+            noiseData[x][y] = static_cast<int>(((noise.GetNoise((float)x, (float)y) + 1.0f) * amplitudeMultiplier) - 40.0f); // -40 
+            // noiseData[x][y] = static_cast<int>(((1 - std::abs(mountain.GetNoise((float)x, (float)y))) * amplitudeMultiplier)); 
         }
     }
 
@@ -56,16 +56,19 @@ void World::generatePlane(int randSeed)
     } 
 
 
-
-    for (int i = 0; i < xs; i++) 
+    if (printHeights)
     {
-        for (int j = 0; j < ys; j++) 
+        for (int i = 0; i < xs; i++) 
         {
-            std::cout << noiseData[i][j]; 
-        }
+            for (int j = 0; j < ys; j++) 
+            {
+                std::cout << noiseData[i][j]; 
+            }
 
-        std::cout << "\n";  
+            std::cout << "\n";  
+        }
     }
+
 
     noiseData[0][0] = 0.0f;  // using the array 
 
@@ -77,6 +80,16 @@ void World::generateSingle()
     positions.push_back(glm::vec3(0.0f, 0.0f, 0.0f)); 
 }
 
+void World::generatePlane() 
+{
+    for (int i = 0; i < 20; i++) 
+    {
+        for (int j = 0; j < 20; j++) 
+        {
+            positions.push_back(glm::vec3((float)i, 0.0f, (float)j));
+        }
+    }
+}
 
 
 void World::printCubes() 
