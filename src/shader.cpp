@@ -102,6 +102,14 @@ void Shader::setVec3(const std::string &name, float x, float y, float z) const
     glUniform3f(vecLoc, x, y, z); 
 }
 
+void Shader::setVec4(const std::string &name, const glm::vec4& value) const 
+{
+    GLuint vecLoc = glGetUniformLocation(ID, name.c_str()); 
+    glUniform4f(vecLoc, value.x, value.y, value.z, value.w); 
+}
+
+
+
 
 void Shader::Delete() 
 {

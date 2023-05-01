@@ -209,6 +209,9 @@ int main()
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
 
+    Shader crossHairProgram("res/shaders/crosshair.vert", "res/shaders/crosshair.frag"); 
+    crossHairProgram.Activate(); 
+
     // cube 
 	VBO VBO1(vertices, sizeof(vertices));
 	VAO VAO1(VBO1); 
@@ -236,9 +239,20 @@ int main()
     lightTEX.GenerateCubeMap(lampFaces, 512, 512, GL_RGBA, false); 
     lightTEX.Unbind(); 
 
+    VBO VBO2(crosshairVertices, sizeof(crosshairVertices)); 
+    VAO crosshairVAO(VBO2); 
+    crosshairVAO.Bind(); 
+    crosshairVAO.configVertexAttributes(0, 4, 4, 0); 
+    crosshairVAO.Unbind(); 
+
+    Texture crosshairTEX(GL_TEXTURE0); 
+    crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
+    crosshairTEX.Generate("res/textures/crosshair.png", 512, 512, GL_RGBA, false); 
+    crosshairTEX.Unbind(); 
+
      
-    world.generateLand(rand() % 3000 + 1, false); // generating God seed...
-    // world.generatePlane();
+    // world.generateLand(rand() % 3000 + 1, false); // generating God seed...
+    world.generatePlane();
     // world.generateSingle(); 
 
     Render renderer; 
@@ -255,8 +269,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST); 
 
-        float lightX = 150*sin(5.0f*(float)glfwGetTime()) + 100.0f, lightY = 60*cos(5.0f*(float)glfwGetTime()) + 5.0f, lightZ = 100.0f; 
-        // float lightX = 5.0f, lightY = 5.0f, lightZ = 0.0f; 
+        // float lightX = 150*sin(5.0f*(float)glfwGetTime()) + 100.0f, lightY = 60*cos(5.0f*(float)glfwGetTime()) + 5.0f, lightZ = 100.0f; 
+        float lightX = 5.0f, lightY = 5.0f, lightZ = 0.0f; 
         glm::vec3 lightPos(lightX, lightY, lightZ); 
 
 
@@ -291,9 +305,35 @@ int main()
         
     
         renderer.setShaders(lightShaderProgram); 
-        renderer.drawVoxel(lightShaderProgram, lightPos, 10.0f); 
+        renderer.drawVoxel(lightShaderProgram, lightPos, 1.0f); 
         lightTEX.Unbind(); 
 
+
+
+        // 2D Rendering 
+        glDisable(GL_DEPTH_TEST); 
+        crossHairProgram.Activate(); 
+
+        crosshairVAO.Bind(); 
+        crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0);  
+
+        glm::mat4 projection = glm::mat4(1.0f); 
+        projection = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);  
+        glm::mat4 model = glm::mat4(1.0f); 
+        model = glm::translate(model, glm::vec3((float)SCR_WIDTH / 2, (float)SCR_HEIGHT / 2, 0.0f)); 
+        model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+
+
+        crossHairProgram.setInt("crosshairSprite", 0); 
+        crossHairProgram.setMat("model", 1, GL_FALSE, model); 
+        crossHairProgram.setMat("projection", 1, GL_FALSE, projection);   
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);  
+
+        crosshairVAO.Unbind(); 
+        crosshairTEX.Unbind(); 
+
+        
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 
     }
