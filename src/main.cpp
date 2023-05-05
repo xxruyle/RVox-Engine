@@ -26,7 +26,7 @@
 
 
 // global variables 
-const unsigned int SCR_WIDTH = 1400;
+const unsigned int SCR_WIDTH = 1300;
 const unsigned int SCR_HEIGHT = 1000;
 
 
@@ -89,12 +89,12 @@ GLfloat crosshairVertices[] = {
 };
 
 std::vector<std::string> cubeMapFaces = {
-    "res/textures/snowblock/right.jpg", 
-    "res/textures/snowblock/left.jpg", 
-    "res/textures/snowblock/top.jpg", 
-    "res/textures/snowblock/bottom.jpg", 
-    "res/textures/snowblock/front.jpg", 
-    "res/textures/snowblock/back.jpg", 
+    "res/textures/grassblock/right.jpg", 
+    "res/textures/grassblock/left.jpg", 
+    "res/textures/grassblock/top.jpg", 
+    "res/textures/grassblock/bottom.jpg", 
+    "res/textures/grassblock/front.jpg", 
+    "res/textures/grassblock/back.jpg", 
 }; 
 
 std::vector<std::string> lampFaces = {
@@ -233,6 +233,7 @@ int main()
     TEX.GenerateCubeMap(cubeMapFaces, 512, 512, GL_RGB, false);  
     TEX.Unbind(); 
 
+    // redstone lamp texture 
     Texture lightTEX(GL_TEXTURE1); 
     lightTEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
     // lightTEX.Generate("res/textures/green.jpg", 512, 512, GL_RGB, true); 
@@ -245,17 +246,17 @@ int main()
     crosshairVAO.configVertexAttributes(0, 4, 4, 0); 
     crosshairVAO.Unbind(); 
 
-    Texture crosshairTEX(GL_TEXTURE0); 
-    crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0); 
+    Texture crosshairTEX(GL_TEXTURE2); 
+    crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE2); 
     crosshairTEX.Generate("res/textures/crosshair.png", 512, 512, GL_RGBA, false); 
     crosshairTEX.Unbind(); 
 
      
-    // world.generateLand(rand() % 3000 + 1, false); // generating God seed...
-    world.generatePlane();
+    world.generateLand(rand() % 3000 + 1, false); // generating God seed...
+    // world.generatePlane();
     // world.generateSingle(); 
 
-    Render renderer; 
+    Render renderer(SCR_WIDTH, SCR_HEIGHT);  
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -266,17 +267,20 @@ int main()
 
         processInput(window); 
         glClearColor(57.0f/255.0f, 54.0f/255.0f, 70.0f/255.0f, 1.0f); 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
-        // float lightX = 150*sin(5.0f*(float)glfwGetTime()) + 100.0f, lightY = 60*cos(5.0f*(float)glfwGetTime()) + 5.0f, lightZ = 100.0f; 
-        float lightX = 5.0f, lightY = 5.0f, lightZ = 0.0f; 
+
+
+        // float lightX = 150*sin(0.5f*(float)glfwGetTime()) + 100.0f, lightY = 60*cos(0.5f*(float)glfwGetTime()) + 5.0f, lightZ = 100.0f; 
+        float lightX = 5.0f, lightY = 100.0f, lightZ = 0.0f; 
         glm::vec3 lightPos(lightX, lightY, lightZ); 
 
 
         // rendering cube 
         shaderProgram.Activate(); 
-        shaderProgram.setInt("cubeMap", 0); // setting texture 
+        // shaderProgram.setInt("cubeMap", 0); // setting texture 
         shaderProgram.setFloat("ambience", 0.1f); 
         shaderProgram.setVec3("objectColor", 1.0f, 1.0f, 1.0f); 
         shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f); 
@@ -286,13 +290,23 @@ int main()
         renderer.viewProject(gameCamera); 
         renderer.setShaders(shaderProgram); 
 
-        TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
+        // TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
         VAO1.Bind();
 
-        for (auto setF : world.positions)
+        // drawing the world voxel vector 
+        for (auto voxel : world.voxelVec)
         {
-            renderer.drawVoxel(shaderProgram, setF, 1.0f); 
+            renderer.drawVoxel(shaderProgram, voxel.coordinates, voxel.color, 1.0f); 
         }
+
+        // drawing the raycast with scaled down voxels 
+/*         std::vector<glm::vec3> raycast = gameCamera.voxelTraversal(); 
+
+        for (auto position: raycast) 
+        {
+            renderer.drawVoxel(shaderProgram, position, 0.2); 
+        } */
+
         TEX.Unbind(); 
 
 
@@ -305,7 +319,7 @@ int main()
         
     
         renderer.setShaders(lightShaderProgram); 
-        renderer.drawVoxel(lightShaderProgram, lightPos, 1.0f); 
+        renderer.drawRotatingVoxel(lightShaderProgram, lightPos, 20.0f, 2.0f*(float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));  
         lightTEX.Unbind(); 
 
 
@@ -315,20 +329,10 @@ int main()
         crossHairProgram.Activate(); 
 
         crosshairVAO.Bind(); 
-        crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE0);  
-
-        glm::mat4 projection = glm::mat4(1.0f); 
-        projection = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);  
-        glm::mat4 model = glm::mat4(1.0f); 
-        model = glm::translate(model, glm::vec3((float)SCR_WIDTH / 2, (float)SCR_HEIGHT / 2, 0.0f)); 
-        model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-
-
+        crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE2);  
         crossHairProgram.setInt("crosshairSprite", 0); 
-        crossHairProgram.setMat("model", 1, GL_FALSE, model); 
-        crossHairProgram.setMat("projection", 1, GL_FALSE, projection);   
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);  
+        
+        renderer.draw2D(crossHairProgram, glm::vec2((float)SCR_WIDTH /2, (float)SCR_HEIGHT/2), 10.0f); 
 
         crosshairVAO.Unbind(); 
         crosshairTEX.Unbind(); 

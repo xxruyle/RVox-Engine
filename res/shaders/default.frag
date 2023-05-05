@@ -9,6 +9,8 @@ in vec3 FragPos;
 // texture sample for cube map
 uniform samplerCube cubeMap; 
 
+uniform vec3 voxelColor; 
+
 
 // uniforms for lighting 
 uniform vec3 lightPos; 
@@ -22,7 +24,7 @@ uniform vec3 viewPos;
 void main()
 {
 	// ambient 
-	float ambientStrength = 0.1; 
+	float ambientStrength = 0.5; 
 	vec3 ambient = ambientStrength * lightColor; 
 
 	// diffuse 
@@ -44,5 +46,6 @@ void main()
 	// putting it all together  
 	vec3 result = (specular + ambient + diffuse) * objectColor; 
 
-	FragColor = texture(cubeMap, TexCoord) * vec4(result, 1.0); 
+	// FragColor = texture(cubeMap, TexCoord) * vec4(result, 1.0); // for textures 
+	FragColor = vec4(voxelColor, 0.0) * vec4(result, 1.0);
 }

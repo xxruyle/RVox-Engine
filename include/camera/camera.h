@@ -1,6 +1,9 @@
 #pragma once 
 #include <iostream>
 #include <cmath>
+#include <math.h> 
+#include <stdio.h> 
+
 #include <algorithm>
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
@@ -52,6 +55,14 @@ class Camera
 
 
         glm::vec3 rayCast(); // casts a vector from camera and gets first cube that the vector hits, returns glm::vec4(origin, xray, yray, zray)  
+        glm::vec3 brensenCast(); // raycast using brensenham line algorithm
+
+        std::vector<glm::vec3> bresenhamCoords(); 
+
+        std::vector<glm::vec3> voxelTraversal(); 
+
+        void printPosition(); 
+
         glm::vec3 getVoxelFace(glm::vec3 origin, float xray, float yray, float zray); // returns the side of the cube that the raycast is hitting
         void deleteVoxel();  
 }; 

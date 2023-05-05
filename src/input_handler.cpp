@@ -22,7 +22,13 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
     if (button == GLFW_KEY_3 && action == GLFW_PRESS)  // prints how many cubes there are 
         world.printCubes(); 
 
+    if (button == GLFW_KEY_4 && action == GLFW_PRESS) 
+        camera.voxelTraversal(); 
+
+
     if (button == GLFW_KEY_G && action == GLFW_PRESS) 
         world.generateLand(rand() % 2000 + 1, false); 
+
+    
 }
 
