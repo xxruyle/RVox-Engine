@@ -30,5 +30,10 @@ public:
 
     void get(int localX, int localY, int localZ); // gets the previously set voxel at a current position 
 
+    void generate(int randSeed, int startX, int startZ); // generates a chunk based on chunk coordinate in world  
 
+    void printVoxelSize() 
+    {
+        std::cout << voxels.size() << std::endl;  
+    }
 }; 

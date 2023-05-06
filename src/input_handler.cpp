@@ -4,7 +4,7 @@ void InputHandler::handleMouseCallbackInput(GLFWwindow* window, int button, int 
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
     {
-        camera.deleteVoxel(); 
+        chunkManager.deleteVoxel();  
     }
 }
 
@@ -20,15 +20,15 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     if (button == GLFW_KEY_3 && action == GLFW_PRESS)  // prints how many cubes there are 
-        world.printCubes(); 
+        chunkManager.printTotalVoxels();  
 
-    if (button == GLFW_KEY_4 && action == GLFW_PRESS) 
-        camera.voxelTraversal(); 
+    if (button == GLFW_KEY_4 && (action == GLFW_PRESS))   
+        chunkManager.printCameraChunkLocation(); 
+
+
 
 
     if (button == GLFW_KEY_G && action == GLFW_PRESS) 
-        world.generateLand(rand() % 2000 + 1, false); 
-
-    
+        chunkManager.createChunks(rand() % 2000 + 1);   
 }
 

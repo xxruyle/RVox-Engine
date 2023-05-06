@@ -13,6 +13,7 @@
 #include "world/world.h"
 
 
+
 class Camera 
 {
     private: 
@@ -43,7 +44,7 @@ class Camera
 
     
 
-        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, World* world);   
+        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, World* world);    
 
         glm::mat4 getViewMatrix(); 
         void processInput(GLFWwindow* window, float deltaTime); // camera movement 
@@ -54,15 +55,11 @@ class Camera
         void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
 
 
-        glm::vec3 rayCast(); // casts a vector from camera and gets first cube that the vector hits, returns glm::vec4(origin, xray, yray, zray)  
-        glm::vec3 brensenCast(); // raycast using brensenham line algorithm
 
-        std::vector<glm::vec3> bresenhamCoords(); 
 
-        std::vector<glm::vec3> voxelTraversal(); 
 
-        void printPosition(); 
+
 
         glm::vec3 getVoxelFace(glm::vec3 origin, float xray, float yray, float zray); // returns the side of the cube that the raycast is hitting
-        void deleteVoxel();  
+        void deleteVoxel();   
 }; 

@@ -18,6 +18,7 @@
 #include "texture/texture.h"
 #include "camera/camera.h"
 #include "world/world.h"
+#include "world/chunk_manager.h"
 #include "game_time/gameTime.h"
 #include "input/input_handler.h" 
 #include "texture/stb_image.h" 
@@ -77,15 +78,14 @@ GLfloat vertices[] = {
 };
 
 GLfloat crosshairVertices[] = {
-    // top right triangle 
-     0.5f, -0.5f,      0.0f, 1.0f, 
-     0.5f, 0.5f,       1.0f, 1.0f, 
-    -0.5f, 0.5f,       0.0f, 1.0f, 
+    // pos      // tex
+    0.0f, 1.0f, 0.0f, 1.0f,
+    1.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 
 
-    // bottom left triangle 
-     0.5, -0.5,        0.0f, 1.0f,
-    -0.5f, 0.5f,       0.0f, 1.0f, 
-    -0.5f, -0.5f,      0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    1.0f, 0.0f, 1.0f, 0.0f
 };
 
 std::vector<std::string> cubeMapFaces = {
@@ -108,9 +108,11 @@ std::vector<std::string> lampFaces = {
 
 // initializing helper classes 
 World world; 
-Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f, &world); 
+Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f, &world);  
 GameTime gTime;
-
+Render renderer(SCR_WIDTH, SCR_HEIGHT);
+ChunkManager chunkManager(world, renderer, gameCamera);     
+InputHandler inputHandler(gameCamera, chunkManager);   
 
 GLuint indices[] = {  // note that we start from 0!
     0, 1, 3,  // sole triangle
@@ -118,30 +120,15 @@ GLuint indices[] = {  // note that we start from 0!
 };
 
 
+void processInput(GLFWwindow* window); 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods); 
+void key_callback(GLFWwindow* window, int button, int scancode, int action, int mods); 
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
 {
     // Whenever the window changes in size GLFW calls this function
     glViewport(0, 0, width, height); 
 }
-
-
-InputHandler inputHandler(gameCamera, world); 
-
-void processInput(GLFWwindow* window) 
-{
-    gameCamera.processInput(window, gTime.deltaTime);  
-}
-
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) 
-{
-    inputHandler.handleMouseCallbackInput(window, button, action, mods); 
-}
-
-void key_callback(GLFWwindow* window, int button, int scancode, int action, int mods) 
-{
-    inputHandler.handleKeyCallbackInput(window, button, action, mods); 
-} 
 
 
 bool firstMouse = true; 
@@ -227,6 +214,8 @@ int main()
     lightVAO.configVertexAttributes(0, 3, 6, 0); 
     lightVAO.Unbind(); 
 
+
+
     // Grass/block texture  
     Texture TEX(GL_TEXTURE0); 
     TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
@@ -248,15 +237,17 @@ int main()
 
     Texture crosshairTEX(GL_TEXTURE2); 
     crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE2); 
-    crosshairTEX.Generate("res/textures/crosshair.png", 512, 512, GL_RGBA, false); 
+    crosshairTEX.Generate("res/textures/crosshairbox.png", 512, 512, GL_RGBA, false); 
     crosshairTEX.Unbind(); 
 
      
-    world.generateLand(rand() % 3000 + 1, false); // generating God seed...
+    // world.generateLand(rand() % 3000 + 1, false); // generating God seed...
     // world.generatePlane();
     // world.generateSingle(); 
 
-    Render renderer(SCR_WIDTH, SCR_HEIGHT);  
+ 
+
+    chunkManager.createChunks(rand() % 2000 + 1);  
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -270,6 +261,7 @@ int main()
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
+
 
 
 
@@ -293,11 +285,10 @@ int main()
         // TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
         VAO1.Bind();
 
-        // drawing the world voxel vector 
-        for (auto voxel : world.voxelVec)
-        {
-            renderer.drawVoxel(shaderProgram, voxel.coordinates, voxel.color, 1.0f); 
-        }
+        // drawing the chunk manager voxels 
+        chunkManager.renderChunks(shaderProgram);  
+
+        // chunkManager.voxelOutline(); // enables voxel outline coloring 
 
         // drawing the raycast with scaled down voxels 
 /*         std::vector<glm::vec3> raycast = gameCamera.voxelTraversal(); 
@@ -326,18 +317,21 @@ int main()
 
         // 2D Rendering 
         glDisable(GL_DEPTH_TEST); 
+/*         glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
         crossHairProgram.Activate(); 
 
         crosshairVAO.Bind(); 
         crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE2);  
-        crossHairProgram.setInt("crosshairSprite", 0); 
+        crossHairProgram.setInt("crosshairSprite", 2); 
         
-        renderer.draw2D(crossHairProgram, glm::vec2((float)SCR_WIDTH /2, (float)SCR_HEIGHT/2), 10.0f); 
+        renderer.draw2D(crossHairProgram, glm::vec2(((float)SCR_WIDTH /2) - 5.0f, ((float)SCR_HEIGHT/2) - 5.0f), 10.0f); 
 
         crosshairVAO.Unbind(); 
         crosshairTEX.Unbind(); 
 
-        
+        glDisable(GL_BLEND); 
+
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 
     }
@@ -354,3 +348,18 @@ int main()
     return 0; 
 }
 
+void processInput(GLFWwindow* window) 
+{
+    gameCamera.processInput(window, gTime.deltaTime);  
+}
+
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) 
+{
+    inputHandler.handleMouseCallbackInput(window, button, action, mods); 
+}
+
+void key_callback(GLFWwindow* window, int button, int scancode, int action, int mods) 
+{
+    inputHandler.handleKeyCallbackInput(window, button, action, mods); 
+}  
