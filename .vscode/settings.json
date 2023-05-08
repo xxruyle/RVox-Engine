@@ -66,6 +66,8 @@
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
         "xlocmon": "cpp",
-        "xloctime": "cpp"
+        "xloctime": "cpp",
+        "memory_resource": "cpp",
+        "cinttypes": "cpp"
     }
 }

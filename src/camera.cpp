@@ -53,8 +53,8 @@ void Camera::processInput(GLFWwindow* window, float deltaTime)
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) // "sprint"
     {
         mSpeed += 1.0f; 
-        if (mSpeed > 50.0f) 
-            mSpeed = 50.0f;
+        if (mSpeed > 90.0f) 
+            mSpeed = 90.0f;
     }
     else
     {

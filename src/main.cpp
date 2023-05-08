@@ -287,16 +287,8 @@ int main()
 
         // drawing the chunk manager voxels 
         chunkManager.renderChunks(shaderProgram);  
+        chunkManager.voxelOutline(); // enables voxel outline coloring 
 
-        // chunkManager.voxelOutline(); // enables voxel outline coloring 
-
-        // drawing the raycast with scaled down voxels 
-/*         std::vector<glm::vec3> raycast = gameCamera.voxelTraversal(); 
-
-        for (auto position: raycast) 
-        {
-            renderer.drawVoxel(shaderProgram, position, 0.2); 
-        } */
 
         TEX.Unbind(); 
 

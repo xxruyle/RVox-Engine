@@ -21,7 +21,7 @@ void Chunk::generate(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5))); // -40  
+            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6))); // -40  
             // noiseData[x][y] = static_cast<int>(((1 - abs(mountain.GetNoise((float)x, (float)y))))); 
         }
     }

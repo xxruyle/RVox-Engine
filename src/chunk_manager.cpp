@@ -4,47 +4,106 @@
 
 void ChunkManager::createChunks(int randSeed) 
 { // creates chunks and makes them generate a chunk 
-    chunks.clear(); 
-    for (int i = 0; i < 25; i++) 
+    chunkMap.clear(); 
+    currentRandomSeed = randSeed; 
+    for (int i = 0; i < wSizeX; i++) 
     {
-        for (int j = 0; j < 25; j++) 
+        for (int j = 0; j < wSizeZ; j++)  
         {
-            Chunk c1; 
+            Chunk& c1 = chunkMap[glm::vec3(i, 0, j)];  
             c1.position = glm::vec3(i, 0, j);  
             // std::cout << c1.position.x << ' ' << c1.position.z << std::endl; 
             c1.generate(randSeed, c1.position.x * 32, c1.position.z * 32);
-            chunks.push_back(c1);  
         }
     }
 }
 
 void ChunkManager::renderChunks(Shader& shader)  
 { // renders the existing chunks 
-    for (auto& chunk : chunks)  
-    {
-        for (unsigned int i = 0; (i < chunk.voxels.size()); i++)   
-        {
-            if (isNearPlayer(camera.mPosition, chunk.position))
-            {
-                renderer.drawVoxel(shader, chunk.voxels[i].coordinates, chunk.voxels[i].color, 1.0f);   
 
+/*     for (auto& chunk: chunkMap) 
+    {
+        if (isNearPlayer(camera.mPosition, chunk.first)) //chunk.first is the vec3 coordinates which is the key of the chunkMap 
+        {
+            for (unsigned int i = 0; i < chunk.second.voxels.size(); i++) 
+            {
+                renderer.drawVoxel(shader, chunk.second.voxels[i].coordinates, chunk.second.voxels[i].color, 1.0f);  
             }
         }
-    }
+    } */
+
+    chunkBuffer.clear();  
+    getNearChunks(); 
+
+    for (unsigned int i = 0; i < chunkBuffer.size(); i++) // if queue is not empty  
+    {
+        if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
+        {
+            if (isNearPlayer(camera.mPosition, chunkBuffer[i])) 
+            {
+                for (unsigned int j = 0; j < chunkMap[chunkBuffer[i]].voxels.size(); j++) 
+                {
+                    renderer.drawVoxel(shader, chunkMap[chunkBuffer[i]].voxels[j].coordinates, chunkMap[chunkBuffer[i]].voxels[j].color, 1.0f); 
+                }
+            }
+        } else {
+            Chunk& c1 = chunkMap[chunkBuffer[i]];
+            c1.position = chunkBuffer[i]; 
+            c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
+        }
+    } 
 }
 
 
-void ChunkManager::printCameraChunkLocation() 
+glm::vec3 ChunkManager::getChunkLocation(glm::vec3 coordinatePosition)  
 {
-    std::cout << "ChunkCoord X : " << floor(camera.mPosition.x / 32) << "| ChunkCoord Z: " << floor(camera.mPosition.z / 32) << std::endl;  
+    int xChunkPos = floor(coordinatePosition.x / 32); 
+    int zChunkPos = floor(coordinatePosition.z / 32); 
+
+    return glm::vec3(xChunkPos, 0, zChunkPos); 
+}
+
+void ChunkManager::printChunkLocation()
+{
+    int xChunkPos = floor(camera.mPosition.x / 32); 
+    int zChunkPos = floor(camera.mPosition.z / 32);  
+
+    std::cout << "X: " << xChunkPos << ' ' << "Z: " << zChunkPos << std::endl; 
+
+}
+
+void ChunkManager::getNearChunks() 
+{ // gets the nearest available chunks that the camera can possibly render and pushes it on a queue 
+    // std::vector<std::pair<int, int>> nearChunks; // a vector full of pairs 
+    int xPos = floor(camera.mPosition.x / 32); // the chunk coordinate of the x position 
+    int zPos = floor(camera.mPosition.z / 32);  // the chunk coordinate of the z position 
+    int maxDistance = (int)(renderDistance / 32); // calculating the max amount of chunks the player can see radius wise with respect to chunk coordinates  
+
+    for (int i = -maxDistance; i < maxDistance; i++)  // going from left of the grid to the right of the grid to get all of the nearest chunks near camera 
+    {
+        for (int j = -maxDistance; j < maxDistance; j++) // going from bottom to top of the grid 
+        {
+            // std::pair<int,int> point = std::make_pair(xPos + i, zPos + j);  // a point in the grid 
+            // nearChunks.push_back(point);
+            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
+        }
+    }
+     
+
+/*     // getting the grid 
+    for (unsigned int i = 0; i < nearChunks.size(); i++) 
+    {
+        // std::cout << nearChunks[i].first << ' ' << nearChunks[i].second << std::endl; 
+        chunkBuffer.push_back(glm::vec3(nearChunks[i].first, 0, nearChunks[i].second)); 
+    } */
 }
 
 void ChunkManager::printTotalVoxels()  
 {
     int sum = 0;  
-    for (auto chunk : chunks) 
+    for (auto& chunk : chunkMap) 
     {
-        sum += chunk.voxels.size(); 
+        sum += chunk.second.voxels.size(); 
     }
 
     std::cout << "Total Voxels: " << sum << std::endl;  
@@ -68,19 +127,20 @@ glm::vec3 ChunkManager::brensenCast()
 {
     std::vector<glm::vec3> voxelCoords = voxelTraversal(); 
 
-    for (auto& chunk : chunks) 
+    glm::vec3 chunkCoord; 
+
+    for (unsigned int i = 0; i < voxelCoords.size(); i++) 
     {
-        for (unsigned int i = 0; i < voxelCoords.size(); i++) 
+        chunkCoord = getChunkLocation(voxelCoords[i]); 
+        for (unsigned int j = 0; j < chunkMap[chunkCoord].voxels.size(); j++) 
         {
-            for (unsigned int j = 0; j < chunk.voxels.size(); j++) 
+            if (chunkMap[chunkCoord].voxels[j].coordinates == voxelCoords[i])  
             {
-                if (chunk.voxels[j].coordinates == voxelCoords[i]) 
-                    return voxelCoords[i];
+                return voxelCoords[i]; 
             }
         }
-    }
+    }  
 
-    // std::cout << "No block casted" << std::endl; 
     return glm::vec3(0); 
 }
 
@@ -172,35 +232,33 @@ void ChunkManager::voxelOutline()
 { // changes color of voxel to voxel outline color if casted
  
 // TO DO: OPTIMIZE BETTER, BAD FRAMEDROPS WHEN ENABLED  
-    glm::vec3 voxel_position = brensenCast(); 
-    for (auto& chunk : chunks) 
+    glm::vec3 voxelPosition = brensenCast(); 
+
+    glm::vec3 chunkCoord = getChunkLocation(voxelPosition);   
+    for (unsigned int i = 0; i < chunkMap[chunkCoord].voxels.size(); i++) 
     {
-        for (unsigned int i = 0; i < chunk.voxels.size(); i++) 
+        if (chunkMap[chunkCoord].voxels[i].coordinates == voxelPosition)  
         {
-            if (chunk.voxels[i].coordinates == voxel_position) 
-            {
-                chunk.voxels[i].color = chunk.voxels[i].outlineColor;  
-            } else {
-                chunk.voxels[i].color = chunk.voxels[i].colorCopy;  
-            }
-        }
+            chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].outlineColor; 
+        } else {
+            chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].colorCopy;
+        } 
     }
 
+    
 }
 
 void ChunkManager::deleteVoxel()
 {
-    glm::vec3 voxel_position = brensenCast(); 
-    for (auto& chunk : chunks) 
+    glm::vec3 voxelPosition = brensenCast(); 
+
+    glm::vec3 chunkCoord = getChunkLocation(voxelPosition);   
+    for (unsigned int i = 0; i < chunkMap[chunkCoord].voxels.size(); i++) 
     {
-        for (unsigned int i = 0; i < chunk.voxels.size(); i++) 
+        if (chunkMap[chunkCoord].voxels[i].coordinates == voxelPosition)  
         {
-            if (chunk.voxels[i].coordinates == voxel_position)
-            {
-                chunk.voxels.erase(chunk.voxels.begin() + i);  
-                break; 
-            }
+            chunkMap[chunkCoord].voxels.erase(chunkMap[chunkCoord].voxels.begin() + i); 
+            break; 
         }
     }
-
 }

@@ -22,11 +22,7 @@
 class World
 {
 public: 
-
-
-    void generateLand(int randSeed, bool printHeights); 
-    void generateSingle(); 
-    void generatePlane(); 
-    void printCubes(); 
+    int wSizeX = 3; 
+    int wSizeZ = 3; 
 
 }; 
