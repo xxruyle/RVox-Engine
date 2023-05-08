@@ -21,6 +21,7 @@ void ChunkManager::createChunks(int randSeed)
 void ChunkManager::renderChunks(Shader& shader)  
 { // renders the existing chunks 
 
+    // looping over every chunk 
 /*     for (auto& chunk: chunkMap) 
     {
         if (isNearPlayer(camera.mPosition, chunk.first)) //chunk.first is the vec3 coordinates which is the key of the chunkMap 
@@ -32,6 +33,7 @@ void ChunkManager::renderChunks(Shader& shader)
         }
     } */
 
+    // looping over chunks that are within player render distance  
     chunkBuffer.clear();  
     getNearChunks(); 
 
@@ -39,14 +41,14 @@ void ChunkManager::renderChunks(Shader& shader)
     {
         if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
         {
-            if (isNearPlayer(camera.mPosition, chunkBuffer[i])) 
+            if (isNearPlayer(camera.mPosition, chunkBuffer[i])) // final check to see if player is within render distance chunk 
             {
                 for (unsigned int j = 0; j < chunkMap[chunkBuffer[i]].voxels.size(); j++) 
                 {
                     renderer.drawVoxel(shader, chunkMap[chunkBuffer[i]].voxels[j].coordinates, chunkMap[chunkBuffer[i]].voxels[j].color, 1.0f); 
                 }
             }
-        } else {
+        } else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]];
             c1.position = chunkBuffer[i]; 
             c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
@@ -141,7 +143,7 @@ glm::vec3 ChunkManager::brensenCast()
         }
     }  
 
-    return glm::vec3(0); 
+    return glm::vec3(0, 1000, 0); 
 }
 
 #define SIGN(x) (x > 0 ? 1 : (x < 0 ? -1 : 0))
@@ -196,6 +198,7 @@ std::vector<glm::vec3> ChunkManager::voxelTraversal()
     if (dz > 0) tMaxZ = tDeltaZ * FRAC1(zOrigin); else tMaxZ = tDeltaZ * FRAC0(zOrigin);
     int z = (int)zOrigin; 
 
+    // voxel traversal algorithm 
     for (int i = 0; i < 7; i++) { 
         if (tMaxX < tMaxY) {
             if (tMaxX < tMaxZ) {
@@ -230,22 +233,31 @@ std::vector<glm::vec3> ChunkManager::voxelTraversal()
 
 void ChunkManager::voxelOutline() 
 { // changes color of voxel to voxel outline color if casted
- 
-// TO DO: OPTIMIZE BETTER, BAD FRAMEDROPS WHEN ENABLED  
     glm::vec3 voxelPosition = brensenCast(); 
-
     glm::vec3 chunkCoord = getChunkLocation(voxelPosition);   
-    for (unsigned int i = 0; i < chunkMap[chunkCoord].voxels.size(); i++) 
+    if (voxelPosition != glm::vec3(0, 1000, 0)) 
     {
-        if (chunkMap[chunkCoord].voxels[i].coordinates == voxelPosition)  
+        for (unsigned int i = 0; i < chunkMap[chunkCoord].voxels.size(); i++) 
         {
-            chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].outlineColor; 
-        } else {
-            chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].colorCopy;
-        } 
+            if (chunkMap[chunkCoord].voxels[i].coordinates == voxelPosition)  
+            {
+                prevOutlinedVoxel = &(chunkMap[chunkCoord].voxels[i]); 
+                chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].outlineColor;
+            }    
+            else 
+            {   
+                chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].colorCopy;
+            }
+        }
+    } else {
+        if (prevOutlinedVoxel != nullptr) 
+        {
+            prevOutlinedVoxel->color = prevOutlinedVoxel->colorCopy;
+        }
+             
     }
 
-    
+
 }
 
 void ChunkManager::deleteVoxel()
