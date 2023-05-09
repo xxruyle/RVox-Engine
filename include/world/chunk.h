@@ -18,19 +18,12 @@
 
 class Chunk 
 {
-private: 
-    const int EDGE_SIZE = 64; // 64x64 chunk lengthxlength  
-    const int AREA = EDGE_SIZE * EDGE_SIZE;  // area of a chunk 
-
 public: 
     glm::vec3 position; 
     std::vector<Voxel> voxels; 
 
-    void set(int localX, int localY, int localZ, Voxel voxel); // sets the current voxel given certain position   
-
-    void get(int localX, int localY, int localZ); // gets the previously set voxel at a current position 
-
     void generate(int randSeed, int startX, int startZ); // generates a chunk based on chunk coordinate in world  
+    void generateSolidChunk(int randSeed, int startX, int startZ); 
 
     void printVoxelSize() 
     {
