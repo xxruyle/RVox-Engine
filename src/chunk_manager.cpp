@@ -13,7 +13,7 @@ void ChunkManager::createChunks(int randSeed)
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)];  
             c1.position = glm::vec3(i, 0, j);  
             // std::cout << c1.position.x << ' ' << c1.position.z << std::endl; 
-            c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);
+            c1.generate(randSeed, c1.position.x * 32, c1.position.z * 32);
         }
     }
 }
@@ -33,6 +33,18 @@ void ChunkManager::renderChunks(Shader& shader)
         }
     } 
 
+    getNearChunks(); 
+
+    for (unsigned int i = 0; i < (sizeof(chunkBuffer) / sizeof(glm::vec3)); i++) 
+    {
+        if (!(chunkMap.count(chunkBuffer[i])))
+        {
+            Chunk& c1 = chunkMap[chunkBuffer[i]];
+            c1.position = chunkBuffer[i]; 
+            c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32); 
+        }
+    }
+
     // looping over chunks that are within player render distance  
     // chunkBuffer.clear();  
 /*     getNearChunks(); 
@@ -48,10 +60,10 @@ void ChunkManager::renderChunks(Shader& shader)
                     renderer.drawVoxel(shader, chunkMap[chunkBuffer[i]].voxels[j].coordinates, chunkMap[chunkBuffer[i]].voxels[j].color, 1.0f); 
                 }
             }
-        } else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+        }  else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]];
             c1.position = chunkBuffer[i]; 
-            c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
+            c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
         }
     }  */
 }

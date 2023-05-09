@@ -29,7 +29,7 @@ class ChunkManager : World
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 private: 
-    static const int renderDistance = 96; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 320; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
