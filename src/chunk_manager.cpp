@@ -13,7 +13,7 @@ void ChunkManager::createChunks(int randSeed)
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)];  
             c1.position = glm::vec3(i, 0, j);  
             // std::cout << c1.position.x << ' ' << c1.position.z << std::endl; 
-            c1.generate(randSeed, c1.position.x * 32, c1.position.z * 32);
+            c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);
         }
     }
 }
@@ -22,7 +22,7 @@ void ChunkManager::renderChunks(Shader& shader)
 { // renders the existing chunks 
 
     // looping over every chunk 
-/*     for (auto& chunk: chunkMap) 
+    for (auto& chunk: chunkMap) 
     {
         if (isNearPlayer(camera.mPosition, chunk.first)) //chunk.first is the vec3 coordinates which is the key of the chunkMap 
         {
@@ -31,13 +31,13 @@ void ChunkManager::renderChunks(Shader& shader)
                 renderer.drawVoxel(shader, chunk.second.voxels[i].coordinates, chunk.second.voxels[i].color, 1.0f);  
             }
         }
-    } */
+    } 
 
     // looping over chunks that are within player render distance  
-    chunkBuffer.clear();  
-    getNearChunks(); 
+    // chunkBuffer.clear();  
+/*     getNearChunks(); 
 
-    for (unsigned int i = 0; i < chunkBuffer.size(); i++) // if queue is not empty  
+    for (unsigned int i = 0; i < (sizeof(chunkBuffer) / sizeof(glm::vec3)); i++) // if queue is not empty   
     {
         if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
         {
@@ -51,11 +51,17 @@ void ChunkManager::renderChunks(Shader& shader)
         } else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]];
             c1.position = chunkBuffer[i]; 
-            c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
+            c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
         }
-    } 
+    }  */
 }
 
+
+void ChunkManager::renderOneVoxel(Shader& shader)  
+{ // for debugging 
+    Voxel voxel(glm::vec3(0.0,0.0,0.0), glm::vec3(1.0, 1.0, 1.0));  
+    renderer.drawVoxel(shader, voxel.coordinates, voxel.color, 1.0f);  
+}
 
 glm::vec3 ChunkManager::getChunkLocation(glm::vec3 coordinatePosition)  
 {
@@ -81,13 +87,16 @@ void ChunkManager::getNearChunks()
     int zPos = floor(camera.mPosition.z / 32);  // the chunk coordinate of the z position 
     int maxDistance = (int)(renderDistance / 32); // calculating the max amount of chunks the player can see radius wise with respect to chunk coordinates  
 
+    int arrayI = 0; // array index 
     for (int i = -maxDistance; i < maxDistance; i++)  // going from left of the grid to the right of the grid to get all of the nearest chunks near camera 
     {
         for (int j = -maxDistance; j < maxDistance; j++) // going from bottom to top of the grid 
         {
             // std::pair<int,int> point = std::make_pair(xPos + i, zPos + j);  // a point in the grid 
             // nearChunks.push_back(point);
-            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
+            // chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
+            chunkBuffer[arrayI] = glm::vec3(xPos + i, 0, zPos + j);  
+            arrayI += 1; 
         }
     }
      

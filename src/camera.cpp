@@ -1,6 +1,6 @@
 #include <camera/camera.h>
 
-Camera::Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, World* world)
+/* Camera::Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity)
 {
     mPosition = position; 
     mFront = front; 
@@ -9,10 +9,9 @@ Camera::Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, floa
     mFov = fov; 
     mSpeed = speed; 
     mSensitivity = sensitivity; 
-    mWorld = world; 
     updateDirectionVectors(); 
 }
-
+ */
 void Camera::updateDirectionVectors() 
 {
     mDirection.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch)); 
@@ -66,34 +65,7 @@ void Camera::processInput(GLFWwindow* window, float deltaTime)
 }
 
 
-glm::vec3 Camera::getVoxelFace(glm::vec3 origin, float xray, float yray, float zray)
-{
-    std::cout << origin.x - xray << " " << origin.y - yray << " " << origin.z - zray <<  std::endl;
-    float maxFromOrigin[3] = {std::abs(origin.x - xray), std::abs(origin.y - yray), std::abs(origin.z - zray)}; 
-    float max = -1000;  // max starts with min outside of the range we are testing for 
-    int maxIndex = 0;
-    for (int j = 0; j < 3; j++) // loop over 3 times and find max value 
-    {
-        if (maxFromOrigin[j] > max) 
-        {
-            std::cout << maxFromOrigin[j] << std::endl; 
-            max = maxFromOrigin[j];
-            maxIndex = j;
-        } 
-    }
-    std::cout << max << std::endl; 
-    int axisDirection = 1.0f; // decides which side a block will be plac
-    if (maxIndex == 0) {
-        (origin.x - xray) > 0 ? axisDirection *= -1.0f : axisDirection = 1.0f; 
-        return glm::vec3(origin.x + axisDirection, origin.y, origin.z); 
-    } else if (maxIndex == 1) {
-        (origin.y - yray) > 0 ? axisDirection *= -1.0f : axisDirection = 1.0f;
-        return glm::vec3(origin.x, origin.y + axisDirection, origin.z);
-    } else { // if maxIndex == 3
-        (origin.z - zray) > 0 ? axisDirection *= -1.0f : axisDirection = 1.0f;
-        return glm::vec3(origin.x, origin.y, origin.z + axisDirection); 
-    } 
-}
+
 
 
 void Camera::processMouseMovement(double xoffset, double yoffset) 
@@ -127,6 +99,8 @@ void Camera::zoom(double xoffset, double yoffset)
     if (mFov > 90.0f) 
         mFov = 90.0f; 
 }
+
+
 
 
 

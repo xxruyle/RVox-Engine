@@ -15,7 +15,6 @@ uniform vec3 voxelColor;
 // uniforms for lighting 
 uniform vec3 lightPos; 
 
-uniform vec3 objectColor; 
 uniform vec3 lightColor; 
 uniform vec3 viewPos; 
 
@@ -44,7 +43,7 @@ void main()
 	vec3 specular = specularStrength * spec * lightColor; 
 
 	// putting it all together  
-	vec3 result = (specular + ambient + diffuse) * objectColor; 
+	vec3 result = (specular + ambient + diffuse) * voxelColor;  
 
 	// FragColor = texture(cubeMap, TexCoord) * vec4(result, 1.0); // for textures 
 	FragColor = vec4(voxelColor, 0.0) * vec4(result, 1.0);

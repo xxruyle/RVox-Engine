@@ -4,7 +4,7 @@ void Render::viewProject(Camera& camera)
 {
     projection = glm::mat4(1.0f);  // projection matrix 
     view = camera.getViewMatrix();  
-    projection = glm::perspective(glm::radians(camera.mFov), (float)(SCR_WIDTH/SCR_HEIGHT), 0.1f, 300.0f);
+    projection = glm::perspective(glm::radians(camera.mFov), (float)(SCR_WIDTH/SCR_HEIGHT), camera.nearD, camera.farD); 
 }
 
 void Render::setShaders(Shader& shader) 
@@ -30,15 +30,27 @@ void Render::drawVoxelCubeMap(Shader& shader, Texture& texture, glm::vec3 positi
 
 
 void Render::drawVoxel(Shader& shader, glm::vec3 position, glm::vec3 color, float scale)
-{
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
-    model = glm::scale(model, glm::vec3(scale, scale, scale));  
-    shader.setMat("model", 1, GL_FALSE, model); 
-    shader.setVec3("voxelColor", color.x, color.y, color.z);
+{ // TO DO: make a frustum voxel in frustum function 
+    if (frustum.pointInFrustum(position)) // if point is in frustum 
+    { 
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, position);
+        model = glm::scale(model, glm::vec3(scale, scale, scale));  
+        shader.setMat("model", 1, GL_FALSE, model); 
+        shader.setVec3("voxelColor", color.x, color.y, color.z);
 
-    // rendering the triangles for the cube  
-    glDrawArrays(GL_TRIANGLES, 0, 36); 
+        // rendering the triangles for the cube  
+        glDrawArrays(GL_TRIANGLES, 0, 36); 
+    } /* else { // for debugging purposes, shows culled voxels as red 
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, position);
+        model = glm::scale(model, glm::vec3(scale, scale, scale));  
+        shader.setMat("model", 1, GL_FALSE, model); 
+        shader.setVec3("voxelColor", 1.0, 0.0, 0.0); 
+
+        // rendering the triangles for the cube  
+        glDrawArrays(GL_TRIANGLES, 0, 36); 
+    } */
 }
 
 void Render::drawRotatingVoxel(Shader& shader, glm::vec3 position, float scale, float rotation, glm::vec3 axisRotations)

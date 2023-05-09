@@ -29,7 +29,7 @@ class ChunkManager : World
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 private: 
-    int renderDistance = 64; // the number of blocks the player can see radius wise 
+    static const int renderDistance = 96; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
@@ -40,16 +40,19 @@ public:
     Render& renderer; 
     Camera& camera; 
 
-    ChunkManager(World& world, Render& renderer, Camera& camera) : world(world), renderer(renderer), camera(camera) {};       
+    ChunkManager(World& world, Render& renderer, Camera& camera) : world(world), renderer(renderer), camera(camera) {};        
 
 
 
     std::vector<Chunk> chunks; // a vector cainting each chunk
     std::unordered_map<glm::vec3, Chunk> chunkMap;  // an unordered map containing the chunk space coordinates as a key and chunk as value 
-    std::vector<glm::vec3> chunkBuffer; // buffer for loading the chunk coordinates that are near the player  
+    // std::vector<glm::vec3> chunkBuffer; // buffer for loading the chunk coordinates that are near the player  
+    glm::vec3 chunkBuffer[((renderDistance / 32) * 2) * ((renderDistance / 32) * 2)];    
     
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
+
+    void renderOneVoxel(Shader& shader);  
 
     glm::vec3 getChunkLocation(glm::vec3 coordinatePosition); // prints what chunk coorddinate the camera is in  
     void printChunkLocation(); 

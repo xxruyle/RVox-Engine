@@ -23,6 +23,7 @@
 #include "input/input_handler.h" 
 #include "texture/stb_image.h" 
 #include "render/render.h"
+#include "camera/frustum.h" 
 
 
 
@@ -108,9 +109,10 @@ std::vector<std::string> lampFaces = {
 
 // initializing helper classes 
 World world; 
-Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f, &world);  
+Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
 GameTime gTime;
-Render renderer(SCR_WIDTH, SCR_HEIGHT);
+Frustum frustum(gameCamera);  
+Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);  
 ChunkManager chunkManager(world, renderer, gameCamera);     
 InputHandler inputHandler(gameCamera, chunkManager);   
 
@@ -240,14 +242,8 @@ int main()
     crosshairTEX.Generate("res/textures/crosshairbox.png", 512, 512, GL_RGBA, false); 
     crosshairTEX.Unbind(); 
 
-     
-    // world.generateLand(rand() % 3000 + 1, false); // generating God seed...
-    // world.generatePlane();
-    // world.generateSingle(); 
-
- 
-
     chunkManager.createChunks(rand() % 2000 + 1);  
+
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -257,8 +253,8 @@ int main()
         gTime.getDeltaTime();
 
         processInput(window); 
+
         glClearColor(57.0f/255.0f, 54.0f/255.0f, 70.0f/255.0f, 1.0f); 
-        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
@@ -274,7 +270,7 @@ int main()
         shaderProgram.Activate(); 
         // shaderProgram.setInt("cubeMap", 0); // setting texture 
         shaderProgram.setFloat("ambience", 0.1f); 
-        shaderProgram.setVec3("objectColor", 1.0f, 1.0f, 1.0f); 
+        // shaderProgram.setVec3("objectColor", 1.0f, 1.0f, 1.0f); 
         shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f); 
         shaderProgram.setVec3("lightPos", lightX, lightY, lightZ); 
         shaderProgram.setVec3("viewPos", (float)gameCamera.mPosition.x, (float)gameCamera.mPosition.y, (float)gameCamera.mPosition.z);  
@@ -285,10 +281,14 @@ int main()
         // TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
         VAO1.Bind();
 
-        // drawing the chunk manager voxels 
-        chunkManager.renderChunks(shaderProgram);  
-        chunkManager.voxelOutline(); // enables voxel outline coloring 
+        // setting up frustum  
+        frustum.setCamInternals(); 
+        frustum.setCamDef(); 
 
+        // drawing the chunk manager chunks 
+        chunkManager.renderChunks(shaderProgram);  
+        // chunkManager.renderOneVoxel(shaderProgram);   
+        // chunkManager.voxelOutline(); // enables voxel outline coloring 
 
         TEX.Unbind(); 
 
@@ -306,11 +306,8 @@ int main()
         lightTEX.Unbind(); 
 
 
-
         // 2D Rendering 
         glDisable(GL_DEPTH_TEST); 
-/*         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
         crossHairProgram.Activate(); 
 
         crosshairVAO.Bind(); 

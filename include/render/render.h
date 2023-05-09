@@ -7,6 +7,7 @@
 #include "camera/camera.h" 
 #include "shader/shader.h"
 #include "texture/texture.h" 
+#include "camera/frustum.h" 
 
 class Render
 {
@@ -22,10 +23,9 @@ private:
 
 
 public:
-    Render(float window_width, float window_height) : SCR_WIDTH(window_width), SCR_HEIGHT(window_height) {};
+    Frustum& frustum; 
+    Render(float window_width, float window_height, Frustum& frustum) : SCR_WIDTH(window_width), SCR_HEIGHT(window_height), frustum(frustum) {};
 
-
-    
     glm::mat4 model; 
 
     void viewProject(Camera& camera);   

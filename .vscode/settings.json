@@ -68,6 +68,7 @@
         "xlocmon": "cpp",
         "xloctime": "cpp",
         "memory_resource": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "queue": "cpp"
     }
 }

@@ -10,56 +10,66 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "world/world.h"
 
 
 
 class Camera 
 {
-    private: 
-        bool firstMouse = true; 
-        void updateDirectionVectors(); 
+private: 
+    bool firstMouse = true; 
+    void updateDirectionVectors(); 
 
-    public: 
-        glm::vec3 mDirection; 
-        glm::vec3 mPlayerDirection; 
+public: 
 
-        glm::vec3 mPosition; 
-        glm::vec3 mFront; 
-        glm::vec3 mRight; 
-        glm::vec3 mUp; 
-        glm::vec3 mTarget; 
+    float SCR_WIDTH = 1300; 
+    float SCR_HEIGHT = 1000; 
+    glm::vec3 mDirection; 
+    glm::vec3 mPlayerDirection; 
 
-        glm::vec3 mWorldUp = glm::vec3(0.0f, 1.0f, 0.0f); // k basis vector
-        glm::vec3 mPlayerForward; 
+    glm::vec3 mPosition; 
+    glm::vec3 mFront; 
+    glm::vec3 mRight; 
+    glm::vec3 mUp; 
+    glm::vec3 mTarget; 
 
-        float mYaw; 
-        float mPitch; 
-        float mFov; 
+    glm::vec3 mWorldUp = glm::vec3(0.0f, 1.0f, 0.0f); // k basis vector
+    glm::vec3 mPlayerForward; 
 
-        float mSpeed; 
-        float mSensitivity; 
+    float mYaw; 
+    float mPitch; 
+    float mFov; 
 
-        World* mWorld; // the world of cubes 
+    float mSpeed; 
+    float mSensitivity; 
 
-    
+    float angle;
+    float ratio; 
+    float nearD; 
+    float farD; 
 
-        Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity, World* world);    
-
-        glm::mat4 getViewMatrix(); 
-        void processInput(GLFWwindow* window, float deltaTime); // camera movement 
-
-        void processMouseMovement(double xoffset, double yoffset); // updates pitch and yaw based on mouse movement and updates direction vectors  
-    
-
-        void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
-
-
-
-
-
+    // Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity);    
+    Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity) : mPosition(position), mFront(front), mYaw(yaw), mPitch(pitch), mFov(fov), mSpeed(speed), mSensitivity(sensitivity) {
+        angle = glm::radians(mFov); 
+        ratio = (float)(SCR_WIDTH/SCR_HEIGHT);  
+        nearD = 0.1f; 
+        farD = 300.0f; 
+        updateDirectionVectors(); 
+    }; 
 
 
-        glm::vec3 getVoxelFace(glm::vec3 origin, float xray, float yray, float zray); // returns the side of the cube that the raycast is hitting
-        void deleteVoxel();   
+    glm::mat4 getViewMatrix(); 
+    void processInput(GLFWwindow* window, float deltaTime); // camera movement 
+
+    void processMouseMovement(double xoffset, double yoffset); // updates pitch and yaw based on mouse movement and updates direction vectors  
+
+    void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
+
+
+
+
+
+
+
+    glm::vec3 getVoxelFace(glm::vec3 origin, float xray, float yray, float zray); // returns the side of the cube that the raycast is hitting
+    void deleteVoxel();   
 }; 
