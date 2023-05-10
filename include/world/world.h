@@ -22,7 +22,7 @@
 class World
 {
 public: 
-    int wSizeX = 5; 
-    int wSizeZ = 5; 
+    int wSizeX = 1; 
+    int wSizeZ = 1; 
 
 }; 

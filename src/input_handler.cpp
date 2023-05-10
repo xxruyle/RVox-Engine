@@ -23,7 +23,9 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
         chunkManager.printTotalVoxels();  
 
     if (button == GLFW_KEY_4 && action == GLFW_PRESS) 
+    {
         chunkManager.printChunkLocation(); 
+    }
 
     if (button == GLFW_KEY_G && action == GLFW_PRESS) 
         chunkManager.createChunks(rand() % 2000 + 1);   

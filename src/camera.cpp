@@ -88,6 +88,7 @@ void Camera::processMouseMovement(double xoffset, double yoffset)
 glm::mat4 Camera::getViewMatrix()
 {
     return glm::lookAt(mPosition, mPosition + mFront, mUp);  
+    // return glm::lookAt(mPosition, glm::vec3(0,0,0), mUp); 
 }
 
 void Camera::zoom(double xoffset, double yoffset)

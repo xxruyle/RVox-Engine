@@ -334,8 +334,8 @@ int main()
         frustum.setCamDef(); 
 
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);  
-        // chunkManager.renderOneVoxel(shaderProgram);   
+        chunkManager.renderChunks(shaderProgram);   
+        // chunkManager.renderOneVoxel(shaderProgram);    
         // chunkManager.voxelOutline(); // enables voxel outline coloring 
 
         TEX.Unbind(); 
