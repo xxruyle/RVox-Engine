@@ -4,10 +4,9 @@
 #include <functional> 
 #include <vector> 
 #include <string> 
-#include <map> 
+#include <unordered_map> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
-
 
 
 #include <glm/glm.hpp>
@@ -16,7 +15,8 @@
 #include <noise/FastNoiseLite.h>
 
 
-
+#define GLM_ENABLE_EXPERIMENTAL // enables hashing of glm::vec3 
+#include "glm/gtx/hash.hpp"
 
 
 class World
@@ -24,5 +24,8 @@ class World
 public: 
     int wSizeX = 1; 
     int wSizeZ = 1; 
+
+    std::unordered_map<glm::vec3, int> worldMap; 
+    
 
 }; 

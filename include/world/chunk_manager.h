@@ -24,12 +24,12 @@
 #include "glm/gtx/hash.hpp"
 
 
-class ChunkManager : World 
+class ChunkManager
 { // class to manage, create, and send chunks to be rendered
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 private: 
-    static const int renderDistance = 32; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 128; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
@@ -54,6 +54,7 @@ public:
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
 
     void renderOneVoxel(Shader& shader);  
+
 
     glm::vec3 getChunkLocation(glm::vec3 coordinatePosition); // prints what chunk coorddinate the camera is in  
     void printChunkLocation(); 

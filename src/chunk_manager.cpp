@@ -1,23 +1,28 @@
-#include "world/world.h" 
-#include "world/chunk_manager.h" 
-#include "world/chunk.h"
+#include "world/chunk_manager.h"  
+
 
 void ChunkManager::createChunks(int randSeed) 
 { // creates chunks and makes them generate a chunk 
     chunkMap.clear(); 
+    world.worldMap.clear(); 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < wSizeX; i++) 
+    for (int i = 0; i < world.wSizeX; i++) 
     {
-        for (int j = 0; j < wSizeZ; j++)  
+        for (int j = 0; j < world.wSizeZ; j++)  
         {
-            Chunk& c1 = chunkMap[glm::vec3(i, 0, j)];  
+            // Chunk c1(this->world);   
+            Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
+            c1.world = &world;  
             c1.position = glm::vec3(i, 0, j);  
-            c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);
+            // c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32); 
+            c1.generate(randSeed, c1.position.x * 32, c1.position.z * 32); 
             // c1.generateDebugChunk(); 
-            c1.checkInteriorVoxels(); 
+            // c1.checkInteriorVoxels(); 
         }
     }
 }
+
+
 
 void ChunkManager::renderChunks(Shader& shader)  
 { // renders the existing chunks 
@@ -27,49 +32,54 @@ void ChunkManager::renderChunks(Shader& shader)
     {
         if (isNearPlayer(camera.mPosition, chunk.first)) //chunk.first is the vec3 coordinates which is the key of the chunkMap 
         {
-
+            
             for (auto voxel : chunk.second.voxelMap) // looping over each voxel in a voxel map 
             {
-                if (!(voxel.second.isInterior)) // if the voxel is not an interior voxel  
+                
+                // if (!(voxel.second.isInterior)) // if the voxel is not an interior voxel  
+                    
                     renderer.drawVoxel(shader, voxel.second.coordinates, voxel.second.color, 1.0f); 
             }
         }
     } 
 
     // infinite terrain generation 
+    chunkBuffer.clear(); 
     getNearChunks(); 
 
-    for (unsigned int i = 0; i < (sizeof(chunkBuffer) / sizeof(glm::vec3)); i++) 
+    for (unsigned int i = 0; i < chunkBuffer.size(); i++)  
     {
         if (!(chunkMap.count(chunkBuffer[i])))
         {
             Chunk& c1 = chunkMap[chunkBuffer[i]];
+            c1.world = &world; 
+            
             c1.position = chunkBuffer[i]; 
-            c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32); 
-            c1.checkInteriorVoxels(); 
-        }
+            c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32); 
+        } 
     } */
 
     // looping over chunks that are within player render distance  
     chunkBuffer.clear(); 
     getNearChunks(); 
 
-    for (unsigned int i = 0; i < chunkBuffer.size(); i++) // if queue is not empty   
+    for (unsigned int i = 0; i < chunkBuffer.size(); i++) 
     {
         if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
         {
-            if (isNearPlayer(camera.mPosition, chunkBuffer[i])) // final check to see if player is within render distance chunk 
-            {
+            // if (isNearPlayer(camera.mPosition, chunkBuffer[i])) // final check to see if player is within render distance chunk 
+            // {
                 for (auto& voxel : chunkMap[chunkBuffer[i]].voxelMap) // looping over each voxel in a voxel map 
                 {
-                    if (!(voxel.second.isInterior)) // if the voxel is not an interior voxel  
+                    if (!(voxel.second.isInterior)) // if the voxel is not an interior voxel   
                         renderer.drawVoxel(shader, voxel.second.coordinates, voxel.second.color, 1.0f); 
                 }
-            }
+            // }
         }  else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
-            Chunk& c1 = chunkMap[chunkBuffer[i]];
+            Chunk& c1 = chunkMap[chunkBuffer[i]]; 
+            c1.world = &world; 
             c1.position = chunkBuffer[i]; 
-            c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
+            c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
             c1.checkInteriorVoxels(); 
         }
     } 
@@ -78,7 +88,7 @@ void ChunkManager::renderChunks(Shader& shader)
 
 void ChunkManager::renderOneVoxel(Shader& shader)  
 { // for debugging 
-    Voxel voxel(glm::vec3(0.0,0.0,0.0), glm::vec3(1.0, 1.0, 1.0));  
+    Voxel voxel(glm::vec3(0.0,0.0,0.0), glm::vec3(1.0, 0.5, 0.31), 1);     
     renderer.drawVoxel(shader, voxel.coordinates, voxel.color, 1.0f);  
 }
 
@@ -112,11 +122,12 @@ void ChunkManager::getNearChunks()
         {
             // std::pair<int,int> point = std::make_pair(xPos + i, zPos + j);  // a point in the grid 
             // nearChunks.push_back(point);
-            // chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
-            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j));   
+            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
+
         }
     }
-     
+
+
 
 /*     // getting the grid 
     for (unsigned int i = 0; i < nearChunks.size(); i++) 
@@ -304,6 +315,9 @@ void ChunkManager::deleteVoxel()
             break; 
         }
     } */
+    std::cout << voxelPosition.x << ' ' << voxelPosition.y << ' ' << voxelPosition.z << std::endl;  
     chunkMap[chunkCoord].voxelMap.erase(voxelPosition); 
+    world.worldMap.erase(voxelPosition); 
     chunkMap[chunkCoord].checkInteriorVoxels();  
+
 }

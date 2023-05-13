@@ -71,8 +71,9 @@ void Chunk::generate(int randSeed, int startX, int startZ)
 
             if (i == 0 ||i == xs - 1 || j == zs - 1 || j == 0) // makes it so that the chunk borders are easily seen 
             {
-                Voxel voxel(glm::vec3(startX+i, noiseData[i][j], startZ+j), glm::vec3(1.0f, 0.0f, 0.0f));   
-                voxels.push_back(voxel); 
+                Voxel voxel(glm::vec3(startX+i, noiseData[i][j], startZ+j), glm::vec3(1.0f, 0.0f, 0.0f), 1);   
+                world->worldMap[glm::vec3(startX+i, noiseData[i][j], startZ+j)] = 1; 
+                voxelMap.insert(std::make_pair(glm::vec3(startX+i, noiseData[i][j], startZ+j), voxel));
             } else if (noiseData[i][j] < 40) { // grass 
                 // the color for R value 
                 if (pow(noiseData[i][j], 1.5) > 136) 
@@ -80,8 +81,9 @@ void Chunk::generate(int randSeed, int startX, int startZ)
                 else 
                     color = 1.0f * pow(noiseData[i][j], 1.5);
 
-                Voxel voxel(glm::vec3(startX+i, noiseData[i][j], startZ+j), glm::vec3(color/255.0f, 205.0f/255.0f, 50.0f/255.0f)); 
-                voxels.push_back(voxel);                 
+                Voxel voxel(glm::vec3(startX+i, noiseData[i][j], startZ+j), glm::vec3(color/255.0f, 205.0f/255.0f, 50.0f/255.0f),  1); 
+                world->worldMap[glm::vec3(startX+i, noiseData[i][j], startZ+j)] = 1; 
+                voxelMap.insert(std::make_pair(glm::vec3(startX+i, noiseData[i][j], startZ+j), voxel));                
             } else { // snow mountains 
                 if (pow(noiseData[i][j], 1.5) < 159) 
                     color = 159.0f;
@@ -89,8 +91,9 @@ void Chunk::generate(int randSeed, int startX, int startZ)
                     color = 1.0f * pow(noiseData[i][j], 1.5);
 
 
-                Voxel voxel(glm::vec3(startX+i, noiseData[i][j], startZ+j), glm::vec3(color/255.0f, 237.0f/255.0f, 252.0f/255.0f));   
-                voxels.push_back(voxel); 
+                Voxel voxel(glm::vec3(startX+i, noiseData[i][j], startZ+j), glm::vec3(color/255.0f, 237.0f/255.0f, 252.0f/255.0f), 1);   
+                world->worldMap[glm::vec3(startX+i, noiseData[i][j], startZ+j)] = 1; 
+                voxelMap.insert(std::make_pair(glm::vec3(startX+i, noiseData[i][j], startZ+j), voxel));
             }
         }
     } 
@@ -113,7 +116,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
         // Gather noise data
     int noiseData[xs][zs];
-    int stoneLimit = 20; 
+    int stoneLimit = 1; 
 
     for (int x = 0; x < xs; x++) 
     {
@@ -136,14 +139,31 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
                 int surface = stoneLimit + noiseData[i][j] - 4;
 
-                if (k < surface) // stone 
+                if ((i == 0 || j == 0) && (k > surface))  
                 {
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(130.0f/255.0f, 136.0f/255.0f, 134.0f/255.0f));   
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));
-                   
+                    if (world != nullptr) 
+                    {
+                        Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(1.0f, 0.0f, 0.0f), 1);    
+                        world->worldMap[glm::vec3(startX+i, k, startZ+j)] = 1; 
+                        voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));
+                    }   
+                }
+
+                else if (k < surface) // stone 
+                {
+                    if (world != nullptr) 
+                    {
+                        Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(130.0f/255.0f, 136.0f/255.0f, 134.0f/255.0f), 1);   
+                        world->worldMap[glm::vec3(startX+i, k, startZ+j)] = 1; 
+                        voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));
+                    }
                 } else if (k < 35) { // water 
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(62.0f/255.0f, 164.0f/255.0f, 240.0f/255.0f)); 
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));   
+                    if (world != nullptr) 
+                    {
+                        Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(62.0f/255.0f, 164.0f/255.0f, 240.0f/255.0f),  1); 
+                        world->worldMap[glm::vec3(startX+i, k, startZ+j)] = 1;
+                        voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));   
+                    }
                 } else if (k < 80) { // grass 
                     // the color for R value 
                     if (pow(k, 1.5) > 136) 
@@ -151,17 +171,26 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
                     else 
                         color = 1.0f * pow(k, 1.5);
 
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 205.0f/255.0f, 50.0f/255.0f)); 
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));    
+                    if (world != nullptr) 
+                    {
+                        Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 205.0f/255.0f, 50.0f/255.0f), 1); 
+                        world->worldMap[glm::vec3(startX+i, k, startZ+j)] = 1;
+                        voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));    
+                    }
+                    
                 } else { // snow mountains 
                     if (pow(k, 1.5) < 159) 
                         color = 159.0f;
                     else 
                         color = 1.0f * pow(k, 1.5);
 
-
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 237.0f/255.0f, 252.0f/255.0f));   
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));  
+                    if (world != nullptr)
+                    {
+                        Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 237.0f/255.0f, 252.0f/255.0f), 1);   
+                        world->worldMap[glm::vec3(startX+i, k, startZ+j)] = 1;
+                        voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));
+                    }
+                      
                 }
             } 
         }
@@ -170,13 +199,15 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
 void Chunk::generateDebugChunk() 
 { // chunk for debugging purposes
-    for (unsigned int i = 0; i < 4; i++) 
+    for (unsigned int i = 0; i < 32; i++) 
     {
-        for (unsigned int j = 0; j < 4; j++) 
+        for (unsigned int j = 0; j < 32; j++) 
         {
-            for (unsigned int k = 0; k < 4; k++) 
+            for (unsigned int k = 0; k < 32; k++) 
             {
-                Voxel voxel(glm::vec3(i, j,k), glm::vec3(pow(i,5)/255.0f, pow(j,5)/255.0f, pow(k,5)/255.0f));  
+                Voxel voxel(glm::vec3(i, j, k), glm::vec3((float)(rand() % 255+1)/255.0f, (float)(rand() % 255+1)/255.0f, (float)(rand() % 255+1)/255.0f), 1);  
+                // Voxel voxel(glm::vec3(i, j, k), glm::vec3(0.0f/255.0f, 0.0f/255.0f, 0.0f/255.0f), 1);
+                world->worldMap[glm::vec3(i, j, k)] = 1;
                 voxelMap.insert(std::make_pair(glm::vec3(i,j,k), voxel));  
             }
         }
@@ -185,8 +216,12 @@ void Chunk::generateDebugChunk()
     // front = voxels[current index + coordinates.z + 1], if block is not front(x, y, z + coordinates.z + 1) then block does not exist   
 }
 
+
 void Chunk::checkInteriorVoxels()    
 { // checks interior voxels
+
+
+
     glm::vec3 faceArray[6]; 
     enum faces {
         up, down, front, back, left, right 
@@ -203,26 +238,26 @@ void Chunk::checkInteriorVoxels()
 
 
 
+
         for (unsigned int i = 0; i < 6; i++) 
         {
 
-            if ((voxelMap.count(faceArray[i])))  
-            {                
+            if (voxel.second.coordinates.y == 0) 
+            {
                 voxel.second.isInterior = true; 
-            } else { 
-                voxel.second.isInterior = false;  
                 break; 
             }
+
+            if (world != nullptr)
+            {
+                if ((world->worldMap.count(faceArray[i]) || voxelMap.count(faceArray[i])))      
+                {                
+                    voxel.second.isInterior = true; 
+                } else { 
+                    voxel.second.isInterior = false;  
+                    break; 
+                }
+            }
         }
-
     }
-
-
-    
-
-}
-
-void Chunk::getVoxelNeighbors() 
-{
-
 }
