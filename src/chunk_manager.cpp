@@ -75,13 +75,13 @@ void ChunkManager::renderChunks(Shader& shader)
                         renderer.drawVoxel(shader, voxel.second.coordinates, voxel.second.color, 1.0f); 
                 }
             // }
-        }  else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+        }  /* else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.world = &world; 
             c1.position = chunkBuffer[i]; 
             c1.generate(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
             c1.checkInteriorVoxels(); 
-        }
+        } */
     } 
 }
 

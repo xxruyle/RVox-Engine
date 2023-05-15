@@ -1,15 +1,11 @@
 #pragma once 
 #include <iostream>
 #include <cmath>
-#include <math.h> 
-#include <stdio.h> 
 
-#include <algorithm>
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 
 
@@ -58,6 +54,7 @@ public:
 
 
     glm::mat4 getViewMatrix(); 
+    glm::mat4 getProjectionMatrix(); 
     void processInput(GLFWwindow* window, float deltaTime); // camera movement 
 
     void processMouseMovement(double xoffset, double yoffset); // updates pitch and yaw based on mouse movement and updates direction vectors  
@@ -70,6 +67,4 @@ public:
 
 
 
-    glm::vec3 getVoxelFace(glm::vec3 origin, float xray, float yray, float zray); // returns the side of the cube that the raycast is hitting
-    void deleteVoxel();   
 }; 

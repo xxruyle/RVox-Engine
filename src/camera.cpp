@@ -1,17 +1,5 @@
 #include <camera/camera.h>
 
-/* Camera::Camera(glm::vec3 position, glm::vec3 front, float yaw, float pitch, float fov, float speed, float sensitivity)
-{
-    mPosition = position; 
-    mFront = front; 
-    mYaw = yaw; 
-    mPitch = pitch; 
-    mFov = fov; 
-    mSpeed = speed; 
-    mSensitivity = sensitivity; 
-    updateDirectionVectors(); 
-}
- */
 void Camera::updateDirectionVectors() 
 {
     mDirection.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch)); 
@@ -89,6 +77,11 @@ glm::mat4 Camera::getViewMatrix()
 {
     return glm::lookAt(mPosition, mPosition + mFront, mUp);  
     // return glm::lookAt(mPosition, glm::vec3(0,0,0), mUp); 
+}
+
+glm::mat4 Camera::getProjectionMatrix()
+{
+    return glm::perspective(glm::radians(mFov), (float)(SCR_WIDTH/SCR_HEIGHT), nearD, farD);  
 }
 
 void Camera::zoom(double xoffset, double yoffset)

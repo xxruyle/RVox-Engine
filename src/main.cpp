@@ -2,8 +2,6 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <iostream> 
 #include <vector> 
 #include <cmath>
@@ -17,6 +15,7 @@
 #include "buffer/EBO.h" 
 #include "texture/texture.h"
 #include "camera/camera.h"
+#include "camera/orthocamera.h" 
 #include "world/world.h"
 #include "world/chunk_manager.h"
 #include "world/light.h"
@@ -129,7 +128,8 @@ std::vector<std::string> lampFaces = {
 
 // initializing helper classes 
 World world; 
-Camera gameCamera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
+Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
+OrthoCamera orthoCamera(glm::vec3(-30.0, 70.0, -30.0), 45.0, 0.0, 90.0f);  
 Light lighting; 
 GameTime gTime;
 Frustum frustum(gameCamera);  
@@ -273,6 +273,13 @@ int main()
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
+    std::vector<glm::vec3> pointLightPositions = {
+    	glm::vec3( 0.7f,  0.2f,  2.0f),
+    	glm::vec3( 2.3f, -3.3f, -4.0f),
+    	glm::vec3(-4.0f,  2.0f, -12.0f),
+    	glm::vec3( 0.0f,  0.0f, -3.0f)
+    };  
+
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -287,14 +294,14 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
-        glEnable(GL_CULL_FACE);  
-        glCullFace(GL_BACK);  
+/*         glEnable(GL_CULL_FACE);  
+        glCullFace(GL_BACK);   */
 
 
 
 
-        float lightX = 16.0f, lightY = 37+(3.0*sin(glfwGetTime())), lightZ = 16.0f;  
-        // float lightX = 5.0f, lightY = 5.0f, lightZ = 3.0f;  
+        // float lightX = 16.0f, lightY = 37+(3.0*sin(glfwGetTime())), lightZ = 16.0f;  
+        float lightX = 0.0, lightY = 3.0f, lightZ = 1.0+(2.0f*sin(glfwGetTime()));   
         glm::vec3 lightPos(lightX, lightY, lightZ); 
 
 
@@ -326,16 +333,20 @@ int main()
 
         // shaderProgram.setFloat("light.innerCutOff", glm::cos(glm::radians(25.0f)));  
 
-        // lighting.spotLightInit(shaderProgram, gameCamera);  
+        lighting.spotLightInit(shaderProgram, gameCamera);   
         lighting.sunLightInit(shaderProgram, gameCamera); 
-        // lighting.sourceLightInit(shaderProgram, gameCamera, lightPos);
 
+        for (int i = 0; i < 4; i++) 
+        {
+            lighting.setLightSource(shaderProgram, pointLightPositions[i], i); 
+        }
 
 
 
         // shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f); 
 
-        renderer.viewProject(gameCamera); 
+        renderer.viewProject(gameCamera);  
+        // renderer.viewOrtho(orthoCamera); // orthographic camera  
         renderer.setShaders(shaderProgram); 
 
         TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0);   
@@ -346,13 +357,13 @@ int main()
 
         // setting up frustum  
         frustum.setCamInternals(); 
-        frustum.setCamDef(); 
+        frustum.setCamDef();  
 
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);      
-        // chunkManager.renderOneVoxel(shaderProgram);      
+        chunkManager.renderChunks(shaderProgram);       
+        // chunkManager.renderOneVoxel(shaderProgram);        
         // chunkManager.voxelOutline(); // enables voxel outline coloring 
-        // renderer.drawVoxel(shaderProgram, glm::vec3(0.0f,0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f); 
+        // renderer.drawVoxel(shaderProgram, glm::vec3(gameCamera.mPosition.x + gameCamera.mFront.x * 5,gameCamera.mPosition.y + gameCamera.mFront.y * 5, gameCamera.mPosition.z + gameCamera.mFront.z * 5), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);  
         // renderer.drawVoxel(shaderProgram, glm::vec3(1.0f,1.0f, 3.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f); 
 
 
@@ -369,7 +380,10 @@ int main()
         
     
         renderer.setShaders(lightShaderProgram); 
-        renderer.drawRotatingVoxel(lightShaderProgram, lightPos, 1.0f, 2.0f*(float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));  
+        for (unsigned int i = 0; i < pointLightPositions.size(); i++) 
+        {
+            renderer.drawRotatingVoxel(lightShaderProgram, pointLightPositions[i], 1.0f, 2.0f* (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));  
+        }
         lightTEX.Unbind(); 
 
 

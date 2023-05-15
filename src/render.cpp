@@ -4,7 +4,14 @@ void Render::viewProject(Camera& camera)
 {
     projection = glm::mat4(1.0f);  // projection matrix 
     view = camera.getViewMatrix();  
-    projection = glm::perspective(glm::radians(camera.mFov), (float)(SCR_WIDTH/SCR_HEIGHT), camera.nearD, camera.farD); 
+    projection = camera.getProjectionMatrix();
+}
+
+void Render::viewOrtho(OrthoCamera& orthoCamera) 
+{
+    projection = glm::mat4(1.0f);  // projection matrix 
+    view = orthoCamera.getViewMatrix();  
+    projection = orthoCamera.getOrthoMatrix();  
 }
 
 void Render::setShaders(Shader& shader) 
@@ -41,7 +48,8 @@ void Render::drawVoxel(Shader& shader, glm::vec3 position, glm::vec3 color, floa
 
         // rendering the triangles for the cube  
         glDrawArrays(GL_TRIANGLES, 0, 36); 
-    } /* else { // for debugging purposes, shows culled voxels as red 
+    }
+     /* else { // for debugging purposes, shows culled voxels as red 
         model = glm::mat4(1.0f);
         model = glm::translate(model, position);
         model = glm::scale(model, glm::vec3(scale, scale, scale));  

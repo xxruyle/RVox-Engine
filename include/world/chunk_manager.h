@@ -3,14 +3,10 @@
 #include <cmath> 
 #include <vector> 
 #include <string> 
-#include <utility> // for pair 
-#include <queue> 
 #include <unordered_map> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <noise/FastNoiseLite.h>
 
 #include "world.h" 
@@ -29,7 +25,7 @@ class ChunkManager
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 private: 
-    static const int renderDistance = 128; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 268; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 

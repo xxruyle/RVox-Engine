@@ -2,12 +2,11 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "camera/camera.h" 
 #include "shader/shader.h"
 #include "texture/texture.h" 
 #include "camera/frustum.h" 
+#include "camera/orthocamera.h" 
 
 class Render
 {
@@ -29,6 +28,7 @@ public:
     glm::mat4 model; 
 
     void viewProject(Camera& camera);   
+    void viewOrtho(OrthoCamera& orthoCamera); 
     void setShaders(Shader& shader); 
 
     void drawVoxelCubeMap(Shader& shader, Texture& texture, glm::vec3 position, float scale); 

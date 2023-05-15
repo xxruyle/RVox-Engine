@@ -11,9 +11,6 @@
 #include "shader/shader.h" 
 
 
-#include "buffer/VBO.h"
-#include "buffer/VAO.h"  
-#include "buffer/EBO.h" 
 
 
 struct Vertex {
