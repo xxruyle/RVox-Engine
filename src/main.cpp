@@ -8,6 +8,10 @@
 #include <random>
 #include <time.h> 
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 // header files 
 #include "shader/shader.h" 
 #include "buffer/VBO.h"
@@ -280,6 +284,8 @@ int main()
     	glm::vec3( 0.0f,  0.0f, -3.0f)
     };  
 
+
+    Assimp::Importer importer;
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
