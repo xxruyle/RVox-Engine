@@ -3,7 +3,7 @@
 #include "texture/stb_image.h" 
 #include "texture/texture.h" 
 
-Texture::Texture(GLenum textureUnit)
+Texture::Texture(GLenum textureUnit)  
 {
     glActiveTexture(textureUnit);
     glGenTextures(1, &ID); 

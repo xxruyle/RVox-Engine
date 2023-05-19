@@ -7,6 +7,7 @@
 #include "texture/texture.h" 
 #include "camera/frustum.h" 
 #include "camera/orthocamera.h" 
+#include "world/chunk.h"
 
 class Render
 {
@@ -35,5 +36,7 @@ public:
     void drawVoxel(Shader& shader, glm::vec3 position, glm::vec3 color, float scale); 
     void drawRotatingVoxel(Shader& shader, glm::vec3 position, float scale, float rotation, glm::vec3 axisRotations); 
     void draw2D(Shader& shader, glm::vec2 position, float scale); 
+
+    void drawChunk(Shader& shader, Chunk& chunk,  glm::vec3 position);  
 
 }; 

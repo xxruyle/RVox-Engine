@@ -69,6 +69,10 @@
         "xloctime": "cpp",
         "memory_resource": "cpp",
         "cinttypes": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp",
+        "string_view": "cpp",
+        "numbers": "cpp"
     }
 }

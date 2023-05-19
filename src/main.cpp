@@ -8,10 +8,6 @@
 #include <random>
 #include <time.h> 
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 // header files 
 #include "shader/shader.h" 
 #include "buffer/VBO.h"
@@ -38,8 +34,8 @@ const unsigned int SCR_HEIGHT = 1000;
 
 
 GLfloat vertices[] = {
-    // Back face
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     // Back face
+     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,         
      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -79,7 +75,8 @@ GLfloat vertices[] = {
      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,   
+
 };
 
 
@@ -94,14 +91,6 @@ GLfloat crosshairVertices[] = {
     1.0f, 0.0f, 1.0f, 0.0f
 };
 
-/* std::vector<std::string> cubeMapFaces = {
-    "res/textures/grassblock/right.jpg", 
-    "res/textures/grassblock/left.jpg", 
-    "res/textures/grassblock/top.jpg", 
-    "res/textures/grassblock/bottom.jpg", 
-    "res/textures/grassblock/front.jpg", 
-    "res/textures/grassblock/back.jpg", 
-};  */
 
 std::vector<std::string> cubeMapFaces = {
     "res/textures/iron.jpg", 
@@ -138,7 +127,7 @@ Light lighting;
 GameTime gTime;
 Frustum frustum(gameCamera);  
 Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);  
-ChunkManager chunkManager(world, renderer, gameCamera);     
+ChunkManager chunkManager(world, renderer, gameCamera, frustum);      
 InputHandler inputHandler(gameCamera, chunkManager);   
 
 
@@ -247,18 +236,18 @@ int main()
 
 
     // Grass/block texture  
-    Texture TEX(GL_TEXTURE0); 
+    Texture TEX(GL_TEXTURE0);  
     TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
     TEX.GenerateCubeMap(cubeMapFaces, 512, 512, GL_RGB, false);  
     TEX.Unbind(); 
 
-    Texture tSpec(GL_TEXTURE2); 
+    Texture tSpec(GL_TEXTURE2);  
     tSpec.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
     tSpec.GenerateCubeMap(specularMap, 512, 512, GL_RGB, false);  
     tSpec.Unbind(); 
 
     // redstone lamp texture 
-    Texture lightTEX(GL_TEXTURE1); 
+    Texture lightTEX(GL_TEXTURE1);   
     lightTEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE2); 
     // lightTEX.Generate("res/textures/green.jpg", 512, 512, GL_RGB, true); 
     lightTEX.GenerateCubeMap(lampFaces, 512, 512, GL_RGBA, false); 
@@ -270,7 +259,7 @@ int main()
     crosshairVAO.configVertexAttributes(0, 4, 4, 0); 
     crosshairVAO.Unbind(); 
 
-    Texture crosshairTEX(GL_TEXTURE3); 
+    Texture crosshairTEX(GL_TEXTURE3);   
     crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3); 
     crosshairTEX.Generate("res/textures/crosshairbox.png", 512, 512, GL_RGBA, false); 
     crosshairTEX.Unbind(); 
@@ -284,8 +273,6 @@ int main()
     	glm::vec3( 0.0f,  0.0f, -3.0f)
     };  
 
-
-    Assimp::Importer importer;
 
     // The main render loop 
     while (!glfwWindowShouldClose(window)) 
@@ -316,30 +303,7 @@ int main()
         shaderProgram.setInt("material.specular", 1); 
  
 
-/*         shaderProgram.setVec3("light.position", gameCamera.mPosition.x, gameCamera.mPosition.y, gameCamera.mPosition.z);  
-        shaderProgram.setVec3("light.direction", gameCamera.mFront.x, gameCamera.mFront.y, gameCamera.mFront.z);  
-        shaderProgram.setFloat("light.cutOff", glm::cos(glm::radians(12.5f))); 
-        shaderProgram.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f))); 
-        shaderProgram.setVec3("viewPos", gameCamera.mPosition.x, gameCamera.mPosition.y, gameCamera.mPosition.z);  
-
-
-
-        // shaderProgram.setVec3("light.direction", -0.2f, -1.0f, -0.3f);    
-        shaderProgram.setVec3("light.ambient",  0.1f, 0.1f, 0.1f);   
-        shaderProgram.setVec3("light.diffuse",  0.8f, 0.8f, 0.8f);  
-        shaderProgram.setVec3("light.specular", 1.0f, 1.0f, 1.0f);  
-
-        shaderProgram.setFloat("light.constant",  1.0f); 
-        shaderProgram.setFloat("light.linear",    0.09f); 
-        shaderProgram.setFloat("light.quadratic", 0.032f); 
-
-        shaderProgram.setFloat("material.shininess", 32.0f);    */
-
-        // shaderProgram.setVec3("light.position", lightX, lightY, lightZ);  
-
-        // shaderProgram.setFloat("light.innerCutOff", glm::cos(glm::radians(25.0f)));  
-
-        lighting.spotLightInit(shaderProgram, gameCamera);   
+        // lighting.spotLightInit(shaderProgram, gameCamera);   
         lighting.sunLightInit(shaderProgram, gameCamera); 
 
         for (int i = 0; i < 4; i++) 
@@ -355,27 +319,23 @@ int main()
         // renderer.viewOrtho(orthoCamera); // orthographic camera  
         renderer.setShaders(shaderProgram); 
 
-        TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0);   
-        tSpec.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
+        // TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0);   
+        // tSpec.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
 
         
-        VAO1.Bind();
+        // VAO1.Bind();
 
         // setting up frustum  
         frustum.setCamInternals(); 
         frustum.setCamDef();  
 
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);       
-        // chunkManager.renderOneVoxel(shaderProgram);        
-        // chunkManager.voxelOutline(); // enables voxel outline coloring 
-        // renderer.drawVoxel(shaderProgram, glm::vec3(gameCamera.mPosition.x + gameCamera.mFront.x * 5,gameCamera.mPosition.y + gameCamera.mFront.y * 5, gameCamera.mPosition.z + gameCamera.mFront.z * 5), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);  
-        // renderer.drawVoxel(shaderProgram, glm::vec3(1.0f,1.0f, 3.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f); 
+        chunkManager.renderChunks(shaderProgram);        
+        // chunkManager.renderOneVoxel(shaderProgram);         
 
 
-        TEX.Unbind(); 
-        tSpec.Unbind(); 
-
+/*         TEX.Unbind(); 
+        tSpec.Unbind();  */
 
         // rendering light source 
         lightShaderProgram.Activate(); 

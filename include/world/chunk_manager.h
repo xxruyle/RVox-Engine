@@ -15,6 +15,8 @@
 #include "render/render.h" 
 #include "shader/shader.h"
 
+#include "camera/frustum.h" 
+
 
 #define GLM_ENABLE_EXPERIMENTAL // enables hashing of glm::vec3 
 #include "glm/gtx/hash.hpp"
@@ -25,7 +27,7 @@ class ChunkManager
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 private: 
-    static const int renderDistance = 268; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 128; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
@@ -35,8 +37,9 @@ public:
     World& world; 
     Render& renderer; 
     Camera& camera; 
+    Frustum& frustum; 
 
-    ChunkManager(World& world, Render& renderer, Camera& camera) : world(world), renderer(renderer), camera(camera) {};        
+    ChunkManager(World& world, Render& renderer, Camera& camera, Frustum& frustum) : world(world), renderer(renderer), camera(camera), frustum(frustum) {};        
 
 
 

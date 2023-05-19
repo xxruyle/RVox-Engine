@@ -22,7 +22,7 @@ void Frustum::setCamInternals()
 
 void Frustum::setCamDef() 
 {
-    glm::vec3 dir, nc, fc, X, Y, Z; 
+    glm::vec3 nc, fc, X, Y, Z;  
 
     Z = -camera.mFront; 
 

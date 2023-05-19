@@ -61,6 +61,8 @@ void Render::drawVoxel(Shader& shader, glm::vec3 position, glm::vec3 color, floa
     } */
 }
 
+
+
 void Render::drawRotatingVoxel(Shader& shader, glm::vec3 position, float scale, float rotation, glm::vec3 axisRotations)
 { // allow use of drawing a voxel but have the ability to rotate 
     model = glm::mat4(1.0f);

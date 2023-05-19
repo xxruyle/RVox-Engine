@@ -23,6 +23,7 @@ public:
     bool isInterior; // determines whether block should be culled, if interior cull. 
 
 
+
     Voxel(glm::vec3 coordinates, glm::vec3 color,  int id) : coordinates(coordinates),  color(color), id(id), colorCopy(color) {
         outlineColor = glm::vec3(pow(color.x, 6), pow(color.y, 6), pow(color.z, 6)); 
     }; 

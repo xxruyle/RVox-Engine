@@ -16,10 +16,10 @@ void OrthoCamera::updateDirectionVectors()
 
 glm::mat4 OrthoCamera::getViewMatrix()
 {
-    return glm::lookAt(glm::vec3(40.0f*cos(glfwGetTime()), 50.0f, 40.0f*sin(glfwGetTime())), glm::vec3(16.0f, 32.0f, 16.0f), up);    
+    return glm::lookAt(glm::vec3(-50, 50.0f, -50), glm::vec3(0.0f, 0.0f, 0.0f), up);    
 }
 
 glm::mat4 OrthoCamera::getOrthoMatrix() 
 {
-    return glm::ortho((float)-SCR_WIDTH/ 50.0f, (float)SCR_WIDTH/ 50.0f, (float)-SCR_HEIGHT / 50.0f, (float)SCR_HEIGHT / 50.0f , 0.0f, 200.0f);     
+    return glm::ortho((float)-SCR_WIDTH/ 10.0f, (float)SCR_WIDTH/ 10.0f, (float)-SCR_HEIGHT / 10.0f, (float)SCR_HEIGHT / 10.0f , -200.0f, 200.0f);     
 }
