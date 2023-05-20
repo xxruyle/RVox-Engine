@@ -62,9 +62,11 @@ void Chunk::generate(int randSeed, int startX, int startZ)
 
 void Chunk::generateSolidChunk(int randSeed, int startX, int startZ) 
 {
-    const int xs = 32;
-    const int zs = 32;
-    float frequency = 0.008f; 
+    const int xs = 34;
+    const int zs = 34;
+    // float frequency = 0.008f; 
+    float frequency = 0.08f; 
+
 
 
     FastNoiseLite mountain; 
@@ -82,7 +84,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 4))); // -40   
+            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX - 1 + x), (float)(startZ - 1 + z)) + 1.0f, 4))); // -40   
             // noiseData[x][y] = static_cast<int>(((1 - abs(mountain.GetNoise((float)x, (float)y))))); 
         }
     }
@@ -185,18 +187,18 @@ void Chunk::mesh()
     // glm::vec3 faceArray[6]; 
 
     // unsigned int indice = 0; 
-    for ( int x = 0; x < 32; x++) 
+    for ( int x = 0; x < 34; x++) 
     {
         for (int y = 0; y < 256; y++) 
         {
-            for (int z = 0; z < 32; z++) 
+            for (int z = 0; z < 34; z++) 
             {   
 
                 if (voxels[x][y][z] == 1)
                 {
 
                 
-                if ((z+1 < 32) && (z+1 >= 0)) // back 
+                if ((z+1 < 33) && (z+1 >= 0)) // back 
                 {
                     if (voxels[x][y][z+1] == 0)  
                     {
@@ -213,7 +215,7 @@ void Chunk::mesh()
                     }   
                 }
 
-                if ((z-1 < 32) && (z-1 >= 0)) // front
+                if ((z-1 < 33) && (z-1 >= 0)) // front
                 {
                     if (voxels[x][y][z-1] == 0)  
                     {
@@ -230,7 +232,7 @@ void Chunk::mesh()
                     }   
                 }
 
-                if ((x+1 < 32) && (x+1 >= 0)) // left 
+                if ((x+1 < 33) && (x+1 >= 0)) // left 
                 {
                     if (voxels[x+1][y][z] == 0)  
                     {
@@ -247,7 +249,7 @@ void Chunk::mesh()
                     }   
                 }
 
-                if ((x-1 < 32) && (x-1 >= 0)) // right 
+                if ((x-1 < 33) && (x-1 >= 0)) // right 
                 {
                     if (voxels[x-1][y][z] == 0)  
                     {
