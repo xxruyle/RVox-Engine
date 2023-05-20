@@ -21,7 +21,7 @@ void Chunk::generate(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6))); // -40   
+            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 4))); // -40   
             // noiseData[x][y] = static_cast<int>(((1 - abs(mountain.GetNoise((float)x, (float)y))))); 
         }
     }
@@ -76,13 +76,13 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
         // Gather noise data
     int noiseData[xs][zs];
-    int stoneLimit = 1; 
+    int stoneLimit = 20; 
 
     for (int x = 0; x < xs; x++) 
     {
         for (int z = 0; z < zs; z++)  
         {
-            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 5))); // -40   
+            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 4))); // -40   
             // noiseData[x][y] = static_cast<int>(((1 - abs(mountain.GetNoise((float)x, (float)y))))); 
         }
     }
@@ -101,27 +101,31 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
                 if ((i == 0 || j == 0) && (k > surface))  
                 {
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(1.0f, 0.0f, 0.0f), 1);    
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));                     
+                    voxels[i][k][j] = 1;
+/*                       Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(1.0f, 0.0f, 0.0f), 1);    
+                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));   */                     
                 }
 
                 else if (k < surface) // stone 
                 {
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(130.0f/255.0f, 136.0f/255.0f, 134.0f/255.0f), 1);   
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));
+                    voxels[i][k][j] = 1;
+/*                      Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(130.0f/255.0f, 136.0f/255.0f, 134.0f/255.0f), 1);   
+                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));  */ 
                     
                 } else if (k < 35) { // water 
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(62.0f/255.0f, 164.0f/255.0f, 240.0f/255.0f),  1); 
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));  
+                    voxels[i][k][j] = 1;
+/*                      Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(62.0f/255.0f, 164.0f/255.0f, 240.0f/255.0f),  1); 
+                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));   */ 
                 } else if (k < 80) { // grass 
                     // the color for R value 
                     if (pow(k, 1.5) > 136) 
                         color = 136.0f; 
                     else                     
                         color = 1.0f * pow(k, 1.5);
-                    
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 205.0f/255.0f, 50.0f/255.0f), 1); 
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));   
+
+                    voxels[i][k][j] = 1;
+/*                       Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 205.0f/255.0f, 50.0f/255.0f), 1); 
+                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));  */    
                         
                     
  
@@ -130,8 +134,9 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
                         color = 159.0f;
                     else 
                         color = 1.0f * pow(k, 1.5);
-                    Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 237.0f/255.0f, 252.0f/255.0f), 1);   
-                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel));
+                    voxels[i][k][j] = 1;
+                     Voxel voxel(glm::vec3(startX+i, k, startZ+j), glm::vec3(color/255.0f, 237.0f/255.0f, 252.0f/255.0f), 1);   
+                    voxelMap.insert(std::make_pair(glm::vec3(startX+i, k, startZ+j), voxel)); 
                 }
             } 
         }
@@ -140,26 +145,34 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
 void Chunk::generateDebugChunk(int randSeed) 
 { // chunk for debugging purposes
-    FastNoiseLite noise;  
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);  
-    noise.SetSeed(randSeed); 
+    FastNoiseLite noise; 
+    noise.SetSeed(randSeed);   
 
-    int noiseArray[32][32][32];  
+        // Gather noise data
+    float noiseData[32][32][32];
 
-    for (unsigned int i = 0; i < 32; i++) 
+    for (int x = 0; x < 32; x++) 
     {
-        for (unsigned int j = 0; j < 32; j++) 
+        for (int y = 0; y < 32; y++)
         {
-            for (unsigned int k = 0; k < 32; k++) 
+            for (int z = 0; z < 32; z++)  
             {
+                noiseData[x][y][z] = noise.GetNoise((float)(x), (float)(y), (float)(z)); // -40  
+            }
+        }
+    }
 
-                float noiseData = noise.GetNoise((float)i, (float)j, (float)k);  
-                int blockType; 
-                noiseData > 0 ? blockType = 1 : blockType = 0;  
-                noiseArray[i][j][k] = blockType;  
-                
-                Voxel voxel(glm::vec3(i, j, k), glm::vec3((float)(rand() % 255+1)/255.0f, (float)(rand() % 255+1)/255.0f, (float)(rand() % 255+1)/255.0f), 1);  
-                voxelMap.insert(std::make_pair(glm::vec3(i,j,k), voxel));  
+    for (int x = 0; x < 32; x++) 
+    {
+        for (int y = 0; y < 32; y++)
+        {
+            for (int z = 0; z < 32; z++)  
+            {
+                noiseData[x][y][z] > 0.0f ? voxels[x][y][z] = 1 : voxels[x][y][z] = 0;   
+
+                   
+/*                 Voxel voxel(glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 1);    
+                voxelMap.insert(std::make_pair(glm::vec3(x, y, z), voxel));  */
             }
         }
     }
@@ -169,12 +182,129 @@ void Chunk::generateDebugChunk(int randSeed)
 void Chunk::mesh()      
 { // checks interior voxels
 
-    glm::vec3 faceArray[6]; 
+    // glm::vec3 faceArray[6]; 
 
     // unsigned int indice = 0; 
-    for (auto& voxel : voxelMap) 
+    for ( int x = 0; x < 32; x++) 
     {
-        faceArray[up] = glm::vec3(voxel.second.coordinates.x, voxel.second.coordinates.y + 1, voxel.second.coordinates.z); // up
+        for (int y = 0; y < 256; y++) 
+        {
+            for (int z = 0; z < 32; z++) 
+            {   
+
+                if (voxels[x][y][z] == 1)
+                {
+
+                
+                if ((z+1 < 32) && (z+1 >= 0)) // back 
+                {
+                    if (voxels[x][y][z+1] == 0)  
+                    {
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + backIndices[i]);   
+
+                        for (unsigned int i = 0; i < backFace.size(); i++) 
+                        {
+                            Vertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
+                            vertex.Normal = backNormals[i];   
+                            vertices.push_back(vertex);      
+                        }
+                    }   
+                }
+
+                if ((z-1 < 32) && (z-1 >= 0)) // front
+                {
+                    if (voxels[x][y][z-1] == 0)  
+                    {
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + frontIndices[i]); 
+
+                        for (unsigned int i = 0; i < frontFace.size(); i++) 
+                        {
+                            Vertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
+                            vertex.Normal = frontNormals[i];  
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                }
+
+                if ((x+1 < 32) && (x+1 >= 0)) // left 
+                {
+                    if (voxels[x+1][y][z] == 0)  
+                    {
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + leftIndices[i]); 
+
+                        for (unsigned int i = 0; i < leftFace.size(); i++) 
+                        {
+                            Vertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
+                            vertex.Normal = leftNormals[i];  
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                }
+
+                if ((x-1 < 32) && (x-1 >= 0)) // right 
+                {
+                    if (voxels[x-1][y][z] == 0)  
+                    {
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + rightIndices[i]); 
+
+                        for (unsigned int i = 0; i < rightFace.size(); i++)  
+                        {
+                            Vertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
+                            vertex.Normal = rightNormals[i];   
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                }
+
+
+                if ((y-1 < 32) && (y-1 >= 0)) // bottom 
+                {
+                    if (voxels[x][y-1][z] == 0)  
+                    {
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + bottomIndices[i]); 
+
+                        for (unsigned int i = 0; i < bottomFace.size(); i++)   
+                        {
+                            Vertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
+                            vertex.Normal = bottomNormals[i];    
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                }
+
+                if ((y+1 < 256) && (y+1 >= 0)) // top  
+                {
+                    if (voxels[x][y+1][z] == 0)  
+                    {
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + topIndices[i]); 
+
+                        for (unsigned int i = 0; i < topFace.size(); i++)   
+                        {
+                            Vertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
+                            vertex.Normal = topNormals[i];     
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                }
+                }   
+            }
+        }
+    }
+    // for (auto& voxel : voxelMap) 
+    // {
+/*         faceArray[up] = glm::vec3(voxel.second.coordinates.x, voxel.second.coordinates.y + 1, voxel.second.coordinates.z); // up
         faceArray[down] = glm::vec3(voxel.second.coordinates.x, voxel.second.coordinates.y - 1, voxel.second.coordinates.z); // down
         faceArray[front] = glm::vec3(voxel.second.coordinates.x, voxel.second.coordinates.y, voxel.second.coordinates.z - 1); // front
         faceArray[back] = glm::vec3(voxel.second.coordinates.x, voxel.second.coordinates.y, voxel.second.coordinates.z + 1); // back
@@ -270,20 +400,9 @@ void Chunk::mesh()
                 vertices.push_back(vertex);        
             }
         }
-    } 
+    }  */
     setupMesh(); 
-    vertices.clear(); 
-
-/*     std::cout << vertices.size();
-    for (unsigned int i = 0; i < vertices.size(); i++) 
-    {
-        std::cout << vertices[i].Position.x << ' ' << vertices[i].Position.y << ' ' << vertices[i].Position.z << std::endl;  
-    }
-
-    for (unsigned int i = 0; i < indices.size(); i++) 
-    {
-        std::cout << indices[i];   
-    } */
+    vertices.clear();
 
 }
 
@@ -325,7 +444,7 @@ void Chunk::draw(Shader& shader, Frustum& frustum)
     glm::mat4 model; 
     model = glm::mat4(1.0f); 
     shader.setMat("model", 1, GL_FALSE, model);  
-    shader.setVec3("voxelColor", 1.0, 1.0, 1.0);  
+    shader.setVec3("voxelColor", 75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
 
     glBindVertexArray(VAO);  
     // glDrawArrays(GL_TRIANGLES, 0, vertices.size());     

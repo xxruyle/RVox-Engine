@@ -6,15 +6,15 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
     world.worldMap.clear(); 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < world.wSizeX; i++) 
+    for (int i = 0; i < 1; i++) 
     {
-        for (int j = 0; j < world.wSizeZ; j++)  
+        for (int j = 0; j < 1; j++)  
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
             c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);     
             // c1.generate(randSeed, c1.position.x * 32, c1.position.z * 32); 
-            // c1.generateDebugChunk(randSeed);   
+            // c1.generateDebugChunk(randSeed);     
             c1.mesh();  
         }
     }
@@ -76,7 +76,7 @@ void ChunkManager::renderChunks(Shader& shader)
                         renderer.drawVoxel(shader, voxel.second.coordinates, voxel.second.color, 1.0f); 
                 } */
             // }
-        }  else { // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+        }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.position = chunkBuffer[i]; 
             c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
@@ -142,7 +142,7 @@ void ChunkManager::printTotalVoxels()
     int sum = 0;  
     for (auto& chunk : chunkMap) 
     {
-        sum += chunk.second.voxelMap.size();  
+        sum += sizeof(chunk.second.voxels) / sizeof(int); 
     }
 
     std::cout << "Total Voxels: " << sum << std::endl;  
@@ -168,7 +168,7 @@ glm::vec3 ChunkManager::brensenCast()
 
     glm::vec3 chunkCoord; 
 
-    for (unsigned int i = 0; i < voxelCoords.size(); i++) 
+    for (unsigned int i = 1; i < voxelCoords.size(); i++) 
     {
         chunkCoord = getChunkLocation(voxelCoords[i]); 
 /*         for (unsigned int j = 0; j < chunkMap[chunkCoord].voxels.size(); j++) 
@@ -178,12 +178,26 @@ glm::vec3 ChunkManager::brensenCast()
                 return voxelCoords[i]; 
             }
         } */
-        if (chunkMap[chunkCoord].voxelMap.count(voxelCoords[i])) // if there are coordinates with the voxel coords in the voxelmap 
+/*         if (chunkMap[chunkCoord].voxelMap.count(voxelCoords[i])) // if there are coordinates with the voxel coords in the voxelmap 
         {
             return voxelCoords[i]; 
+        } */
+
+/*         std::cout << (int)voxelCoords[i].x - (int)chunkMap[chunkCoord].position.x * 32 << ' ' << (int)voxelCoords[i].y - (int)chunkMap[chunkCoord].position.y * 32 << ' ' << (int)voxelCoords[i].z - (int)chunkMap[chunkCoord].position.z * 32 << std::endl;   */
+
+
+        int xCoord = (int)voxelCoords[i].x - (int)chunkMap[chunkCoord].position.x * 32; 
+        int yCoord = (int)voxelCoords[i].y - (int)chunkMap[chunkCoord].position.y * 32; 
+        int zCoord = (int)voxelCoords[i].z - (int)chunkMap[chunkCoord].position.z * 32; 
+
+        if (xCoord >= 0 && yCoord >= 0 && zCoord >= 0) 
+        {
+            if (chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] == 1)  
+            {
+                return glm::vec3((int)voxelCoords[i].x, (int)voxelCoords[i].y, (int)voxelCoords[i].z);    
+            }
         }
     }  
-
     return glm::vec3(0, 1000, 0); 
 }
 
@@ -313,8 +327,15 @@ void ChunkManager::deleteVoxel()
             break; 
         }
     } */
+
+    int xCoord = (int)voxelPosition.x - (int)chunkMap[chunkCoord].position.x * 32; 
+    int yCoord = (int)voxelPosition.y - (int)chunkMap[chunkCoord].position.y * 32; 
+    int zCoord = (int)voxelPosition.z - (int)chunkMap[chunkCoord].position.z * 32;  
+
+
     std::cout << voxelPosition.x << ' ' << voxelPosition.y << ' ' << voxelPosition.z << std::endl;  
-    chunkMap[chunkCoord].voxelMap.erase(voxelPosition); 
+    // chunkMap[chunkCoord].voxelMap.erase(voxelPosition);  
+    chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] = 0;    
     chunkMap[chunkCoord].mesh();   
 
 }

@@ -283,7 +283,7 @@ int main()
 
         processInput(window); 
 
-        glClearColor(57.0f/255.0f, 54.0f/255.0f, 70.0f/255.0f, 1.0f); 
+        glClearColor(37.0f/255.0f, 197.0f/255.0f, 223.0f/255.0f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
