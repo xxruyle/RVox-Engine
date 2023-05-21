@@ -27,6 +27,12 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
         chunkManager.printChunkLocation(); 
     }
 
+    if (button == GLFW_KEY_5 && action == GLFW_PRESS) 
+    {
+        chunkManager.chunkMap.erase(glm::vec3(0,0,0)); 
+    }
+
+
     if (button == GLFW_KEY_G && action == GLFW_PRESS) 
         chunkManager.createChunks(rand() % 2000 + 1);  
 

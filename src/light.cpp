@@ -10,7 +10,7 @@ void Light::sunLightInit(Shader& shader, Camera& camera)
     shader.setVec3("dirLight.color", 250.0f/255.0f, 150.0f/255.0f, 27.0f/255.0f); 
     shader.setVec3("viewPos", camera.mPosition.x, camera.mPosition.y, camera.mPosition.z);  
     shader.setVec3("dirLight.ambient",  0.3f, 0.3f, 0.3f);   
-    shader.setVec3("dirLight.diffuse",  0.8f, 0.8f, 0.8f);  
+    shader.setVec3("dirLight.diffuse",  0.6f, 0.6f, 0.6f);  
     shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);  
 
     shader.setFloat("material.shininess", 32.0f); 

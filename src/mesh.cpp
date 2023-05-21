@@ -36,6 +36,8 @@ void Mesh::setupMesh()
     // vertex normals
     glEnableVertexAttribArray(1);	
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+
     
 /*     // vertex texture coords
     glEnableVertexAttribArray(2);	

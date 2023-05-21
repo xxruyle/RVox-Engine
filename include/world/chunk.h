@@ -36,7 +36,8 @@ public:
     glm::vec3 position; 
     // std::vector<Voxel> voxels; 
     std::unordered_map<glm::vec3, Voxel> voxelMap;   
-    int voxels[34][256][34];  // the voxel array  
+    char voxels[33][256][33];  // the voxel array   
+    glm::vec3 voxelColors[33][256][33]; 
 
 
     std::vector<Vertex> vertices; // for the chunk mesh    

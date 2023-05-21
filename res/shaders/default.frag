@@ -46,6 +46,7 @@ in vec3 TexCoord;
 
 in vec3 Normal; 
 in vec3 FragPos; 
+in vec3 Color; 
 
 // texture sample for cube map
 // uniform samplerCube cubeMap; 
@@ -83,7 +84,7 @@ void main()
     // phase 3: Spot light
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);      
     
-    FragColor = vec4(voxelColor, 0.0) * vec4(result, 1.0); //vec4 sun color  
+    FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color   
 	
 }
 

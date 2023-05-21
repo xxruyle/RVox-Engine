@@ -26,13 +26,6 @@ class ChunkManager
 { // class to manage, create, and send chunks to be rendered
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
-private: 
-    static const int renderDistance = 300; // the number of blocks the player can see radius wise  
-    int currentRandomSeed; // the current random seed 
-
-    bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
-
-
 public: 
     World& world; 
     Render& renderer; 
@@ -52,6 +45,8 @@ public:
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
 
+    void meshNeighbors(Chunk& chunk);  // gives chunks data about their neighbors 
+
     void renderOneVoxel(Shader& shader);  
 
 
@@ -68,5 +63,12 @@ public:
 
     // initializing the prev outlined voxel for voxelOutline. Not the most elegant solution for the voxelOutline bug, but whatever lol 
     Voxel* prevOutlinedVoxel = nullptr; 
+
+private: 
+    static const int renderDistance = 128; // the number of blocks the player can see radius wise  
+    int currentRandomSeed; // the current random seed 
+
+    bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
+
 
 }; 
