@@ -34,17 +34,14 @@ class Chunk
 {
 public: 
     glm::vec3 position; 
-    // std::vector<Voxel> voxels; 
-    std::unordered_map<glm::vec3, Voxel> voxelMap;   
     char voxels[33][256][33];  // the voxel array   
-    glm::vec3 voxelColors[33][256][33]; 
+    // glm::vec3 voxelColors[33][256][33]; 
 
 
     std::vector<Vertex> vertices; // for the chunk mesh    
     std::vector<unsigned int> indices;
     
 
-    void generate(int randSeed, int startX, int startZ); // generates a chunk based on chunk coordinate in world  
     void generateSolidChunk(int randSeed, int startX, int startZ); 
     void generateDebugChunk(int randSeed);  
 

@@ -326,12 +326,11 @@ int main()
         // VAO1.Bind();
 
         // setting up frustum  
-        frustum.setCamInternals(); 
-        frustum.setCamDef();  
+/*         frustum.setCamInternals(); 
+        frustum.setCamDef();  */ 
 
         // drawing the chunk manager chunks 
         chunkManager.renderChunks(shaderProgram);        
-        // chunkManager.renderOneVoxel(shaderProgram);         
 
 
 /*         TEX.Unbind(); 

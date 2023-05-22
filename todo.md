@@ -1,10 +1,30 @@
-# May 20, 2023 
-1) Need to meshing problem where deletion of chunks are not accepted by chunk neighbors 
-2) Add coloring to voxels 
-    3) Make another voxel array, with rgb vec3s, send it to the gpu, and then clear   
-3) Add collision 
-4) Add placing blocks
-5) Frustum Culling (chunks only) 
+# ToDo 
+- [X] Need to meshing problem where deletion of chunks are not accepted by chunk neighbors (**COMPLETED**: May 22, 2023)
+- [X] Left chunk border problem when meshing (voxel color tied with it ?)
+- [ ] Add coloring to voxels 
+  - [ ] Voxel struct with block ID, 
+- [ ] Model loading with assimp 
+- [ ] Refactoring 
+  - [ ] main
+  - [ ] camera and orthocamera 
+  - [ ] chunkmanager and chunk
+  - [ ] world
+  - [ ] vao, vbo ebo
+  - [ ] render and chunk draw functions 
+- [ ] Face culling and fixing the ebo indices setup  
+- [ ] Frustum culling chunks
+- [ ] debugging tools (Wireframe boxes and x,y,z axis crosshair)
+- [ ] rendering fog
+- [ ] Memory problem where it increases drastically when adding voxels to array 
+- [ ] Placing blocks 
+- [ ] Add collision (AAAB)
+- [ ] 3rd Person Camera 
+- [ ] Better terrain generation 
+  - [ ] Caves
+  - [ ] Biomes
+  - [ ] Trees
+  - [ ] Roads 
+   
 
 
 # Meshing Neighboring Chunks 
