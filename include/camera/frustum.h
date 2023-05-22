@@ -15,11 +15,6 @@
  
 class Frustum
 {
-private: 
-    enum {
-        TOP = 0, BOTTOM, LEFT,
-        RIGHT, NEARP, FARP 
-    }; 
 
 
 public: 
@@ -42,4 +37,15 @@ public:
     void setCamInternals();   
     void setCamDef();
     bool pointInFrustum(glm::vec3 point); 
+    bool chunkInFrustum(glm::vec3 chunkPosition); 
+
+private: 
+    enum {
+        TOP = 0, BOTTOM, LEFT,
+        RIGHT, NEARP, FARP 
+    }; 
+
+
+    std::vector<glm::vec3> getChunkCorners(glm::vec3 chunkPosition);   
+
 }; 

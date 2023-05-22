@@ -7,9 +7,9 @@ void ChunkManager::createChunks(int randSeed)
     world.worldMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 2; i++) 
+    for (int i = 0; i < 3; i++) 
     {
-        for (int j = 0; j < 2; j++)  
+        for (int j = 0; j < 3; j++)  
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
@@ -36,18 +36,17 @@ void ChunkManager::renderChunks(Shader& shader)
     {
         if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
         {
-            if (isNearPlayer(camera.mPosition, chunkBuffer[i]))
+            if (isNearPlayer(camera.mPosition, chunkBuffer[i]))  
                 chunkMap[chunkBuffer[i]].draw(shader, frustum);
-            else 
-                chunkMap.erase(chunkBuffer[i]); 
+            
 
-        }  /* else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+        }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.position = chunkBuffer[i]; 
             c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
             c1.mesh(); 
             // meshNeighbors(c1);  
-        } */
+        }
     } 
 }
 
@@ -67,8 +66,7 @@ void ChunkManager::meshNeighbors(Chunk& chunk)
         }
         
 
-        // finally, we mesh the chunk itself 
-        // and then mesh the right neighbor as well 
+ 
         chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z + 1)].mesh(); 
     }
 
@@ -84,11 +82,9 @@ void ChunkManager::meshNeighbors(Chunk& chunk)
             }
         }
         
-        // and then mesh the right neighbor as well 
         chunkMap[glm::vec3(chunk.position.x + 1, chunk.position.y, chunk.position.z)].mesh(); 
 
 
-        // finally, we mesh the chunk itself 
 
     }
 
@@ -133,6 +129,7 @@ void ChunkManager::meshNeighbors(Chunk& chunk)
         chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z - 1)].mesh(); 
     }
 
+    // mesh the chunk itself 
     chunk.mesh(); 
 }
 

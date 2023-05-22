@@ -72,8 +72,10 @@ std::vector<glm::vec3> backFace = {
 
 
 std::vector<unsigned int> backIndices = {
-    0, 1, 2, 
-    0, 3, 1 
+/*     0, 1, 2, 
+    0, 3, 1  */
+    2, 1, 0, 
+    1, 3, 0 
 }; 
 
 std::vector<glm::vec3> backNormals = {
@@ -120,8 +122,8 @@ std::vector<glm::vec3> leftFace = {
 };
 
 std::vector<unsigned int> leftIndices = {
-    0, 1, 2, 
-    0, 2, 3, 
+    3, 1, 0, 
+    3, 2, 1, 
 }; 
 
 std::vector<glm::vec3> leftNormals = {
@@ -144,8 +146,9 @@ std::vector<glm::vec3> rightFace = {
 };
 
 std::vector<unsigned int> rightIndices = {
-    0, 1, 2, 
+    0, 2, 1,
     0, 1, 3 
+
 }; 
 
 std::vector<glm::vec3> rightNormals = {
@@ -192,8 +195,10 @@ std::vector<glm::vec3> topFace = {
 };
 
 std::vector<unsigned int> topIndices = {
-    0, 1, 2, 
-    0, 1, 3 
+/*     0, 2, 1, 
+    0, 1, 3  */
+    1, 2, 0,
+    3, 1, 0
 }; 
 
 std::vector<glm::vec3> topNormals = {

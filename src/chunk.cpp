@@ -317,16 +317,15 @@ void Chunk::setupMesh()
 
 void Chunk::draw(Shader& shader, Frustum& frustum)
 {
-/*     if (frustum.pointInFrustum(glm::vec3(position.x + 15, position.y + 15, position.z +16))) // if point is in frustum  
-    {  */
-    glm::mat4 model; 
-    model = glm::mat4(1.0f); 
-    shader.setMat("model", 1, GL_FALSE, model);  
-    shader.setVec3("voxelColor", 75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
+     if (frustum.chunkInFrustum(position)) // if point is in frustum   
+    {  
+        glm::mat4 model; 
+        model = glm::mat4(1.0f); 
+        shader.setMat("model", 1, GL_FALSE, model);  
+        // shader.setVec3("voxelColor", 75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
 
-    glBindVertexArray(VAO);  
-    // glDrawArrays(GL_TRIANGLES, 0, vertices.size());     
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
-    glBindVertexArray(0);
-    // }
+        glBindVertexArray(VAO);  
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
+        glBindVertexArray(0);
+    }
 }

@@ -10,7 +10,7 @@ void Frustum::setCamInternals()
     this->farD = camera.farD;    
 
     // compute width and height using near and far plane sections 
-    tang = (float)tan(camera.angle * 0.5);       
+    tang = (float)tan(camera.angle * 0.5);          
     nh = nearD * tang; 
     nw = nh * ratio; 
     fh = farD * tang; 
@@ -22,7 +22,7 @@ void Frustum::setCamInternals()
 
 void Frustum::setCamDef() 
 {
-    glm::vec3 nc, fc, X, Y, Z;  
+    glm::vec3  nc, fc, X, Y, Z;  
 
     Z = -camera.mFront; 
 
@@ -74,11 +74,56 @@ bool Frustum::pointInFrustum(glm::vec3 point)
     {
         if (pl[i].distance(point) < 0) // outside frustum
         {
-            // std::cout << "(0,0,0) point outside frustum" << std::endl; 
             return false;
         }
               
     }
-    // std::cout << "(0,0,0) point inside frustum" << std::endl; 
     return true;   
+}
+
+bool Frustum::chunkInFrustum(glm::vec3 chunkPostition) 
+{ // returns true if chunk is in the frustum, false otherwise 
+    std::vector<glm::vec3> chunkCorners = getChunkCorners(glm::vec3(chunkPostition.x * 32, 0, chunkPostition.z * 32));   
+
+	// for each plane do ...
+	for(unsigned int i=0; i < 6; i++) {
+
+		// reset counters for corners in and out
+		int out = 0, in = 0;
+		// for each corner of the box do ...
+		// get out of the cycle as soon as a box as corners
+		// both inside and out of the frustum
+		for (unsigned int k = 0; k < chunkCorners.size(); k++) {
+
+			// is the corner outside or inside
+			if (pl[i].distance(chunkCorners[k]) < 0) 
+				out++;
+			else
+				in++;
+		}
+		//if all corners are out
+		if (!in)
+			return false;
+
+	}
+    // if there is atleast one corner in 
+    return true; 
+}
+
+std::vector<glm::vec3> Frustum::getChunkCorners(glm::vec3 chunkPosition)   
+{ // gets corners based on chunk position 
+    std::vector<glm::vec3> corners; 
+    corners.push_back(glm::vec3(chunkPosition.x, 0, chunkPosition.z)); // front bottom right 
+    corners.push_back(glm::vec3(chunkPosition.x, 256, chunkPosition.z)); // front top right 
+
+    corners.push_back(glm::vec3(chunkPosition.x + 32, 0, chunkPosition.z)); // front bottom left 
+    corners.push_back(glm::vec3(chunkPosition.x + 32, 256, chunkPosition.z)); // front  top left 
+
+    corners.push_back(glm::vec3(chunkPosition.x, 0, chunkPosition.z + 32)); // back bottom right 
+    corners.push_back(glm::vec3(chunkPosition.x, 256, chunkPosition.z + 32)); // back top right 
+
+    corners.push_back(glm::vec3(chunkPosition.x + 32, 0, chunkPosition.z + 32)); // back bottom left 
+    corners.push_back(glm::vec3(chunkPosition.x + 32, 256, chunkPosition.z + 32)); // back top left 
+
+    return corners;
 }
