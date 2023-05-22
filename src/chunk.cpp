@@ -210,11 +210,11 @@ void Chunk::mesh()
                 
 
 
-                if (voxels[x][y][z] == 1 || (x == 32  && voxels[x][y][z] == 1) || (z == 32 && voxels[x][y][z] == 1))
+                if (voxels[x][y][z] == 1)
                 {
 
                 
-                if ((z+1 < 33) && (z+1 >= 0)) // back 
+                if ((z+1 < 34) && (z+1 >= 0)) // back 
                 {
                     if (voxels[x][y][z+1] == 0)  
                     {
@@ -232,7 +232,7 @@ void Chunk::mesh()
                     }   
                 }
 
-                if ((z-1 < 33) && (z-1 >= 0)) // front
+                if ((z-1 < 34) && (z-1 >= 0)) // front
                 {
                     if (voxels[x][y][z-1] == 0)  
                     {
@@ -250,7 +250,7 @@ void Chunk::mesh()
                     }   
                 }
 
-                if ((x+1 < 33) && (x+1 >= 0)) // left 
+                if ((x+1 < 34) && (x+1 >= 0)) // left 
                 {
                     if (voxels[x+1][y][z] == 0)  
                     {
@@ -268,7 +268,7 @@ void Chunk::mesh()
                     }   
                 }
 
-                if ((x-1 < 33) && (x-1 >= 0)) // right 
+                if ((x-1 < 34) && (x-1 >= 0)) // right 
                 {
                     if (voxels[x-1][y][z] == 0)  
                     {

@@ -65,7 +65,7 @@ public:
     Voxel* prevOutlinedVoxel = nullptr; 
 
 private: 
-    static const int renderDistance = 128; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 300; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
