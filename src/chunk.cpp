@@ -88,36 +88,36 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     }  
 }
 
-void Chunk::generateDebugChunk(int randSeed) 
-{ // chunk for debugging purposes
+void Chunk::generateDebugChunk(int randSeed, int startX, int startZ) 
+{ // 3D noise chunk 
     FastNoiseLite noise; 
+    noise.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic); 
+    noise.SetFrequency(.1);  
+    noise.SetFractalOctaves(3); 
+    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes); 
     noise.SetSeed(randSeed);   
 
         // Gather noise data
-    float noiseData[32][32][32];
+    float noiseData[33][100][33];
 
-    for (int x = 0; x < 32; x++) 
+    for (int x = 0; x < 33; x++) 
     {
-        for (int y = 0; y < 32; y++)
+        for (int y = 0; y < 100; y++)
         {
-            for (int z = 0; z < 32; z++)  
+            for (int z = 0; z < 33; z++)  
             {
-                noiseData[x][y][z] = noise.GetNoise((float)(x), (float)(y), (float)(z)); // -40  
+                noiseData[x][y][z] = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z)); // -40   
             }
         }
     }
 
-    for (int x = 0; x < 32; x++) 
+    for (int x = 0; x < 33; x++) 
     {
-        for (int y = 0; y < 32; y++)
+        for (int y = 0; y < 100; y++)
         {
-            for (int z = 0; z < 32; z++)  
+            for (int z = 0; z < 33; z++)  
             {
                 noiseData[x][y][z] > 0.0f ? voxels[x][y][z] = 1 : voxels[x][y][z] = 0;   
-
-                   
-/*                 Voxel voxel(glm::vec3(x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 1);    
-                voxelMap.insert(std::make_pair(glm::vec3(x, y, z), voxel));  */
             }
         }
     }

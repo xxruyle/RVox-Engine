@@ -39,13 +39,15 @@ public:
     std::vector<Texture> textures; 
 
     // Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);  
-    Mesh(std::vector<Vertex> vertices);  
+    // Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);  
+
+
 
     void Draw(Shader& shader); 
 
 private: 
     unsigned int VAO, VBO, EBO; 
 
-    void setupMesh(); 
+    void setupMesh();
 
 }; 

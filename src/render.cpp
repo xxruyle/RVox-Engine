@@ -75,6 +75,7 @@ void Render::drawRotatingVoxel(Shader& shader, glm::vec3 position, float scale, 
 
 void Render::draw2D(Shader& shader, glm::vec2 position, float scale)
 { // render 2D hud like images to screen 
+
     projection = glm::mat4(1.0f); 
     projection = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);  
     glm::mat4 model = glm::mat4(1.0f); 

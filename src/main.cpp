@@ -10,21 +10,17 @@
 
 // header files 
 #include "shader/shader.h" 
-#include "buffer/VBO.h"
-#include "buffer/VAO.h" 
-#include "buffer/EBO.h" 
 #include "texture/texture.h"
 #include "camera/camera.h"
 #include "camera/orthocamera.h" 
-#include "world/world.h"
 #include "world/chunk_manager.h"
 #include "world/light.h"
 #include "game_time/gameTime.h"
 #include "input/input_handler.h" 
-#include "texture/stb_image.h" 
 #include "render/render.h"
 #include "camera/frustum.h" 
 #include "mesh/mesh.h"
+#include "hud/hud.h" 
 
 
 
@@ -32,149 +28,25 @@
 const unsigned int SCR_WIDTH = 1300;
 const unsigned int SCR_HEIGHT = 1000;
 
-
-GLfloat vertices[] = {
-     // Back face
-     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,         
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-    // Front face
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    // Left face
-    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
-    // Right face
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,      
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,    
-    // Bottom face
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-    // Top face
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,   
-
-};
-
-
-GLfloat crosshairVertices[] = {
-    // pos      // tex
-    0.0f, 1.0f, 0.0f, 1.0f,
-    1.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 0.0f, 0.0f, 
-
-    0.0f, 1.0f, 0.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 0.0f, 1.0f, 0.0f
-};
-
-
-std::vector<std::string> cubeMapFaces = {
-    "res/textures/iron.jpg", 
-    "res/textures/iron.jpg",
-    "res/textures/iron.jpg",
-    "res/textures/iron.jpg", 
-    "res/textures/iron.jpg", 
-    "res/textures/iron.jpg",
-}; 
-
-std::vector<std::string> specularMap = {
-    "res/textures/ironSpecular.jpg",     
-    "res/textures/ironSpecular.jpg",    
-    "res/textures/ironSpecular.jpg",    
-    "res/textures/ironSpecular.jpg",     
-    "res/textures/ironSpecular.jpg",     
-    "res/textures/ironSpecular.jpg",    
-}; 
-
-std::vector<std::string> lampFaces = {
-    "res/textures/redstonelamp/right.png", 
-    "res/textures/redstonelamp/left.png", 
-    "res/textures/redstonelamp/top.png", 
-    "res/textures/redstonelamp/bottom.png", 
-    "res/textures/redstonelamp/front.png", 
-    "res/textures/redstonelamp/back.png", 
-};
-
 // initializing helper classes 
-World world; 
 Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
 OrthoCamera orthoCamera(glm::vec3(-30.0, 70.0, -30.0), 45.0, 0.0, 90.0f);  
 Light lighting; 
 GameTime gTime;
 Frustum frustum(gameCamera);  
 Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);  
-ChunkManager chunkManager(world, renderer, gameCamera, frustum);      
+ChunkManager chunkManager(renderer, gameCamera, frustum);      
 InputHandler inputHandler(gameCamera, chunkManager);   
-
-
-GLuint indices[] = {  // note that we start from 0!
-    0, 1, 3,  // sole triangle
-    1, 2, 3, 
-};
-
-
+Hud hud(renderer); 
 
 
 void processInput(GLFWwindow* window); 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods); 
 void key_callback(GLFWwindow* window, int button, int scancode, int action, int mods); 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset); 
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
-{
-    // Whenever the window changes in size GLFW calls this function
-    glViewport(0, 0, width, height); 
-}
-
-
-bool firstMouse = true; 
-float lastX = SCR_HEIGHT/2, lastY = SCR_WIDTH/2; // put mouse at center of screen 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)   
-{
-    
-    if (firstMouse) // initially set to true
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-
-    float xoffset = xpos - lastX; 
-    float yoffset = lastY - ypos; 
-    lastX = xpos; 
-    lastY = ypos; 
-
-    gameCamera.processMouseMovement(xoffset, yoffset); 
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
-{
-    gameCamera.zoom(xoffset , yoffset);  
-}
 
 int main() 
 {
@@ -209,55 +81,13 @@ int main()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hide cursor and capture it 
     gladLoadGL(); // initializing glad 
 
-    Shader lightShaderProgram("res/shaders/lightsource.vert", "res/shaders/lightsource.frag"); 
-    lightShaderProgram.Activate(); 
-
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
 
     Shader crossHairProgram("res/shaders/crosshair.vert", "res/shaders/crosshair.frag"); 
     crossHairProgram.Activate(); 
 
-    // cube 
-	VBO VBO1(vertices, sizeof(vertices));
-	VAO VAO1(VBO1); 
-	VAO1.Bind();
-    VAO1.configVertexAttributes(0, 3, 6, 0); // coordinates 
-    VAO1.configVertexAttributes(1, 3, 6, 3*sizeof(GLfloat)); // texture
-    VAO1.Unbind(); 
-
-    // lightsource 
-    // VAO for light source 
-    VAO lightVAO(VBO1);  
-    lightVAO.Bind();
-    lightVAO.configVertexAttributes(0, 3, 6, 0); 
-    lightVAO.Unbind(); 
-
-
-
-    // Grass/block texture  
-    Texture TEX(GL_TEXTURE0);  
-    TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); 
-    TEX.GenerateCubeMap(cubeMapFaces, 512, 512, GL_RGB, false);  
-    TEX.Unbind(); 
-
-    Texture tSpec(GL_TEXTURE2);  
-    tSpec.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
-    tSpec.GenerateCubeMap(specularMap, 512, 512, GL_RGB, false);  
-    tSpec.Unbind(); 
-
-    // redstone lamp texture 
-    Texture lightTEX(GL_TEXTURE1);   
-    lightTEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE2); 
-    // lightTEX.Generate("res/textures/green.jpg", 512, 512, GL_RGB, true); 
-    lightTEX.GenerateCubeMap(lampFaces, 512, 512, GL_RGBA, false); 
-    lightTEX.Unbind(); 
-
-    VBO VBO2(crosshairVertices, sizeof(crosshairVertices)); 
-    VAO crosshairVAO(VBO2); 
-    crosshairVAO.Bind(); 
-    crosshairVAO.configVertexAttributes(0, 4, 4, 0); 
-    crosshairVAO.Unbind(); 
+    hud.crossHairInit(); // initializes crosshair 
 
     Texture crosshairTEX(GL_TEXTURE3);   
     crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3); 
@@ -266,12 +96,6 @@ int main()
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
-    std::vector<glm::vec3> pointLightPositions = {
-    	glm::vec3( 0.7f,  0.2f,  2.0f),
-    	glm::vec3( 2.3f, -3.3f, -4.0f),
-    	glm::vec3(-4.0f,  2.0f, -12.0f),
-    	glm::vec3( 0.0f,  0.0f, -3.0f)
-    };  
 
 
     // The main render loop 
@@ -290,79 +114,28 @@ int main()
         glEnable(GL_CULL_FACE);  
         glCullFace(GL_BACK);  
 
-
-
-
-        // float lightX = 16.0f, lightY = 37+(3.0*sin(glfwGetTime())), lightZ = 16.0f;  
-        float lightX = 0.0, lightY = 3.0f, lightZ = 1.0+(2.0f*sin(glfwGetTime()));   
-        glm::vec3 lightPos(lightX, lightY, lightZ); 
-
-
         shaderProgram.Activate(); 
         shaderProgram.setInt("material.diffuse", 0); 
         shaderProgram.setInt("material.specular", 1); 
  
 
-        // lighting.spotLightInit(shaderProgram, gameCamera);   
+        // lighting.spotLightInit(shaderProgram, gameCamera);    
         lighting.sunLightInit(shaderProgram, gameCamera); 
-
-        for (int i = 0; i < 4; i++) 
-        {
-            lighting.setLightSource(shaderProgram, pointLightPositions[i], i); 
-        }
-
-
-
-        // shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f); 
 
         renderer.viewProject(gameCamera);  
         // renderer.viewOrtho(orthoCamera); // orthographic camera  
         renderer.setShaders(shaderProgram); 
-
-        // TEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0);   
-        // tSpec.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE1); 
-
-        
-        // VAO1.Bind();
 
         // setting up frustum  
         frustum.setCamInternals(); 
         frustum.setCamDef();  
 
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);        
-
-
-/*         TEX.Unbind(); 
-        tSpec.Unbind();  */
-
-        // rendering light source 
-        lightShaderProgram.Activate(); 
-        lightVAO.Bind(); 
-        lightTEX.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE2); 
-        lightShaderProgram.setInt("lightCubeMap", 2); // texture setting 
-        lightShaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);   
-        
-    
-        renderer.setShaders(lightShaderProgram); 
-        for (unsigned int i = 0; i < pointLightPositions.size(); i++) 
-        {
-            renderer.drawRotatingVoxel(lightShaderProgram, pointLightPositions[i], 1.0f, 2.0f* (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));  
-        }
-        lightTEX.Unbind(); 
-
+        chunkManager.renderChunks(shaderProgram);       
 
         // 2D Rendering 
-        glDisable(GL_DEPTH_TEST); 
-        crossHairProgram.Activate(); 
-
-        crosshairVAO.Bind(); 
-        crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3);  
-        crossHairProgram.setInt("crosshairSprite", 3); 
-        
-        renderer.draw2D(crossHairProgram, glm::vec2(((float)SCR_WIDTH /2) - 5.0f, ((float)SCR_HEIGHT/2) - 5.0f), 10.0f); 
-
-        crosshairVAO.Unbind(); 
+        crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3);   
+        hud.DrawCrosshair(crossHairProgram); 
         crosshairTEX.Unbind(); 
 
         glDisable(GL_BLEND); 
@@ -371,13 +144,7 @@ int main()
         glfwPollEvents(); 
     }
 
-
-    VAO1.Delete(); 
-    VBO1.Delete(); 
-    TEX.Delete(); 
-    lightTEX.Delete(); 
     shaderProgram.Delete(); 
-    lightShaderProgram.Delete(); 
     glfwDestroyWindow(window);
     glfwTerminate(); 
     return 0; 
@@ -398,3 +165,35 @@ void key_callback(GLFWwindow* window, int button, int scancode, int action, int 
 {
     inputHandler.handleKeyCallbackInput(window, button, action, mods); 
 }  
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
+{
+    // Whenever the window changes in size GLFW calls this function
+    glViewport(0, 0, width, height); 
+}
+
+bool firstMouse = true; 
+float lastX = SCR_HEIGHT/2, lastY = SCR_WIDTH/2; // put mouse at center of screen 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)   
+{
+    
+    if (firstMouse) // initially set to true
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+
+    float xoffset = xpos - lastX; 
+    float yoffset = lastY - ypos; 
+    lastX = xpos; 
+    lastY = ypos; 
+
+    gameCamera.processMouseMovement(xoffset, yoffset); 
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
+{
+    gameCamera.zoom(xoffset , yoffset);  
+}

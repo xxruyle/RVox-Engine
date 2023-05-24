@@ -9,7 +9,6 @@
 #include <glm/glm.hpp>
 #include <noise/FastNoiseLite.h>
 
-#include "world.h" 
 #include "chunk.h"
 #include "voxel.h"
 #include "render/render.h" 
@@ -27,12 +26,11 @@ class ChunkManager
 // TO DO: create chunk size variable  
 // TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 public: 
-    World& world; 
     Render& renderer; 
     Camera& camera; 
     Frustum& frustum; 
 
-    ChunkManager(World& world, Render& renderer, Camera& camera, Frustum& frustum) : world(world), renderer(renderer), camera(camera), frustum(frustum) {};        
+    ChunkManager(Render& renderer, Camera& camera, Frustum& frustum) : renderer(renderer), camera(camera), frustum(frustum) {};        
 
 
 
@@ -65,7 +63,7 @@ public:
     Voxel* prevOutlinedVoxel = nullptr; 
 
 private: 
-    static const int renderDistance = 300; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 500; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 

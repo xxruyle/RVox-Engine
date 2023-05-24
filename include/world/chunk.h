@@ -16,7 +16,6 @@
 #include <noise/FastNoiseLite.h>
 
 
-#include "world.h" 
 #include "voxel.h" 
 #include "mesh/mesh.h" 
 
@@ -31,7 +30,7 @@
 
 
 class Chunk
-{
+{ // stores local chunk voxel positions and chunk mesh 
 public: 
     glm::vec3 position; 
     char voxels[33][256][33];  // the voxel array   
@@ -43,19 +42,14 @@ public:
     
 
     void generateSolidChunk(int randSeed, int startX, int startZ); 
-    void generateDebugChunk(int randSeed);  
+    void generateDebugChunk(int randSeed, int startX, int startZ);   
+    void addLightSource(); 
+
 
     void mesh(); // checks each block for the chunk to see and assigns them to be interior accordingly.   
     void draw(Shader& shader, Frustum& frustum); // draw the chunk    
-
-
     
 private: 
-    enum faces {
-        up = 0, down = 1 , front = 2, back = 3, left = 4, right = 5 
-    };
-
-
     unsigned int VAO, VBO, EBO;
     void setupMesh(); 
  

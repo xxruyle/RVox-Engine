@@ -4,23 +4,20 @@
 void ChunkManager::createChunks(int randSeed) 
 { // creates chunks and makes them generate a chunk 
     chunkMap.clear(); 
-    world.worldMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 3; i++) 
+    for (int i = 0; i < 2; i++) 
     {
-        for (int j = 0; j < 3; j++)  
+        for (int j = 0; j < 2; j++)   
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
             c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);     
+            // c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32); 
             c1.mesh(); 
             meshNeighbors(c1); 
-
-            // std::cout << sizeof(c1) << std::endl;   
-
         }
-    }
+    }   
 }
 
 
@@ -44,8 +41,8 @@ void ChunkManager::renderChunks(Shader& shader)
             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.position = chunkBuffer[i]; 
             c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
+            // c1.generateDebugChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);  
             c1.mesh(); 
-            // meshNeighbors(c1);  
         }
     } 
 }
