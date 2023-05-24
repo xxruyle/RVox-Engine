@@ -48,10 +48,8 @@ in vec3 Normal;
 in vec3 FragPos; 
 in vec3 Color; 
 
-// texture sample for cube map
-// uniform samplerCube cubeMap; 
+// uniform vec3 voxelColor;
 
-uniform vec3 voxelColor; 
 
 // uniforms for lighting 
 uniform vec3 viewPos; 
@@ -63,14 +61,22 @@ uniform SpotLight spotLight;
 uniform Material material; 
 
 
+// fog values 
+const float fogDensity = 0.0025; 
+const float fogGradient = 2.0; 
+uniform float renderDistance = 600; 
+
+
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);  
 vec3 CalcSpotLight(SpotLight spotlight, vec3 normal, vec3 fragpos, vec3 viewDir); 
+float CalcFog(vec3 cameraPos, float renderDistance); 
 
 
 
 void main()
 {
+	vec4 skyColor = vec4(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f);  
 
     // properties
     vec3 norm = normalize(Normal);
@@ -82,9 +88,11 @@ void main()
 /*     for(int i = 0; i < NR_POINT_LIGHTS; i++)
     	result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);     */
     // phase 3: Spot light
-    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);      
-    
-    FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color   
+    result += CalcSpotLight(spotLight, norm, FragPos, viewDir); 
+	float visibility = CalcFog(viewPos, renderDistance); 
+    // FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color  
+	FragColor = vec4(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f, 0.0) * vec4(result, 1.0);
+	FragColor = mix(skyColor, FragColor, visibility); 
 	
 }
 
@@ -166,4 +174,13 @@ vec3 CalcSpotLight(SpotLight spotlight, vec3 normal, vec3 fragpos, vec3 viewDir)
 
 	// return (ambient + diffuse + specular);
 	return (ambient + diffuse); 
+}
+
+float CalcFog(vec3 cameraPos, float renderDistance)    
+{
+	float distanceFromCamera =  length(FragPos - cameraPos);       
+
+	float visibility = exp(-pow((distanceFromCamera*fogDensity), fogGradient));   
+	visibility = clamp(visibility, 0.0, 1.0); 
+	return visibility; 
 }

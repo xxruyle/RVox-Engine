@@ -6,14 +6,14 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 2; i++) 
+    for (int i = 0; i < 4; i++) 
     {
-        for (int j = 0; j < 2; j++)   
+        for (int j = 0; j < 4; j++)   
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
             c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);     
-            // c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32); 
+            // c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);  
             c1.mesh(); 
             meshNeighbors(c1); 
         }
@@ -58,7 +58,7 @@ void ChunkManager::meshNeighbors(Chunk& chunk)
         {
             for (unsigned int y = 0; y < 256; y++) 
             {   
-                chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z + 1)].voxels[x][y][0] = chunk.voxels[x][y][32];       // update chunk's  neighbor's border  
+                chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z + 1)].voxels[x][y][0] = chunk.voxels[x][y][32]; // the index for the block that needs to be changed is chunk size + 1 - 1 (which is chunk size duh)       // update chunk's  neighbor's border  
             }
         }
         

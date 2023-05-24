@@ -11,14 +11,19 @@
   - [X] vao, vbo ebo
   - [ ] renderer and chunk draw functions 
 - [ ] Model loading with assimp 
-- [ ] Memory management 
+- [ ] Memory management (Run-length encoding (RLE) ?) 
 - [ ] Add coloring to voxels 
   - [ ] Voxel struct with block ID, 
-- [ ] rendering fog
+- [X] rendering fog
+- [ ] Mesh loading time optimizations using bit operations 
 - [ ] debugging tools (Wireframe boxes and x,y,z axis crosshair)
+- [ ] Voxel outline when looking at a voxel 
 - [ ] Placing blocks 
+- [ ] Day Night Cycle 
 - [ ] Add collision (AAAB)
 - [ ] 3rd Person Camera 
+- [ ] Shadow Mapping 
+- [ ] Water 
 - [ ] Better terrain generation 
   - [ ] Caves
   - [ ] Biomes

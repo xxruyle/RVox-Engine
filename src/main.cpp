@@ -107,7 +107,7 @@ int main()
 
         processInput(window); 
 
-        glClearColor(37.0f/255.0f, 197.0f/255.0f, 223.0f/255.0f, 1.0f); 
+        glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
@@ -117,6 +117,7 @@ int main()
         shaderProgram.Activate(); 
         shaderProgram.setInt("material.diffuse", 0); 
         shaderProgram.setInt("material.specular", 1); 
+        shaderProgram.setFloat("renderDistance", 300); 
  
 
         // lighting.spotLightInit(shaderProgram, gameCamera);    

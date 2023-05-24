@@ -48,7 +48,7 @@ public:
         angle = glm::radians(mFov); 
         ratio = (float)(SCR_WIDTH/SCR_HEIGHT);  
         nearD = 0.1f; 
-        farD = 700.0f; 
+        farD = 1000.0f; 
         updateDirectionVectors(); 
     }; 
 

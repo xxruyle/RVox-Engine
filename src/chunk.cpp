@@ -91,10 +91,10 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 void Chunk::generateDebugChunk(int randSeed, int startX, int startZ) 
 { // 3D noise chunk 
     FastNoiseLite noise; 
-    noise.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic); 
-    noise.SetFrequency(.1);  
-    noise.SetFractalOctaves(3); 
-    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes); 
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);  
+    noise.SetFractalType(FastNoiseLite::FractalType_Ridged);
+    noise.SetFrequency(.08);  
+    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
     noise.SetSeed(randSeed);   
 
         // Gather noise data
@@ -117,7 +117,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
         {
             for (int z = 0; z < 33; z++)  
             {
-                noiseData[x][y][z] > 0.0f ? voxels[x][y][z] = 1 : voxels[x][y][z] = 0;   
+                noiseData[x][y][z] > -0.71f ? voxels[x][y][z] = 1 : voxels[x][y][z] = 0;   
             }
         }
     }
@@ -170,7 +170,7 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
                             vertex.Normal = backNormals[i];   
                             // vertex.Color = voxelColors[x][y][z];  
-                            vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
+                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
                             vertices.push_back(vertex);      
                         }
                     }   
@@ -189,7 +189,7 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
                             vertex.Normal = frontNormals[i];  
                             // vertex.Color = voxelColors[x][y][z]; 
-                            vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
+                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -208,7 +208,7 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
                             vertex.Normal = leftNormals[i]; 
                             // vertex.Color = voxelColors[x][y][z];  
-                            vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
+                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -227,7 +227,7 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
                             vertex.Normal = rightNormals[i]; 
                             // vertex.Color = voxelColors[x][y][z]; 
-                            vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);    
+                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);    
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -247,7 +247,7 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
                             vertex.Normal = bottomNormals[i];    
                             // vertex.Color = voxelColors[x][y][z];  
-                            vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
+                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f); 
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -266,7 +266,7 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
                             vertex.Normal = topNormals[i];   
                             // vertex.Color = voxelColors[x][y][z];   
-                            vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
+                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -323,6 +323,7 @@ void Chunk::draw(Shader& shader, Frustum& frustum)
         model = glm::mat4(1.0f); 
         shader.setMat("model", 1, GL_FALSE, model);  
         // shader.setVec3("voxelColor", 75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
+         
 
         glBindVertexArray(VAO);  
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
