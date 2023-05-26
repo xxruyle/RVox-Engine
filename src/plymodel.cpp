@@ -2,7 +2,7 @@
 
 
 void PLYModel::readIn(std::string const &path) 
-{
+{ // reading in the magica voxel ply file export 
     std::vector<Vertex> vertices; 
     std::vector<unsigned int> indices; 
 
@@ -23,11 +23,12 @@ void PLYModel::readIn(std::string const &path)
 
         // Loading in the vertex coordinates  
         glm::vec3 vec; 
-        vec.x = (float)(vPos[i][0] * 10.0f);   
-        vec.z = (float)(vPos[i][1] * 10.0f);    
-        vec.y = (float)((vPos[i][2] * 10.0f) + 50.0f);      
+        vec.x = (float)(((vPos[i][0] * 10.0f) - 0.5f) + 16.0f); // ((* scale) - offset) + position in chunk
+        vec.z = (float)(((vPos[i][1] * 10.0f) + 0.5f) + 16.0f);     
+        vec.y = (float)((vPos[i][2] * 10.0f) + 25.0f);           
 
         v1.Position = vec; 
+
 
         // loading in the colors 
         glm::vec3 vecColor; 
@@ -39,42 +40,34 @@ void PLYModel::readIn(std::string const &path)
 
         // adding the vertex 
         vertices.push_back(v1); 
-
-
-/*         for (unsigned int j = 0; j < 3; j++) 
-        {
-            glm::vec3 vec; 
-
-            std::cout << "Vertex Pos : " << vPos[i][j] << std::endl; 
-        }
-
-        for (unsigned int j = 0; j < 3; j++) 
-        {
-            std::cout << "vertex Color: " << (unsigned int)vColors[i][j] << std::endl;   
-        }
- */
-
     }
 
 
-    // loading the indices  
+    // loading the indices and adding normals  
     for (unsigned int i = 0; i < faceIndices.size(); i++) 
     {
-/*         for (unsigned int j = 0; j < faceIndices[i].size(); j++) 
-        {
-            std::cout << (unsigned int)faceIndices[i][j] << std::endl;  
-        }
-        std::cout << "-----" << std::endl;  */
-
-        indices.push_back((unsigned int)faceIndices[i][0]); 
-
+        indices.push_back((unsigned int)faceIndices[i][2]); 
         indices.push_back((unsigned int)faceIndices[i][1]); 
-        indices.push_back((unsigned int)faceIndices[i][2]); 
-        indices.push_back((unsigned int)faceIndices[i][3]); 
+        indices.push_back((unsigned int)faceIndices[i][0]); 
 
+        indices.push_back((unsigned int)faceIndices[i][3]); 
         indices.push_back((unsigned int)faceIndices[i][2]); 
         indices.push_back((unsigned int)faceIndices[i][0]); 
 
+        // getting the vectors 
+        glm::vec3 A = vertices[(unsigned int)faceIndices[i][0]].Position - vertices[(unsigned int)faceIndices[i][1]].Position; 
+        glm::vec3 B = vertices[(unsigned int)faceIndices[i][2]].Position - vertices[(unsigned int)faceIndices[i][1]].Position; 
+
+        // getting the normal  
+        glm::vec3 normal = glm::normalize(glm::cross(A, B)); 
+
+        // assigning the normals  
+        vertices[(unsigned int)faceIndices[i][2]].Normal = normal; 
+        vertices[(unsigned int)faceIndices[i][1]].Normal = normal; 
+        vertices[(unsigned int)faceIndices[i][0]].Normal = normal; 
+        vertices[(unsigned int)faceIndices[i][3]].Normal = normal; 
+        vertices[(unsigned int)faceIndices[i][2]].Normal = normal; 
+        vertices[(unsigned int)faceIndices[i][0]].Normal = normal;  
     }
 
     std::cout << "Loading mesh data..." << std::endl;  

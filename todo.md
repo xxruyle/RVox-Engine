@@ -10,7 +10,9 @@
   - [X] world (deleted) 
   - [X] vao, vbo ebo
   - [ ] renderer and chunk draw functions 
-- [ ] Model loading with assimp 
+- [X] ~~Model loading with assimp~~ Model loading with happly.h for ply files  
+  - [X] get normals for each vertex in ply file  
+  - Scale the models down to world voxel size (and add them to chunks)? 
 - [ ] Memory management (Run-length encoding (RLE) ?) 
 - [ ] Multithreading
 - [ ] Add coloring to voxels 

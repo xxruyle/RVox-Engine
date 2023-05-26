@@ -42,7 +42,6 @@ Hud hud(renderer);
 
 PLYModel plymodel; 
 
-// Model model("res/models/survivalGuitar/backpack.obj"); 
 
 
 
@@ -103,7 +102,7 @@ int main()
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
-    plymodel.readIn("res/models/trinitas_logo.ply");  
+    plymodel.readIn("res/models/monu1.ply");            
 
 
     // The main render loop 
@@ -132,7 +131,7 @@ int main()
         lighting.sunLightInit(shaderProgram, gameCamera); 
 
         renderer.viewProject(gameCamera);  
-        // renderer.viewOrtho(orthoCamera); // orthographic camera  
+        // renderer.viewOrtho(orthoCamera); // orthographic camera   
         renderer.setShaders(shaderProgram); 
 
         // setting up frustum  
