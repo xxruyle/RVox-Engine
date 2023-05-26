@@ -29,7 +29,8 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
 
     if (button == GLFW_KEY_5 && action == GLFW_PRESS) 
     {
-        chunkManager.chunkMap.erase(glm::vec3(0,0,0)); 
+        chunkManager.chunkMap[glm::vec3(0,0,0)].voxels[0][40][0] = 1; 
+        chunkManager.chunkMap[glm::vec3(0,0,0)].mesh(); 
     }
 
 

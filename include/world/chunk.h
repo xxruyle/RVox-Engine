@@ -26,7 +26,11 @@
 #define GLM_ENABLE_EXPERIMENTAL // enables hashing of glm::vec3 
 #include "glm/gtx/hash.hpp"
 
-
+struct voxelVertex {
+    glm::vec3 Position; 
+    glm::vec3 Normal; 
+    glm::vec3 Color;  
+}; 
 
 
 class Chunk
@@ -37,7 +41,7 @@ public:
     // glm::vec3 voxelColors[33][256][33]; 
 
 
-    std::vector<Vertex> vertices; // for the chunk mesh    
+    std::vector<voxelVertex> vertices; // for the chunk mesh    
     std::vector<unsigned int> indices;
     
 
@@ -47,7 +51,7 @@ public:
 
 
     void mesh(); // checks each block for the chunk to see and assigns them to be interior accordingly.   
-    void draw(Shader& shader, Frustum& frustum); // draw the chunk    
+    void draw(Shader& shader, Frustum& frustum, float renderDistance); // draw the chunk    
     
 private: 
     unsigned int VAO, VBO, EBO;

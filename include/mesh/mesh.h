@@ -7,28 +7,27 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+
 #include "texture/texture.h" 
 #include "shader/shader.h" 
 
 
 
 
-/* struct Vertex {
-    glm::vec3 Position; 
-    glm::vec3 Normal; 
-    glm::vec2 TexCoords; 
-};  */
-
 struct Vertex {
-    glm::vec3 Position; 
+    // position
+    glm::vec3 Position;
+    // normal
     glm::vec3 Normal; 
     glm::vec3 Color; 
 }; 
 
-struct meshTexture { 
-    unsigned int id; 
-    std::string type; 
-}; 
+
 
 class Mesh
 {
@@ -36,12 +35,8 @@ public:
     std::vector<Vertex> vertices; 
     std::vector<unsigned int> indices; 
 
-    std::vector<Texture> textures; 
 
-    // Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);  
-    // Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);  
-
-
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);     
 
     void Draw(Shader& shader); 
 

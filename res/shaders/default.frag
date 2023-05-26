@@ -62,9 +62,20 @@ uniform Material material;
 
 
 // fog values 
-const float fogDensity = 0.0025; 
-const float fogGradient = 2.0; 
-uniform float renderDistance = 600; 
+// const float fogDensity = 0.0025; // for 1000 block render distance 
+
+
+
+
+uniform float renderDistance; 
+
+const float fogDensity = .005;  
+// float fogDensity = ((-4 / 5) *(renderDistance / 100) + 9) * .001;  
+float fogGradient = 2.0; 
+
+
+
+
 
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
@@ -76,6 +87,9 @@ float CalcFog(vec3 cameraPos, float renderDistance);
 
 void main()
 {
+
+
+
 	vec4 skyColor = vec4(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f);  
 
     // properties
@@ -88,10 +102,10 @@ void main()
 /*     for(int i = 0; i < NR_POINT_LIGHTS; i++)
     	result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);     */
     // phase 3: Spot light
-    result += CalcSpotLight(spotLight, norm, FragPos, viewDir); 
+    // result += CalcSpotLight(spotLight, norm, FragPos, viewDir); 
 	float visibility = CalcFog(viewPos, renderDistance); 
     // FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color  
-	FragColor = vec4(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f, 0.0) * vec4(result, 1.0);
+	FragColor = vec4(Color, 0.0) * vec4(result, 1.0); 
 	FragColor = mix(skyColor, FragColor, visibility); 
 	
 }

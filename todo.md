@@ -12,6 +12,7 @@
   - [ ] renderer and chunk draw functions 
 - [ ] Model loading with assimp 
 - [ ] Memory management (Run-length encoding (RLE) ?) 
+- [ ] Multithreading
 - [ ] Add coloring to voxels 
   - [ ] Voxel struct with block ID, 
 - [X] rendering fog

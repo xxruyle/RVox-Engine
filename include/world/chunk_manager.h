@@ -45,8 +45,6 @@ public:
 
     void meshNeighbors(Chunk& chunk);  // gives chunks data about their neighbors 
 
-    void renderOneVoxel(Shader& shader);  
-
 
     glm::vec3 getChunkLocation(glm::vec3 coordinatePosition); // prints what chunk coorddinate the camera is in  
     void printChunkLocation(); 
@@ -63,7 +61,7 @@ public:
     Voxel* prevOutlinedVoxel = nullptr; 
 
 private: 
-    static const int renderDistance = 1000; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 500; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 

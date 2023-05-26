@@ -1,31 +1,13 @@
 #pragma once 
-#include <iostream> 
-#include <cmath> 
-#include <vector> 
+#include <unordered_map> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
-
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-
-class Voxel 
-{
-// The voxel object which stores the world coordinates and texture of the voxel 
-public: 
-    glm::vec3 coordinates; // world coordinates of the voxel  
-    glm::vec3 color; // color of the voxel 
-    int id; 
-    glm::vec3 colorCopy; // copy of the voxel stored when outline color is assigned to the color 
-    glm::vec3 outlineColor; // the outline color of the voxel, 
-
-    bool isInterior; // determines whether block should be culled, if interior cull. 
-
-
-
-    Voxel(glm::vec3 coordinates, glm::vec3 color,  int id) : coordinates(coordinates),  color(color), id(id), colorCopy(color) {
-        outlineColor = glm::vec3(pow(color.x, 6), pow(color.y, 6), pow(color.z, 6)); 
+struct Voxel {
+    std::unordered_map<char, glm::vec3> voxelColors = {
+        {1, glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f)}, // grass
+        {2, glm::vec3(130.0f/255.0f, 136.0f/255.0f, 134.0f/255.0f)}, // stone
+        {3, glm::vec3(236.0f/255.0f, 255.0f/255.0f, 253.0f/255.0f)}, // snow 
     }; 
-
-}; 
+};

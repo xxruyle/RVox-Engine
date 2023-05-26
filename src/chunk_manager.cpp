@@ -6,9 +6,9 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 4; i++) 
+    for (int i = 0; i < 2; i++) 
     {
-        for (int j = 0; j < 4; j++)   
+        for (int j = 0; j < 1; j++)   
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
@@ -34,7 +34,7 @@ void ChunkManager::renderChunks(Shader& shader)
         if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
         {
             if (isNearPlayer(camera.mPosition, chunkBuffer[i]))  
-                chunkMap[chunkBuffer[i]].draw(shader, frustum);
+                chunkMap[chunkBuffer[i]].draw(shader, frustum, renderDistance);
             
 
         }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
@@ -132,11 +132,7 @@ void ChunkManager::meshNeighbors(Chunk& chunk)
 
 
 
-void ChunkManager::renderOneVoxel(Shader& shader)  
-{ // for debugging 
-    Voxel voxel(glm::vec3(0.0,0.0,0.0), glm::vec3(1.0, 0.5, 0.31), 1);     
-    renderer.drawVoxel(shader, voxel.coordinates, voxel.color, 1.0f);  
-}
+
 
 glm::vec3 ChunkManager::getChunkLocation(glm::vec3 coordinatePosition)  
 {
@@ -210,7 +206,7 @@ glm::vec3 ChunkManager::brensenCast()
 
         if (xCoord >= 0 && yCoord >= 0 && zCoord >= 0) 
         {
-            if (chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] == 1)  
+            if (chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] > 0) // if block is not air  
             {
                 return glm::vec3((int)voxelCoords[i].x, (int)voxelCoords[i].y, (int)voxelCoords[i].z);    
             }

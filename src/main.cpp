@@ -19,7 +19,7 @@
 #include "input/input_handler.h" 
 #include "render/render.h"
 #include "camera/frustum.h" 
-#include "mesh/mesh.h"
+#include "mesh/plymodel.h" 
 #include "hud/hud.h" 
 
 
@@ -38,6 +38,13 @@ Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);
 ChunkManager chunkManager(renderer, gameCamera, frustum);      
 InputHandler inputHandler(gameCamera, chunkManager);   
 Hud hud(renderer); 
+
+
+PLYModel plymodel; 
+
+// Model model("res/models/survivalGuitar/backpack.obj"); 
+
+
 
 
 void processInput(GLFWwindow* window); 
@@ -96,6 +103,7 @@ int main()
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
+    plymodel.readIn("res/models/trinitas_logo.ply");  
 
 
     // The main render loop 
@@ -111,8 +119,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
-        glEnable(GL_CULL_FACE);  
-        glCullFace(GL_BACK);  
+/*         glEnable(GL_CULL_FACE);  
+        glCullFace(GL_BACK);   */
 
         shaderProgram.Activate(); 
         shaderProgram.setInt("material.diffuse", 0); 
@@ -132,7 +140,9 @@ int main()
         frustum.setCamDef();  
 
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);       
+        chunkManager.renderChunks(shaderProgram);             
+
+        plymodel.Draw(shaderProgram);  
 
         // 2D Rendering 
         crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3);   
