@@ -262,7 +262,7 @@ void Chunk::mesh()
         }
     }    
     setupMesh(); 
-    vertices.clear();
+    // vertices.clear();  
 }
 
 void Chunk::setupMesh() 
@@ -299,6 +299,15 @@ void Chunk::setupMesh()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords)); */
 
     glBindVertexArray(0);   
+}
+
+void Chunk::changeVoxelColor(glm::vec3 voxelCoord) 
+{
+    voxels[(int)voxelCoord.x][(int)voxelCoord.y][(int)voxelCoord.z] = 3;  
+    // get location of vertex in vertices  
+    // change color 
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(voxelVertex), &vertices[0], GL_STATIC_DRAW);  
 }
 
 void Chunk::draw(Shader& shader, Frustum& frustum, float renderDistance) 

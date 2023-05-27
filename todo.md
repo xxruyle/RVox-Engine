@@ -21,11 +21,14 @@
 - [ ] Mesh loading time optimizations using bit operations 
 - [ ] debugging tools (Wireframe boxes and x,y,z axis crosshair)
 - [ ] Voxel outline when looking at a voxel 
+  - [ ] Draw an outline of a singular block only when racyasting towards a non air block (not chaning block color just overlaying the block with another texture of a block) 
+- [ ] Model Animations  
 - [ ] Placing blocks 
 - [ ] Day Night Cycle 
 - [ ] Add collision (AAAB)
 - [ ] 3rd Person Camera 
 - [ ] Shadow Mapping 
+- [ ] Ambient Occlusion
 - [ ] Water 
 - [ ] Better terrain generation 
   - [ ] Caves

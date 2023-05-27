@@ -34,7 +34,10 @@ void ChunkManager::renderChunks(Shader& shader)
         if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
         {
             if (isNearPlayer(camera.mPosition, chunkBuffer[i]))  
+            {
                 chunkMap[chunkBuffer[i]].draw(shader, frustum, renderDistance);
+            }
+                
             
 
         }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  

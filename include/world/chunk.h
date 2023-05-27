@@ -47,6 +47,7 @@ public:
 
     void generateSolidChunk(int randSeed, int startX, int startZ); 
     void generateDebugChunk(int randSeed, int startX, int startZ);   
+    void changeVoxelColor(glm::vec3 voxelCoord); 
     void addLightSource(); 
 
 

@@ -9,10 +9,11 @@ A Voxel Engine made from scratch using OpenGL
 - Each chunk is meshed before hand 
 - Interior voxels are culled for performance 
 - Chunks are culled when out of frustum 
-
+  
 ## Lighting 
-- Basic lighting at the moment which is calculated using the normals of each voxel 
+- Basic rudimentary lighting which is calculated using the normals of each voxel  
 - Fog 
 
 ## Model Loading 
 ![teapot ply model](res/screenshots/teapotModel.png)   
+![Human And Skeleton](res/screenshots/human%26skeleton.png) 
