@@ -12,7 +12,7 @@
   - [ ] renderer and chunk draw functions 
 - [X] ~~Model loading with assimp~~ Model loading with happly.h for ply files  
   - [X] get normals for each vertex in ply file  
-  - Scale the models down to world voxel size (and add them to chunks)? 
+  - [X] Scale the models down to world voxel size   
 - [ ] Memory management (Run-length encoding (RLE) ?) 
 - [ ] Multithreading
 - [ ] Add coloring to voxels 

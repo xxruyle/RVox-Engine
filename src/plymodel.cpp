@@ -1,7 +1,7 @@
 #include "mesh/plymodel.h" 
 
 
-void PLYModel::readIn(std::string const &path) 
+void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)  
 { // reading in the magica voxel ply file export 
     std::vector<Vertex> vertices; 
     std::vector<unsigned int> indices; 
@@ -23,9 +23,11 @@ void PLYModel::readIn(std::string const &path)
 
         // Loading in the vertex coordinates  
         glm::vec3 vec; 
-        vec.x = (float)(((vPos[i][0] * 10.0f) - 0.5f) + 16.0f); // ((* scale) - offset) + position in chunk
-        vec.z = (float)(((vPos[i][1] * 10.0f) + 0.5f) + 16.0f);     
-        vec.y = (float)((vPos[i][2] * 10.0f) + 25.0f);           
+        // For X: ((* 10.0f) - 0.5) + position in chunk
+        // For Y: ((* 10.0f) + 0.5) + position in chunk 
+        vec.x = (float)(((vPos[i][0] * scale) - 0.5f) + position.x); // ((* scale) - offset) + position in chunk
+        vec.z = (float)(((vPos[i][1] * scale) + 0.5f) + position.z); 
+        vec.y = (float)((vPos[i][2] * scale) + position.y);             
 
         v1.Position = vec; 
 

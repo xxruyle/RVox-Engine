@@ -40,12 +40,6 @@ InputHandler inputHandler(gameCamera, chunkManager);
 Hud hud(renderer); 
 
 
-PLYModel plymodel; 
-
-
-
-
-
 void processInput(GLFWwindow* window); 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods); 
 void key_callback(GLFWwindow* window, int button, int scancode, int action, int mods); 
@@ -102,7 +96,8 @@ int main()
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
-    plymodel.readIn("res/models/monu1.ply");            
+    PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 40, 0), 1.0f);   
+    PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(5, 40, 5), 1.0f); 
 
 
     // The main render loop 
@@ -118,18 +113,20 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
-/*         glEnable(GL_CULL_FACE);  
-        glCullFace(GL_BACK);   */
+        glEnable(GL_CULL_FACE);  
+        glCullFace(GL_BACK);  
 
         shaderProgram.Activate(); 
         shaderProgram.setInt("material.diffuse", 0); 
         shaderProgram.setInt("material.specular", 1); 
         shaderProgram.setFloat("renderDistance", 300); 
  
-
+        // lighting 
         // lighting.spotLightInit(shaderProgram, gameCamera);    
         lighting.sunLightInit(shaderProgram, gameCamera); 
 
+
+        // camera and frustum 
         renderer.viewProject(gameCamera);  
         // renderer.viewOrtho(orthoCamera); // orthographic camera   
         renderer.setShaders(shaderProgram); 
@@ -141,7 +138,10 @@ int main()
         // drawing the chunk manager chunks 
         chunkManager.renderChunks(shaderProgram);             
 
+
+        // models 
         plymodel.Draw(shaderProgram);  
+        plymodelPlayer.Draw(shaderProgram); 
 
         // 2D Rendering 
         crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3);   
