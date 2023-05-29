@@ -50,46 +50,34 @@ in vec3 Color;
 
 // uniform vec3 voxelColor;
 
-
 // uniforms for lighting 
 uniform vec3 viewPos; 
-
 uniform DirLight dirLight; 
 uniform PointLight pointLights[NR_POINT_LIGHTS]; 
 uniform SpotLight spotLight; 
-
 uniform Material material; 
 
 
 // fog values 
 // const float fogDensity = 0.0025; // for 1000 block render distance 
-
-
-
-
 uniform float renderDistance; 
-
 const float fogDensity = .005;  
-// float fogDensity = ((-4 / 5) *(renderDistance / 100) + 9) * .001;  
 float fogGradient = 2.0; 
 
-
-
-
+// frustum values 
+float nearD = 0.1; 
+float farD = 500.0; 
 
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);  
 vec3 CalcSpotLight(SpotLight spotlight, vec3 normal, vec3 fragpos, vec3 viewDir); 
 float CalcFog(vec3 cameraPos, float renderDistance); 
-
+float LinearizeDepth(float depth); 
 
 
 void main()
 {
-
-
-
 	vec4 skyColor = vec4(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f);  
 
     // properties
@@ -104,8 +92,11 @@ void main()
     // phase 3: Spot light
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir); 
 	float visibility = CalcFog(viewPos, renderDistance); 
-    // FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color  
-	FragColor = vec4(Color, 0.0) * vec4(result, 1.0); 
+
+	// float depth = LinearizeDepth(gl_FragCoord.z) / farD; // depth testing 
+	// FragColor = vec4(vec3(depth), 1.0); // depth buffer  
+
+    FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color   
 	FragColor = mix(skyColor, FragColor, visibility); 
 	
 }
@@ -197,4 +188,10 @@ float CalcFog(vec3 cameraPos, float renderDistance)
 	float visibility = exp(-pow((distanceFromCamera*fogDensity), fogGradient));   
 	visibility = clamp(visibility, 0.0, 1.0); 
 	return visibility; 
+}
+
+float LinearizeDepth(float depth)
+{
+	float z = depth * 2.0 - 1.0; 
+	return (2.0 * nearD * farD) / (farD + nearD - z * (farD - nearD)); 
 }

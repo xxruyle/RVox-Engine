@@ -13,17 +13,23 @@ GLfloat crosshairVertices[] = {
 
 void Hud::DrawCrosshair(Shader& shader) 
 {
+    texture.Bind(GL_TEXTURE_2D, GL_TEXTURE1);  
     shader.Activate(); 
-    shader.setInt("crosshairSprite", 3); 
+    shader.setInt("crosshairSprite", 1); 
 
     glBindVertexArray(VAO); 
 
     renderer.draw2D(shader, glm::vec2(((float)1300 / 2) - 5.0f, ((float)1000/ 2) - 5.0f), 10.0f);    
     glBindVertexArray(0);
+    texture.Unbind(); 
 }
 
-void Hud::crossHairInit() 
+void Hud::crossHairInit(const char* textureFilePath) 
 {
+    texture.Init(GL_TEXTURE1); 
+    texture.Bind(GL_TEXTURE_2D, GL_TEXTURE1);   
+    texture.Generate(textureFilePath, 512, 512, GL_RGBA, false);     
+    texture.Unbind();  
     setupMesh();   
 }
 

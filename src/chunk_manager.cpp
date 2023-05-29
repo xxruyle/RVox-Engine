@@ -295,32 +295,26 @@ std::vector<glm::vec3> ChunkManager::voxelTraversal()
     return voxelRayIntersections; 
 }
 
-/* void ChunkManager::voxelOutline() 
+void ChunkManager::voxelOutline(Shader& shader, DebugTools& debugTools)  
 { // changes color of voxel to voxel outline color if casted
     glm::vec3 voxelPosition = brensenCast(); 
-    glm::vec3 chunkCoord = getChunkLocation(voxelPosition);   
-    if (voxelPosition != glm::vec3(0, 1000, 0)) 
+    if (voxelPosition != glm::vec3(0, 1000, 0) ) 
     {
-        for (unsigned int i = 0; i < chunkMap[chunkCoord].voxels.size(); i++) 
-        {
-            if (chunkMap[chunkCoord].voxels[i].coordinates == voxelPosition)  
-            {
-                prevOutlinedVoxel = &(chunkMap[chunkCoord].voxels[i]); 
-                chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].outlineColor;
-            }    
-            else 
-            {   
-                chunkMap[chunkCoord].voxels[i].color = chunkMap[chunkCoord].voxels[i].colorCopy;
-            }
-        }
-    } else {
-        if (prevOutlinedVoxel != nullptr) 
-        {
-            prevOutlinedVoxel->color = prevOutlinedVoxel->colorCopy;
-        }
-             
+
+    
+        glm::vec3 chunkCoord = getChunkLocation(voxelPosition);  
+        int xCoord = (int)voxelPosition.x - (int)chunkMap[chunkCoord].position.x * 32; 
+        int yCoord = (int)voxelPosition.y - (int)chunkMap[chunkCoord].position.y * 32; 
+        int zCoord = (int)voxelPosition.z - (int)chunkMap[chunkCoord].position.z * 32; 
+
+        // std::cout << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; // for debugging purposes  
+
+
+        if (chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] > 0) 
+            debugTools.drawVoxelOutline(shader, glm::vec3(voxelPosition.x, voxelPosition.y, voxelPosition.z));           
     }
-} */
+    
+}
 
 void ChunkManager::deleteVoxel()
 {

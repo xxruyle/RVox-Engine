@@ -19,7 +19,8 @@ class Texture
 
     public: 
         GLuint ID;  
-        Texture(GLenum textureUnit); // initialize the texture object  
+        // Texture(GLenum textureUnit); // initialize the texture object  
+        void Init(GLenum textureUnit); 
         void Bind(GLenum textureType, GLenum textureUnit); // bind the texture 
         void Unbind(); 
         void Generate(const char* file_string, int width, int height, GLenum format, bool flip); // load and generate the texture 

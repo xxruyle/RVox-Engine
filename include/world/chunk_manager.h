@@ -16,6 +16,8 @@
 
 #include "camera/frustum.h" 
 
+#include "debug/debug_tools.h" 
+
 
 #define GLM_ENABLE_EXPERIMENTAL // enables hashing of glm::vec3 
 #include "glm/gtx/hash.hpp"
@@ -54,7 +56,7 @@ public:
 
     glm::vec3 brensenCast(); 
     std::vector<glm::vec3> voxelTraversal();  
-    void voxelOutline(); 
+    void voxelOutline(Shader& shader, DebugTools& debugTools);  
     void deleteVoxel(); 
 
     // initializing the prev outlined voxel for voxelOutline. Not the most elegant solution for the voxelOutline bug, but whatever lol 

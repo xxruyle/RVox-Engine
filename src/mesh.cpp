@@ -40,6 +40,8 @@ void Mesh::setupMesh()
     glBindVertexArray(0);   
 }
 
+
+
 void Mesh::Draw(Shader& shader) 
 {
     glBindVertexArray(VAO); 

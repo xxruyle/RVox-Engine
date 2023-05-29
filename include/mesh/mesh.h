@@ -22,7 +22,6 @@ struct Vertex {
 }; 
 
 
-
 class Mesh
 {
 public: 
@@ -32,11 +31,14 @@ public:
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);     
 
+
     void Draw(Shader& shader); 
 
 private: 
     unsigned int VAO, VBO, EBO; 
 
     void setupMesh();
+    void setupTextureMesh(); 
+ 
 
 }; 

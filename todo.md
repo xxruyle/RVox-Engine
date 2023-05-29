@@ -15,13 +15,13 @@
   - [X] Scale the models down to world voxel size   
 - [ ] Memory management (Run-length encoding (RLE) ?) 
 - [ ] Multithreading
-- [ ] Add coloring to voxels 
-  - [ ] Voxel struct with block ID, 
+- [X] Add coloring to voxels 
 - [X] rendering fog
 - [ ] Mesh loading time optimizations using bit operations 
 - [ ] debugging tools (Wireframe boxes and x,y,z axis crosshair)
-- [ ] Voxel outline when looking at a voxel 
-  - [ ] Draw an outline of a singular block only when racyasting towards a non air block (not chaning block color just overlaying the block with another texture of a block) 
+  - [ ] wireframe boxes 
+  - [ ] x,y,z axis crosshair 
+- [X] Voxel outline when looking at a voxel 
 - [ ] Model Animations  
 - [ ] Placing blocks 
 - [ ] Day Night Cycle 

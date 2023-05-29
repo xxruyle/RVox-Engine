@@ -3,10 +3,12 @@
 #include "texture/stb_image.h" 
 #include "texture/texture.h" 
 
-Texture::Texture(GLenum textureUnit)  
+
+
+void Texture::Init(GLenum textureUnit) 
 {
     glActiveTexture(textureUnit);
-    glGenTextures(1, &ID); 
+    glGenTextures(1, &ID);  
 }
 
 
@@ -52,12 +54,11 @@ void Texture::Generate(const char* file_string, int width, int height, GLenum fo
     int nrChannels; 
     stbi_set_flip_vertically_on_load(flip);  
 
-    unsigned char* data = stbi_load(file_string, &width, &height, &nrChannels, 0);  
+    unsigned char* data = stbi_load(file_string, &width, &height, &nrChannels, 4);  
     if (data)
     {
-        // std::cout << "TEXTURE LOADED: " << file_string << std::endl; 
         // GL_RGBA in 7th parameter if it is in png
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data); // generates textures 
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data); // generates textures   
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         std::cout << "Failed to load texture" << std::endl; 

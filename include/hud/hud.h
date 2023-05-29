@@ -18,10 +18,8 @@ class Hud
 public: 
     Render& renderer; 
 
-
-
     Hud(Render& renderer) : renderer(renderer) {}; 
-    void crossHairInit(); 
+    void crossHairInit(const char* textureFilePath);   
 
     void DrawCrosshair(Shader& shader);   
 
@@ -29,5 +27,6 @@ public:
 
 private: 
     unsigned int VAO, VBO; 
+    Texture texture; 
     void setupMesh();    
 }; 

@@ -21,6 +21,7 @@
 #include "camera/frustum.h" 
 #include "mesh/plymodel.h" 
 #include "hud/hud.h" 
+#include "debug/debug_tools.h"
 
 
 
@@ -84,23 +85,25 @@ int main()
     Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag"); 
     shaderProgram.Activate();  
 
-    Shader crossHairProgram("res/shaders/crosshair.vert", "res/shaders/crosshair.frag"); 
-    crossHairProgram.Activate(); 
+    Shader hudProgram("res/shaders/hud.vert", "res/shaders/hud.frag"); 
+    hudProgram.Activate(); 
 
-    hud.crossHairInit(); // initializes crosshair 
+    Shader outlineProgram("res/shaders/outline.vert", "res/shaders/outline.frag"); 
+    outlineProgram.Activate(); 
+    // outlineProgram.setInt("outlineTexture", 0);  
 
-    Texture crosshairTEX(GL_TEXTURE3);   
-    crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3); 
-    crosshairTEX.Generate("res/textures/crosshairbox.png", 512, 512, GL_RGBA, false); 
-    crosshairTEX.Unbind(); 
+
+
+    hud.crossHairInit("res/textures/crosshairbox.png"); // initializes crosshair  
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
-    PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 40, 0), 1.0f);   
-    PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(5, 40, 5), 1.0f); 
+    PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 40, 0), 1.2f);   
+    PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(5, 40, 5), 1.2f); 
 
+    DebugTools debugTools; 
 
-    // The main render loop 
+    // The main render loop z
     while (!glfwWindowShouldClose(window)) 
     {
         // time functions for deltaTime and fps 
@@ -131,6 +134,7 @@ int main()
         // renderer.viewOrtho(orthoCamera); // orthographic camera   
         renderer.setShaders(shaderProgram); 
 
+
         // setting up frustum  
         frustum.setCamInternals(); 
         frustum.setCamDef();  
@@ -143,10 +147,18 @@ int main()
         plymodel.Draw(shaderProgram);  
         plymodelPlayer.Draw(shaderProgram); 
 
+        // for transparency
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+
+        // voxel outline 
+        outlineProgram.Activate(); 
+        renderer.setShaders(outlineProgram); 
+        chunkManager.voxelOutline(outlineProgram, debugTools);  
+
+
         // 2D Rendering 
-        crosshairTEX.Bind(GL_TEXTURE_2D, GL_TEXTURE3);   
-        hud.DrawCrosshair(crossHairProgram); 
-        crosshairTEX.Unbind(); 
+        hud.DrawCrosshair(hudProgram);  
 
         glDisable(GL_BLEND); 
 
@@ -155,6 +167,8 @@ int main()
     }
 
     shaderProgram.Delete(); 
+    hudProgram.Delete(); 
+    outlineProgram.Delete(); 
     glfwDestroyWindow(window);
     glfwTerminate(); 
     return 0; 
