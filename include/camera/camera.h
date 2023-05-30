@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "player/player.h" 
+
 
 
 class Camera 
@@ -16,9 +18,10 @@ private:
     void updateDirectionVectors(); 
 
 public: 
-
+    bool thirdPerson = false; 
     float SCR_WIDTH = 1300; 
     float SCR_HEIGHT = 1000; 
+    
     glm::vec3 mDirection; 
     glm::vec3 mPlayerDirection; 
 
@@ -54,17 +57,11 @@ public:
 
 
     glm::mat4 getViewMatrix(); 
+    glm::mat4 getPlayerViewMatrix(Player& player);  
     glm::mat4 getProjectionMatrix(); 
     void processInput(GLFWwindow* window, float deltaTime); // camera movement 
 
     void processMouseMovement(double xoffset, double yoffset); // updates pitch and yaw based on mouse movement and updates direction vectors  
 
     void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
-
-
-
-
-
-
-
 }; 

@@ -3,6 +3,8 @@
 
 void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)  
 { // reading in the magica voxel ply file export 
+    BoundingBox boundingBox; 
+
     std::vector<Vertex> vertices; 
     std::vector<unsigned int> indices; 
 
@@ -17,17 +19,41 @@ void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)
     vColors = plyIn.getVertexColors();  
     faceIndices = plyIn.getFaceIndices<size_t>(); 
 
+    float minX = 10000.0f; 
+    float maxX = -10000.0f; 
+
+    float minY = 10000.0f; 
+    float maxY = -10000.0f; 
+
+    float minZ = 10000.0f; 
+    float maxZ = -10000.0f;  
+
+
     for (unsigned int i = 0; i < vPos.size(); i++)  
     {
         Vertex v1; 
 
         // Loading in the vertex coordinates  
         glm::vec3 vec; 
+        // when loading in big models 
         // For X: ((* 10.0f) - 0.5) + position in chunk
         // For Y: ((* 10.0f) + 0.5) + position in chunk 
-        vec.x = (float)(((vPos[i][0] * scale) - 0.5f) + position.x); // ((* scale) - offset) + position in chunk
-        vec.z = (float)(((vPos[i][1] * scale) + 0.5f) + position.z); 
-        vec.y = (float)((vPos[i][2] * scale) + position.y);             
+
+        float xPos = -vPos[i][0]; 
+        float yPos = vPos[i][2]; 
+        float zPos = -vPos[i][1];  
+
+        vec.x = (float)(((xPos * scale)) + position.x); // ((* scale) - offset) + position in chunk
+        vec.z = (float)(((zPos * scale)) + position.z);  
+        vec.y = (float)((yPos * scale) + position.y);             
+
+        minX = std::min(minX, vec.x); 
+        minY = std::min(minY, vec.y); 
+        minZ = std::min(minZ, vec.z); 
+
+        maxX = std::max(maxX, vec.x);  
+        maxY = std::max(maxY, vec.y);  
+        maxZ = std::max(maxZ, vec.z);  
 
         v1.Position = vec; 
 
@@ -44,6 +70,26 @@ void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)
         vertices.push_back(v1); 
     }
 
+    // giving bounding box the min and max coordinates of the mesh  
+    boundingBox.minX = minX; 
+    boundingBox.startminX = minX; 
+
+    boundingBox.maxX = maxX; 
+    boundingBox.startmaxX = maxX; 
+
+    boundingBox.startminY = minY; 
+    boundingBox.minY = minY; 
+
+    boundingBox.startmaxY = maxY; 
+    boundingBox.maxY = maxY; 
+
+    boundingBox.startminZ = minZ; 
+    boundingBox.minZ = minZ; 
+
+    boundingBox.startmaxZ = maxZ; 
+    boundingBox.maxZ = maxZ; 
+
+    ModelBoundingBox = boundingBox;  
 
     // loading the indices and adding normals  
     for (unsigned int i = 0; i < faceIndices.size(); i++) 
@@ -80,8 +126,30 @@ void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)
 
 void PLYModel::Draw(Shader& shader)
 {
+    glm::mat4 model; 
+    model = glm::mat4(1.0f); 
+    // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));     
+
+
+
+    shader.setMat("model", 1, GL_FALSE, model);  
+
+
     for (unsigned int i = 0; i < meshes.size(); i++) 
     {
         meshes[i].Draw(shader);  
     }
+}
+
+void PLYModel::printBoundingBoxInfo() 
+{
+    std::cout << "minX: " << ModelBoundingBox.minX << std::endl; 
+    std::cout << "maxX: " << ModelBoundingBox.maxX << std::endl; 
+
+    std::cout << "minY: " << ModelBoundingBox.minY << std::endl; 
+    std::cout << "maxY: " << ModelBoundingBox.maxY << std::endl; 
+
+    std::cout << "minZ: " << ModelBoundingBox.minZ << std::endl;  
+    std::cout << "maxZ: " << ModelBoundingBox.maxZ << std::endl; 
+    std::cout << "------" << std::endl; 
 }

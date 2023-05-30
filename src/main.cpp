@@ -22,6 +22,7 @@
 #include "mesh/plymodel.h" 
 #include "hud/hud.h" 
 #include "debug/debug_tools.h"
+#include "player/player.h" 
 
 
 
@@ -39,6 +40,8 @@ Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);
 ChunkManager chunkManager(renderer, gameCamera, frustum);      
 InputHandler inputHandler(gameCamera, chunkManager);   
 Hud hud(renderer); 
+
+
 
 
 void processInput(GLFWwindow* window); 
@@ -90,18 +93,29 @@ int main()
 
     Shader outlineProgram("res/shaders/outline.vert", "res/shaders/outline.frag"); 
     outlineProgram.Activate(); 
-    // outlineProgram.setInt("outlineTexture", 0);  
-
 
 
     hud.crossHairInit("res/textures/crosshairbox.png"); // initializes crosshair  
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
-    PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 40, 0), 1.2f);   
-    PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(5, 40, 5), 1.2f); 
+    // PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 0, 5), 1.1f);     
+    // PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(0,0,0) , 1.0f);  
+    // PLYModel xyzAxis("res/models/xyzAxis.ply", gameCamera.mPosition + gameCamera.mFront, 1.0f); 
+
+
+
+
+
+    
+
+    Player player(glm::vec3(0,0,0));  
 
     DebugTools debugTools; 
+    debugTools.getBoundingBoxVertices(player.playerModel->ModelBoundingBox); 
+
+    DebugTools wireFrame; 
+    wireFrame.getOutlineVertices(); 
 
     // The main render loop z
     while (!glfwWindowShouldClose(window)) 
@@ -110,7 +124,7 @@ int main()
         gTime.getFPS(window); 
         gTime.getDeltaTime();
 
-        processInput(window); 
+        processInput(window);  
 
         glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
@@ -131,6 +145,7 @@ int main()
 
         // camera and frustum 
         renderer.viewProject(gameCamera);  
+        // renderer.playerViewProject(gameCamera, player);  // third person camera 
         // renderer.viewOrtho(orthoCamera); // orthographic camera   
         renderer.setShaders(shaderProgram); 
 
@@ -144,17 +159,29 @@ int main()
 
 
         // models 
-        plymodel.Draw(shaderProgram);  
-        plymodelPlayer.Draw(shaderProgram); 
+        // plymodelPlayer.mPosition = glm::vec3(cos(glfwGetTime()), sin(glfwGetTime()), 2.0f * cos(glfwGetTime()));        
+        // std::cout << plymodelPlayer.mPosition.x << ' ' << plymodelPlayer.mPosition.y << ' ' << plymodelPlayer.mPosition.z << std::endl;    
+
+
+
+
+        player.playerModel->Draw(shaderProgram); 
+        // player.playerModel->printBoundingBoxInfo(); 
+        // player.move(window, gTime.deltaTime);    
 
         // for transparency
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
+    
+        glDisable(GL_CULL_FACE); 
 
         // voxel outline 
         outlineProgram.Activate(); 
         renderer.setShaders(outlineProgram); 
-        chunkManager.voxelOutline(outlineProgram, debugTools);  
+        // chunkManager.voxelOutline(outlineProgram, wireFrame);       
+
+        debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);      
+        // std::cout << player.playerModel->ModelBoundingBox.minX << ' ' << player.playerModel->ModelBoundingBox.minY << ' ' << player.playerModel->ModelBoundingBox.minZ << std::endl;   
 
 
         // 2D Rendering 
@@ -177,6 +204,7 @@ int main()
 void processInput(GLFWwindow* window) 
 {
     gameCamera.processInput(window, gTime.deltaTime);  
+    // player.move(window, gTime.deltaTime); 
 }
 
 

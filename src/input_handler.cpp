@@ -37,5 +37,6 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
     if (button == GLFW_KEY_G && action == GLFW_PRESS) 
         chunkManager.createChunks(rand() % 2000 + 1);  
 
+
 }
 

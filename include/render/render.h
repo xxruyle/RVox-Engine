@@ -8,6 +8,7 @@
 #include "camera/frustum.h" 
 #include "camera/orthocamera.h" 
 #include "world/chunk.h"
+#include "player/player.h"
 
 class Render
 {
@@ -29,6 +30,7 @@ public:
     glm::mat4 model; 
 
     void viewProject(Camera& camera);   
+    void playerViewProject(Camera& camera, Player& player); 
     void viewOrtho(OrthoCamera& orthoCamera); 
     void setShaders(Shader& shader); 
 

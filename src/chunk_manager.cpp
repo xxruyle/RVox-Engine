@@ -311,7 +311,7 @@ void ChunkManager::voxelOutline(Shader& shader, DebugTools& debugTools)
 
 
         if (chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] > 0) 
-            debugTools.drawVoxelOutline(shader, glm::vec3(voxelPosition.x, voxelPosition.y, voxelPosition.z));           
+            debugTools.drawVoxelOutline(shader, glm::vec3(voxelPosition.x, voxelPosition.y, voxelPosition.z), glm::vec3(1.001f, 1.001f, 1.001f));            
     }
     
 }

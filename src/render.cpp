@@ -7,6 +7,13 @@ void Render::viewProject(Camera& camera)
     projection = camera.getProjectionMatrix();
 }
 
+void Render::playerViewProject(Camera& camera, Player& player) 
+{
+    projection = glm::mat4(1.0f);  // projection matrix 
+    view = camera.getPlayerViewMatrix(player);    
+    projection = camera.getProjectionMatrix();
+}
+
 void Render::viewOrtho(OrthoCamera& orthoCamera) 
 {
     projection = glm::mat4(1.0f);  // projection matrix 

@@ -18,15 +18,15 @@
 - [X] Add coloring to voxels 
 - [X] rendering fog
 - [ ] Mesh loading time optimizations using bit operations 
-- [ ] debugging tools (Wireframe boxes and x,y,z axis crosshair)
-  - [ ] wireframe boxes 
-  - [ ] x,y,z axis crosshair 
+- [X] debugging tools (Wireframe boxes and x,y,z axis crosshair)
+  - [X] wireframe boxes 
+  - [X] x,y,z axis crosshair 
 - [X] Voxel outline when looking at a voxel 
+- [ ] 3rd Person Camera 
+- [ ] Add collision (AAAB)
 - [ ] Model Animations  
 - [ ] Placing blocks 
 - [ ] Day Night Cycle 
-- [ ] Add collision (AAAB)
-- [ ] 3rd Person Camera 
 - [ ] Shadow Mapping 
 - [ ] Ambient Occlusion
 - [ ] Water 

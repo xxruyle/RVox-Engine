@@ -76,7 +76,13 @@ void Camera::processMouseMovement(double xoffset, double yoffset)
 glm::mat4 Camera::getViewMatrix()
 {
     return glm::lookAt(mPosition, mPosition + mFront, mUp);  
-    // return glm::lookAt(mPosition, glm::vec3(0,0,0), mUp); 
+}
+
+glm::mat4 Camera::getPlayerViewMatrix(Player& player) 
+{
+    mPosition = player.mPosition - glm::vec3(0, -player.playerModel->ModelBoundingBox.startmaxY, 5); // updating camera position 
+    glm::vec3 lookTarget = glm::vec3((player.playerModel->ModelBoundingBox.minX + player.playerModel->ModelBoundingBox.maxX) / 2, player.playerModel->ModelBoundingBox.maxY, (player.playerModel->ModelBoundingBox.minZ + player.playerModel->ModelBoundingBox.maxZ) / 2);      
+    return glm::lookAt(player.mPosition - glm::vec3(0, -player.playerModel->ModelBoundingBox.startmaxY, 5), lookTarget, mUp);       
 }
 
 glm::mat4 Camera::getProjectionMatrix()
