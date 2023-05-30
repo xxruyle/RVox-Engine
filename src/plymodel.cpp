@@ -128,12 +128,9 @@ void PLYModel::Draw(Shader& shader)
 {
     glm::mat4 model; 
     model = glm::mat4(1.0f); 
-    // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));     
-
-
-
+    model = glm::translate(model, mPosition); 
+    // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0, 1, 0));       
     shader.setMat("model", 1, GL_FALSE, model);  
-
 
     for (unsigned int i = 0; i < meshes.size(); i++) 
     {

@@ -6,11 +6,11 @@
 void Frustum::setCamInternals()    
 {
     this->ratio = (float)(camera.SCR_WIDTH/camera.SCR_HEIGHT); 
-    this->nearD = camera.nearD; 
+    this->nearD = camera.nearD;   
     this->farD = camera.farD;    
 
     // compute width and height using near and far plane sections 
-    tang = (float)tan(camera.angle * 0.5);          
+    tang = (float)tan(camera.angle * 0.5);           // set to 180.0f for third person camera    
     nh = nearD * tang; 
     nw = nh * ratio; 
     fh = farD * tang; 

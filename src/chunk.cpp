@@ -23,14 +23,21 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
         // Gather noise data
     int noiseData[xs][zs];
     int stoneLimit = 20; 
+    int heighestPoint = -100000;  //  
+
 
     for (int x = 0; x < xs; x++) 
     {
         for (int z = 0; z < zs; z++)  
         {
-            noiseData[x][z] = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5))); // -40     
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5))); 
+            heighestPoint = std::max(heighestPoint, height); 
+            heighestLocation = glm::vec3(x, heighestPoint + stoneLimit, z);   
+            noiseData[x][z] = height; // -40      
         }
     }
+
+
 
 
     // pushing the positions of each block and making the height map  
@@ -270,8 +277,8 @@ void Chunk::changeVoxelColor(glm::vec3 voxelCoord)
 
 void Chunk::draw(Shader& shader, Frustum& frustum, float renderDistance) 
 {
-     if (frustum.chunkInFrustum(position)) // if point is in frustum   
-    {  
+    // if (frustum.chunkInFrustum(position)) // if point is in frustum   
+    // {  
         glm::mat4 model; 
         model = glm::mat4(1.0f); 
         shader.setMat("model", 1, GL_FALSE, model);  
@@ -281,5 +288,5 @@ void Chunk::draw(Shader& shader, Frustum& frustum, float renderDistance)
         glBindVertexArray(VAO);  
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
         glBindVertexArray(0);
-    }
+    // }
 }

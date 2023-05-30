@@ -13,9 +13,7 @@
 #include "voxel.h"
 #include "render/render.h" 
 #include "shader/shader.h"
-
 #include "camera/frustum.h" 
-
 #include "debug/debug_tools.h" 
 
 
@@ -58,6 +56,8 @@ public:
     std::vector<glm::vec3> voxelTraversal();  
     void voxelOutline(Shader& shader, DebugTools& debugTools);  
     void deleteVoxel(); 
+
+    void spawnPlayer(glm::vec3 chunkCoord, Player& player);  
 
     // initializing the prev outlined voxel for voxelOutline. Not the most elegant solution for the voxelOutline bug, but whatever lol 
     Voxel* prevOutlinedVoxel = nullptr; 

@@ -18,7 +18,7 @@ private:
     void updateDirectionVectors(); 
 
 public: 
-    bool thirdPerson = false; 
+    bool isThirdPerson = true; 
     float SCR_WIDTH = 1300; 
     float SCR_HEIGHT = 1000; 
     
@@ -55,13 +55,23 @@ public:
         updateDirectionVectors(); 
     }; 
 
+    // player variables 
+    float distanceFromPlayer = 20; 
+    float angleAroundPlayer = 0; 
 
     glm::mat4 getViewMatrix(); 
     glm::mat4 getPlayerViewMatrix(Player& player);  
     glm::mat4 getProjectionMatrix(); 
-    void processInput(GLFWwindow* window, float deltaTime); // camera movement 
+    void processInput(GLFWwindow* window, float deltaTime, Player& player); // camera movement  
 
     void processMouseMovement(double xoffset, double yoffset); // updates pitch and yaw based on mouse movement and updates direction vectors  
 
     void zoom(double xoffset, double yoffset); // decreases the fov to zoom 
+
+    void updateThirdPersonInfo(Player& player);  
+    float calculateHorizontalDistance();  
+    float calculateVerticalDistance(); 
+    void calculatePosition(float horizDistance, float vertDistance, Player& player); // caclulates camera position based on player location   
+
+    void changeViewPerson(); 
 }; 

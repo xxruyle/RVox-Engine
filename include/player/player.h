@@ -11,20 +11,21 @@
 class Player 
 {
 public: 
-    glm::vec3 mPosition; 
+    glm::vec3 mPosition;  // default position 
+    glm::vec3 mRight; 
+    glm::vec3 mForward;  
     PLYModel* playerModel;
 
 
-
-    Player(glm::vec3 position) 
+    Player(glm::vec3 position)   
     {
         mPosition = position; 
-        std::string const &path = "res/models/chr_player_default.ply"; 
-        this->playerModel = new PLYModel(path, position, 1.0f);    
+        std::string const &path = "res/models/chr_player_default.ply";  
+        this->playerModel = new PLYModel(path, mPosition, 1.0f);     
     }; 
 
-
     void move(GLFWwindow* window, float deltaTime);   
+
 
     ~Player() { 
         std::cout << "deleting player" << std::endl; 
@@ -33,4 +34,5 @@ public:
 
 private: 
     float mSpeed = 10.0f; 
+    void calculateDirectionalValues(); 
 }; 

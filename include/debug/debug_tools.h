@@ -57,7 +57,6 @@ struct BoundingBox
         topBackLeft       = glm::vec3(minX, maxY, maxZ);   
         topBackRight      = glm::vec3(maxX, maxY, maxZ);   
     }
-
 }; 
 
 

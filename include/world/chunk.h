@@ -38,8 +38,8 @@ class Chunk
 public: 
     glm::vec3 position; 
     char voxels[33][256][33];  // the voxel array   
-    // glm::vec3 voxelColors[33][256][33]; 
 
+    glm::vec3 heighestLocation; 
 
     std::vector<voxelVertex> vertices; // for the chunk mesh    
     std::vector<unsigned int> indices;

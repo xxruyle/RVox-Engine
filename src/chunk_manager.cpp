@@ -6,9 +6,9 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 1; i++) 
+    for (int i = 0; i < 2; i++) 
     {
-        for (int j = 0; j < 1; j++)   
+        for (int j = 0; j < 2; j++)   
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
@@ -191,6 +191,22 @@ bool ChunkManager::isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPositio
 
     return glm::length(distanceVector) < renderDistance;   
 } 
+
+void ChunkManager::spawnPlayer(glm::vec3 chunkCoord, Player& player)  
+{
+    glm::vec3 heighestLocation = chunkMap[chunkCoord].heighestLocation; 
+
+    int xCoord = (int)chunkMap[chunkCoord].position.x * 32 + heighestLocation.x; 
+    int yCoord = (int)chunkMap[chunkCoord].position.y * 32 + heighestLocation.y; 
+    int zCoord = (int)chunkMap[chunkCoord].position.z * 32 + heighestLocation.z; 
+
+    std::cout << "heighest point: " << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; 
+    player.mPosition = glm::vec3(xCoord, yCoord, zCoord);  
+    std::cout << "player location: " << player.mPosition.x << ' ' << player.mPosition.y << ' ' << player.mPosition.z << std::endl; 
+    player.playerModel->mPosition = player.mPosition;   
+
+
+}
 
 
 glm::vec3 ChunkManager::brensenCast() 
