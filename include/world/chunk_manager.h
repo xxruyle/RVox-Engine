@@ -15,10 +15,12 @@
 #include "shader/shader.h"
 #include "camera/frustum.h" 
 #include "debug/debug_tools.h" 
+#include "world/collision.h" 
 
 
 #define GLM_ENABLE_EXPERIMENTAL // enables hashing of glm::vec3 
 #include "glm/gtx/hash.hpp"
+#include "glm/gtx/string_cast.hpp" 
 
 
 class ChunkManager
@@ -29,6 +31,7 @@ public:
     Render& renderer; 
     Camera& camera; 
     Frustum& frustum; 
+    Collision collisionTest; 
 
     ChunkManager(Render& renderer, Camera& camera, Frustum& frustum) : renderer(renderer), camera(camera), frustum(frustum) {};        
 
@@ -45,8 +48,12 @@ public:
 
     void meshNeighbors(Chunk& chunk);  // gives chunks data about their neighbors 
 
+    void checkCollision(Player& player); 
+    bool checkGround(Player& player); 
 
     glm::vec3 getChunkLocation(glm::vec3 coordinatePosition); // prints what chunk coorddinate the camera is in  
+    glm::vec3 getWorldCoordinates(glm::vec3 chunkCoordinates, glm::vec3 voxelPosition); // convert voxel position in local chunk coords to world coordinates 
+    glm::vec3 getChunkCoordinates(glm::vec3 voxelPosition); 
     void printChunkLocation(); 
     void getNearChunks(); // get the nearest chunks that player is near   
 
@@ -63,7 +70,7 @@ public:
     Voxel* prevOutlinedVoxel = nullptr; 
 
 private: 
-    static const int renderDistance = 500; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 1000; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 

@@ -180,7 +180,9 @@ void Camera::zoom(double xoffset, double yoffset)
 void Camera::changeViewPerson() 
 {
     if (isThirdPerson) 
+    {
         isThirdPerson = false; 
+    }
     else 
         isThirdPerson = true; 
 }

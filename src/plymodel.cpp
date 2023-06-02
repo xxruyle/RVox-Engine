@@ -1,9 +1,10 @@
 #include "mesh/plymodel.h" 
 
 
+
 void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)  
 { // reading in the magica voxel ply file export 
-    BoundingBox boundingBox; 
+    AABB boundingBox; 
 
     std::vector<Vertex> vertices; 
     std::vector<unsigned int> indices; 
@@ -129,7 +130,7 @@ void PLYModel::Draw(Shader& shader)
     glm::mat4 model; 
     model = glm::mat4(1.0f); 
     model = glm::translate(model, mPosition); 
-    // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0, 1, 0));       
+    model = glm::rotate(model, glm::radians(angle), glm::vec3(0, 1, 0));            
     shader.setMat("model", 1, GL_FALSE, model);  
 
     for (unsigned int i = 0; i < meshes.size(); i++) 

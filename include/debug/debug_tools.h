@@ -2,8 +2,9 @@
 #include "shader/shader.h" 
 #include "mesh/texture_mesh.h" 
 
-struct BoundingBox
+struct AABB
 {
+
     float startminX; // the value that it started with 
     float minX;  // the value that it currently is in relation to the world 
 
@@ -24,6 +25,11 @@ struct BoundingBox
 
     float startmaxY; 
     float maxY; 
+
+    glm::vec3 normalX = glm::vec3((maxX - minX) / 2, 0, 0); 
+    glm::vec3 normalY = glm::vec3(0, (maxY - minY) / 2, 0); 
+    glm::vec3 normalZ = glm::vec3(0, 0, (maxZ - minZ) / 2);  
+
 
     glm::vec3 bottomFrontLeft;
     glm::vec3 bottomFrontRight;
@@ -57,6 +63,39 @@ struct BoundingBox
         topBackLeft       = glm::vec3(minX, maxY, maxZ);   
         topBackRight      = glm::vec3(maxX, maxY, maxZ);   
     }
+
+    float getXExtent() 
+    {
+        return (maxX - minX) / 2; 
+    }
+
+    float getZExtent() 
+    {
+        return (maxZ - minZ) / 2; 
+    }
+
+
+    float getYExtent() 
+    {
+        return (maxY - minY) / 2; 
+    }
+
+    float getXWidth() 
+    {
+        return maxX - minX;  
+    }
+
+    float getHeight() 
+    {
+        return maxY - minY; 
+    }
+
+    float getZWidth() 
+    {
+        return maxZ - minZ; 
+    }
+    
+
 }; 
 
 
@@ -71,7 +110,7 @@ public:
 
     void getOutlineVertices();  
     void getWireFrameVertices(); 
-    void getBoundingBoxVertices(BoundingBox& boundingBox);   
+    void getBoundingBoxVertices(AABB& boundingBox);   
     void drawVoxelOutline(Shader& shader, glm::vec3 position, glm::vec3 scale);
     void DrawBoundingBox(Shader& shader, glm::vec3 position);  
 

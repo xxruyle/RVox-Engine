@@ -60,13 +60,14 @@ uniform Material material;
 
 // fog values 
 // const float fogDensity = 0.0025; // for 1000 block render distance 
+// const float fogDensity = 0.005; // for 500 block render distance 
 uniform float renderDistance; 
-const float fogDensity = .005;  
-float fogGradient = 2.0; 
+const float fogDensity = .0025;  
+float fogGradient = 3.0; 
 
-// frustum values 
+// frustum values for depth buffer 
 float nearD = 0.1; 
-float farD = 500.0; 
+float farD = 1000.0; 
 
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 

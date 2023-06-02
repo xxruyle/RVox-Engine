@@ -29,7 +29,7 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
 
     if (button == GLFW_KEY_5 && action == GLFW_PRESS) 
     {
-        camera.changeViewPerson(); 
+        camera.changeViewPerson();   
     }
 
 

@@ -10,7 +10,8 @@ class PLYModel
 {
 public: 
     glm::vec3 mPosition; 
-    BoundingBox ModelBoundingBox; 
+    AABB ModelBoundingBox; 
+    float angle = 0.0f; 
 
     PLYModel(std::string const &path, glm::vec3 position, float scale) // default scale should be 10     
     {

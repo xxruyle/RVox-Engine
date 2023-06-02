@@ -181,7 +181,7 @@ void DebugTools::DrawBoundingBox(Shader& shader, glm::vec3 position)
     }
 }
 
-void DebugTools::getBoundingBoxVertices(BoundingBox& boundingBox) 
+void DebugTools::getBoundingBoxVertices(AABB& boundingBox) 
 {
     std::vector<vertexTEX> vertices; 
     std::vector<unsigned int> indices; 

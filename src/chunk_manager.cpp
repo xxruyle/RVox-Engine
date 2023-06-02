@@ -6,9 +6,9 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 2; i++) 
+    for (int i = 0; i < 1; i++) 
     {
-        for (int j = 0; j < 2; j++)   
+        for (int j = 0; j < 1; j++)   
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
@@ -180,6 +180,96 @@ void ChunkManager::printTotalVoxels()
     std::cout << "Total Voxels: " << sum << std::endl;  
 }
 
+bool ChunkManager::checkGround(Player& player)  
+{ // checks every block beneath the player, if there is at least one block, set player onGround bool to true 
+    AABB* playerAABB = &(player.playerModel->ModelBoundingBox); 
+    int y = floor(playerAABB->minY + 0.48999f);  // the offsets here are the voxel aabb extents         
+    int xmin = floor(playerAABB->minX + 0.48f);  
+    int zmin = floor(playerAABB->minZ + 0.48f);  
+    int xmax = ceil(playerAABB->maxX - 0.48f);     
+    int zmax = ceil(playerAABB->maxZ - 0.48f);         
+
+    for (int x = xmin; x <=xmax; x++) 
+    {
+        for (int z = zmin; z <=zmax; z++)  
+        {
+            glm::vec3 underVoxel = getChunkCoordinates(glm::vec3(x, y, z)); 
+            glm::vec3 playerChunk = getChunkLocation(glm::vec3(x, y, z)); 
+            if ((chunkMap[playerChunk].voxels[(int)underVoxel.x][(int)underVoxel.y][(int)underVoxel.z] > 0)) // if the block is solid 
+            {
+                return true;  // if at least one of the blocks is solid return true 
+            }
+        }
+    }
+
+    return false;   
+}
+
+void ChunkManager::checkCollision(Player& player) 
+{
+    int playerPosX = (int)player.mPosition.x; 
+    int playerPosY = (int)player.mPosition.y; 
+    int playerPosZ = (int)player.mPosition.z; 
+    glm::vec3 playerChunk = getChunkLocation(glm::vec3(playerPosX, playerPosY, playerPosZ));   
+
+    for (int x = playerPosX - 5; x < playerPosX + 5; x++)  
+    {
+        for (int y = 0; y < playerPosY + 5; y++)    
+        {
+            for (int z = playerPosZ - 5; z < playerPosZ + 5; z++)   
+            {
+                glm::vec3 playerChunk = getChunkLocation(glm::vec3(x, y, z));  
+
+                // converting world coordinates of voxels to chunk coordinates  
+                int xCoord = x - (int)chunkMap[playerChunk].position.x * 32; 
+                int yCoord = y - (int)chunkMap[playerChunk].position.y * 32; 
+                int zCoord = z - (int)chunkMap[playerChunk].position.z * 32; 
+
+                if (chunkMap[playerChunk].voxels[xCoord][yCoord][zCoord] > 0)
+                {
+                    // make sure to use world coordinates here for  the AABB min and max calculations    
+                    AABB b1 = collisionTest.getVoxelBoundingBox(glm::vec3(x,y,z));  
+
+                    if (collisionTest.AABBtoAABB(b1, player.playerModel->ModelBoundingBox)) 
+                    {
+                        collisionTest.resolveCollision(b1, player);     
+                    } 
+                }
+  
+            }
+        }
+    } 
+
+    if (checkGround(player)) 
+    {
+        player.onGround = true;
+    } 
+    else 
+    {
+        player.onGround = false; 
+    }
+}
+
+glm::vec3 ChunkManager::getWorldCoordinates(glm::vec3 chunkCoordinates, glm::vec3 voxelPosition)  
+{
+    float xPos = (chunkCoordinates.x * 32) + voxelPosition.x; 
+    float yPos = (chunkCoordinates.y * 32) + voxelPosition.y;  
+    float zPos = (chunkCoordinates.z * 32) + voxelPosition.z;  
+    return glm::vec3(xPos, yPos, zPos); 
+}
+
+glm::vec3 ChunkManager::getChunkCoordinates(glm::vec3 voxelPosition) 
+{ // convert world voxel coordinatse to local coordinates 
+    glm::vec3 playerChunk = getChunkLocation(voxelPosition);    
+
+    // converting world coordinates of voxels to chunk coordinates  
+    int xCoord = voxelPosition.x - (int)chunkMap[playerChunk].position.x * 32; 
+    int yCoord = voxelPosition.y - (int)chunkMap[playerChunk].position.y * 32; 
+    int zCoord = voxelPosition.z - (int)chunkMap[playerChunk].position.z * 32;  
+
+    return glm::vec3(xCoord, yCoord, zCoord);   
+
+}
 
 bool ChunkManager::isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition) 
 { // checks to see if chunk is within renderDistance 
@@ -201,11 +291,12 @@ void ChunkManager::spawnPlayer(glm::vec3 chunkCoord, Player& player)
     int zCoord = (int)chunkMap[chunkCoord].position.z * 32 + heighestLocation.z; 
 
     std::cout << "heighest point: " << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; 
-    player.mPosition = glm::vec3(xCoord, yCoord, zCoord);  
+    player.velocityY = 10.0f; 
+    player.mPosition = glm::vec3(xCoord, yCoord + 50, zCoord);  
+    camera.mPosition = glm::vec3(xCoord, yCoord + 50, zCoord);   
     std::cout << "player location: " << player.mPosition.x << ' ' << player.mPosition.y << ' ' << player.mPosition.z << std::endl; 
+
     player.playerModel->mPosition = player.mPosition;   
-
-
 }
 
 

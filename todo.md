@@ -23,9 +23,10 @@
   - [X] wireframe boxes 
   - [X] x,y,z axis crosshair 
 - [X] Voxel outline when looking at a voxel (**COMPLETED**: May 29, 2023)
-- [ ] 3rd Person Camera 
+- [X] 3rd Person Camera (**COMPLETED**: May 31, 2023) 
 - [ ] Add collision (AAAB)
   - [ ] Add Gravity and Surface collisions 
+- [ ] Make model mesh into a 3d array of blocks   
 - [ ] Model Animations  
 - [ ] Placing blocks 
 - [ ] Day Night Cycle 

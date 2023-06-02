@@ -99,13 +99,14 @@ int main()
 
     chunkManager.createChunks(rand() % 2000 + 1);  
 
+    
     // PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 0, 5), 1.1f);     
     // PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(0,0,0) , 1.0f);  
     // PLYModel xyzAxis("res/models/xyzAxis.ply", gameCamera.mPosition + gameCamera.mFront, 1.0f); 
 
 
     Player player(glm::vec3(0, 0, 0));       
-    // chunkManager.spawnPlayer(glm::vec3(0, 0, 0), player); 
+    chunkManager.spawnPlayer(glm::vec3(0, 0, 0), player); 
 
 
     DebugTools debugTools; 
@@ -121,6 +122,8 @@ int main()
         gTime.getFPS(window); 
         gTime.getDeltaTime();
 
+        // The player movement is calculated in this function by way of the camera function being called 
+        // probably not the best structure here but I don't know a better way lol...
         processInput(window, player);   
 
 
@@ -137,12 +140,11 @@ int main()
         shaderProgram.setFloat("renderDistance", 300); 
  
         // lighting 
-        // lighting.spotLightInit(shaderProgram, gameCamera);    
         lighting.sunLightInit(shaderProgram, gameCamera); 
 
 
         // camera and frustum 
-        // renderer.viewProject(gameCamera);        
+        // renderer.viewProject(gameCamera); // first pesron camera         
         renderer.playerViewProject(gameCamera, player);  // third person camera    
         // renderer.viewOrtho(orthoCamera); // orthographic camera   
         renderer.setShaders(shaderProgram); 
@@ -152,8 +154,15 @@ int main()
         frustum.setCamInternals(); 
         frustum.setCamDef();  
 
+
+
+
+
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);             
+        chunkManager.renderChunks(shaderProgram);        
+        chunkManager.checkCollision(player); 
+
+
 
         // models 
         player.playerModel->Draw(shaderProgram); 
@@ -169,8 +178,8 @@ int main()
         renderer.setShaders(outlineProgram); 
         // chunkManager.voxelOutline(outlineProgram, wireFrame);       
 
-        debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);      
-        std::cout << player.playerModel->ModelBoundingBox.bottomFrontLeft.x << ' ' << player.playerModel->ModelBoundingBox.minY << ' ' << player.playerModel->ModelBoundingBox.minZ << std::endl;     
+        // debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);      
+        // std::cout << player.playerModel->ModelBoundingBox.minX << ' ' << player.playerModel->ModelBoundingBox.minY << ' ' << player.playerModel->ModelBoundingBox.minZ << std::endl;      
 
 
         // 2D Rendering 

@@ -37,7 +37,7 @@ class Chunk
 { // stores local chunk voxel positions and chunk mesh 
 public: 
     glm::vec3 position; 
-    char voxels[33][256][33];  // the voxel array   
+    char voxels[33][256][33];  // the voxel array     
 
     glm::vec3 heighestLocation; 
 
