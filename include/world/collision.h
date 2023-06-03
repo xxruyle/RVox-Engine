@@ -19,7 +19,10 @@ public:
 
     void sweptResponse(Player& player, AABB& b2Static); 
 
-    void resolveCollision(AABB& b1, Player& player);
+    void resolveCollision(AABB& b1, Player& player, glm::vec3 collisionNormal);
+
+    void resolveAutoJump(Player& player, glm::vec3 potentialBlockCoords);  
+
 
 
 }; 

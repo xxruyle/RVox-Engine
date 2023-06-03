@@ -187,7 +187,7 @@ bool ChunkManager::checkGround(Player& player)
     int xmin = floor(playerAABB->minX + 0.48f);  
     int zmin = floor(playerAABB->minZ + 0.48f);  
     int xmax = ceil(playerAABB->maxX - 0.48f);     
-    int zmax = ceil(playerAABB->maxZ - 0.48f);         
+    int zmax = ceil(playerAABB->maxZ - 0.48f);          
 
     for (int x = xmin; x <=xmax; x++) 
     {
@@ -205,6 +205,48 @@ bool ChunkManager::checkGround(Player& player)
     return false;   
 }
 
+
+// An entity can auto jump if there is no block above another block that the player is colliding against
+// An entity's maxY must also be taller than the one block height. for this to occur 
+// TODO: Increase the maxY for entities smaller than one block heights? 
+void ChunkManager::checkAutoJump(Player& player, glm::vec3 collisionNormal)  
+{  
+    AABB* playerAABB = &(player.playerModel->ModelBoundingBox); // get the entity bounding box
+    glm::vec3 playerDirection = -collisionNormal; // opposite of the collision normal direction is theplayer direction
+    
+    int maxY = floor(playerAABB->maxY); // the y value the the potential block will have      
+    glm::vec3 potentialBlock; 
+
+    // 4 posibilites of the collision normal, normalized to the x, z space 
+    if (playerDirection == glm::vec3(0, 0, 1)) // positive z direction 
+    {
+        potentialBlock = glm::vec3(player.mPosition.x, maxY, ceil(playerAABB->maxZ));   
+    } 
+    else if (playerDirection == glm::vec3(-1, 0, 0)) // negative x dir 
+    {
+        potentialBlock = glm::vec3(floor(playerAABB->minX), maxY, player.mPosition.z);   
+    }
+    else if (playerDirection == glm::vec3(0, 0, -1)) // negative z directon 
+    {
+        potentialBlock = glm::vec3(player.mPosition.x, maxY, floor(playerAABB->minZ));   
+    }
+    else  // positive x dir 
+    {
+        potentialBlock = glm::vec3(ceil(playerAABB->maxX), maxY, player.mPosition.z);    
+    }
+
+    // check to see if there is no block at potential block location, if so return true 
+    glm::vec3 potentialBlockChunk = getChunkLocation(potentialBlock);   
+    glm::vec3 potentialBlockCoords = getChunkCoordinates(potentialBlock); 
+    if (!(chunkMap[potentialBlockChunk].voxels[(int)potentialBlockCoords.x][(int)potentialBlockCoords.y][(int)potentialBlockCoords.z] > 0))   // if the block is not solid 
+    {
+        collisionTest.resolveAutoJump(player, potentialBlock); // we use world coordinates for the potential block  
+    }   
+}
+
+// checks a 4 block radius around player for potential collisions, if a block is found we do an AABB to AABB collision test
+// if there is a collision test which passes, we resolve the collision, 
+// We also check for potential auto jump possibilites so the player can automatically "teleport" a one block height 
 void ChunkManager::checkCollision(Player& player) 
 {
     int playerPosX = (int)player.mPosition.x; 
@@ -212,11 +254,11 @@ void ChunkManager::checkCollision(Player& player)
     int playerPosZ = (int)player.mPosition.z; 
     glm::vec3 playerChunk = getChunkLocation(glm::vec3(playerPosX, playerPosY, playerPosZ));   
 
-    for (int x = playerPosX - 5; x < playerPosX + 5; x++)  
+    for (int x = playerPosX - 4; x < playerPosX + 4; x++)  
     {
-        for (int y = 0; y < playerPosY + 5; y++)    
+        for (int y = 0; y < playerPosY + 4; y++)    
         {
-            for (int z = playerPosZ - 5; z < playerPosZ + 5; z++)   
+            for (int z = playerPosZ - 4; z < playerPosZ + 4; z++)    
             {
                 glm::vec3 playerChunk = getChunkLocation(glm::vec3(x, y, z));  
 
@@ -227,12 +269,18 @@ void ChunkManager::checkCollision(Player& player)
 
                 if (chunkMap[playerChunk].voxels[xCoord][yCoord][zCoord] > 0)
                 {
-                    // make sure to use world coordinates here for  the AABB min and max calculations    
+                    // we make sure to use world coordinates here for  the AABB min and max calculations    
                     AABB b1 = collisionTest.getVoxelBoundingBox(glm::vec3(x,y,z));  
+
 
                     if (collisionTest.AABBtoAABB(b1, player.playerModel->ModelBoundingBox)) 
                     {
-                        collisionTest.resolveCollision(b1, player);     
+                        glm::vec3 collisionNormal = collisionTest.calculateNormal(player, b1); 
+                        collisionTest.resolveCollision(b1, player, collisionNormal);   
+                        if (!((collisionNormal == glm::vec3(0, 1, 0)) || (collisionNormal == glm::vec3(0, -1, 0)))) // if it is not a ground collision 
+                        {
+                            checkAutoJump(player, collisionNormal);  
+                        }
                     } 
                 }
   
@@ -241,13 +289,9 @@ void ChunkManager::checkCollision(Player& player)
     } 
 
     if (checkGround(player)) 
-    {
         player.onGround = true;
-    } 
     else 
-    {
         player.onGround = false; 
-    }
 }
 
 glm::vec3 ChunkManager::getWorldCoordinates(glm::vec3 chunkCoordinates, glm::vec3 voxelPosition)  
@@ -291,9 +335,8 @@ void ChunkManager::spawnPlayer(glm::vec3 chunkCoord, Player& player)
     int zCoord = (int)chunkMap[chunkCoord].position.z * 32 + heighestLocation.z; 
 
     std::cout << "heighest point: " << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; 
-    player.velocityY = 10.0f; 
-    player.mPosition = glm::vec3(xCoord, yCoord + 50, zCoord);  
-    camera.mPosition = glm::vec3(xCoord, yCoord + 50, zCoord);   
+    player.mPosition = glm::vec3(xCoord, yCoord + 10, zCoord);  
+    camera.mPosition = glm::vec3(xCoord, yCoord + 10, zCoord);   
     std::cout << "player location: " << player.mPosition.x << ' ' << player.mPosition.y << ' ' << player.mPosition.z << std::endl; 
 
     player.playerModel->mPosition = player.mPosition;   

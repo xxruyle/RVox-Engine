@@ -30,7 +30,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));  
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 7.0f)));  
             heighestPoint = std::max(heighestPoint, height); 
             heighestLocation = glm::vec3(x, heighestPoint + stoneLimit, z);   
             noiseData[x][z] = height; // -40      

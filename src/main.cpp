@@ -118,15 +118,6 @@ int main()
     // The main render loop z
     while (!glfwWindowShouldClose(window)) 
     {
-        // time functions for deltaTime and fps 
-        gTime.getFPS(window); 
-        gTime.getDeltaTime();
-
-        // The player movement is calculated in this function by way of the camera function being called 
-        // probably not the best structure here but I don't know a better way lol...
-        processInput(window, player);   
-
-
         glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
@@ -154,18 +145,19 @@ int main()
         frustum.setCamInternals(); 
         frustum.setCamDef();  
 
-
-
-
-
         // drawing the chunk manager chunks 
         chunkManager.renderChunks(shaderProgram);        
         chunkManager.checkCollision(player); 
 
 
+        // time functions for deltaTime and fps 
+        gTime.getFPS(window); 
+        gTime.getDeltaTime();
+
 
         // models 
         player.playerModel->Draw(shaderProgram); 
+
 
         // for transparency
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -178,7 +170,7 @@ int main()
         renderer.setShaders(outlineProgram); 
         // chunkManager.voxelOutline(outlineProgram, wireFrame);       
 
-        // debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);      
+        debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);        
         // std::cout << player.playerModel->ModelBoundingBox.minX << ' ' << player.playerModel->ModelBoundingBox.minY << ' ' << player.playerModel->ModelBoundingBox.minZ << std::endl;      
 
 
@@ -186,6 +178,12 @@ int main()
         hud.DrawCrosshair(hudProgram);  
 
         glDisable(GL_BLEND); 
+
+
+        // The player movement is calculated in this function by way of the camera function being called 
+        // probably not the best structure here but I don't know a better way lol...
+        processInput(window, player);   
+
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 
         glfwPollEvents(); 

@@ -12,10 +12,11 @@
   - [X] world (deleted) 
   - [X] vao, vbo ebo
   - [ ] renderer and chunk draw functions 
+  - [ ] Entity superclass over player 
+  - [ ] ChunkManager
 - [X] ~~Model loading with assimp~~ Model loading with happly.h for ply files  (**COMPLETED**: May 25, 2023)
   - [X] get normals for each vertex in ply file  
   - [X] Scale the models down to world voxel size   
-
 - [X] Add coloring to voxels (**COMPLETED**: May 24, 2023) 
 - [X] rendering fog (**COMPLETED**: May 24, 2023) 
 - [ ] Mesh loading time optimizations using bit operations 
@@ -24,23 +25,37 @@
   - [X] x,y,z axis crosshair 
 - [X] Voxel outline when looking at a voxel (**COMPLETED**: May 29, 2023)
 - [X] 3rd Person Camera (**COMPLETED**: May 31, 2023) 
-- [ ] Add collision (AAAB)
-  - [ ] Add Gravity and Surface collisions 
+- [X] Add collision (AAAB) 
+  - [X] Add Gravity and Surface collisions (**COMPLETED**: June 1, 2023)  
+  - [X] AABB vs ABBB (**COMPLETED**: June 1, 2023)  
+  - [ ] Swept AABB possibly? (Need to do this because original AABB vs AABB isn't good)   
+  - [X] One block height autojump (use a normalized raycast and check if block exists?) 
 - [ ] Make model mesh into a 3d array of blocks   
+- [ ] Model hiearchies, (Player's arms are seperate model but are still attached to the main player mody)
 - [ ] Model Animations  
 - [ ] Placing blocks 
 - [ ] Day Night Cycle 
 - [ ] Shadow Mapping 
 - [ ] Ambient Occlusion
-- [ ] Water 
+- [ ] Water, liquids 
 - [ ] Memory management (Run-length encoding (RLE) ?) 
 - [ ] Multithreading
+- [ ] Entities (npcs) 
+- [ ] Pathfinding for entities and basic AI 
 - [ ] Make gradient across voxel surface like Cube World
+- [ ] Save data 
+
+## More Game Specific 
 - [ ] Better terrain generation 
+  - [ ] 3D noise 
+  - [ ] Lakes 
   - [ ] Caves
   - [ ] Biomes
   - [ ] Trees
   - [ ] Roads 
+- [ ] Multiple realm system (player can teleport between realms)
+- [ ] Player inventory
+- [ ] Combat physics   
    
 
 

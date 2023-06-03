@@ -170,8 +170,8 @@ void Camera::zoom(double xoffset, double yoffset)
         mFov = 90.0f;  */
     distanceFromPlayer -= yoffset * 1.5;  
 
-    if (distanceFromPlayer < 5) 
-        distanceFromPlayer = 5;
+    if (distanceFromPlayer < 3.5) 
+        distanceFromPlayer = 3.5; 
 
     if (distanceFromPlayer > 45) 
         distanceFromPlayer = 45; 

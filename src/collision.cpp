@@ -49,9 +49,10 @@ glm::vec3 Collision::calculateNormal(Player& player, AABB& bbStatic)
     return collisionNormal; 
 }
 
+
 bool Collision::AABBtoAABB(AABB& bbox1, AABB& bbox2) 
 {
-    return( // with extra paddng 
+    return( 
         bbox1.maxX  >= bbox2.minX  &&
         bbox1.minX  <= bbox2.maxX  && 
 
@@ -63,19 +64,18 @@ bool Collision::AABBtoAABB(AABB& bbox1, AABB& bbox2)
     );
 }
 
-void Collision::resolveCollision(AABB& b1, Player& player)   
+void Collision::resolveCollision(AABB& b1, Player& player, glm::vec3 collisionNormal)   
 {
-    glm::vec3 collisionNormal = calculateNormal(player, b1);   
         // x normals  
         if (collisionNormal == glm::vec3(-1.0, 0.0, 0.0))  
         {
             player.velocityX = 0.0f; 
-            player.mPosition = glm::vec3(b1.minX - player.playerModel->ModelBoundingBox.getXExtent() - 0.001f, player.mPosition.y, player.mPosition.z); 
+            player.mPosition = glm::vec3(b1.minX - player.playerModel->ModelBoundingBox.getXExtent() - 0.05f, player.mPosition.y, player.mPosition.z); 
         }
         else if (collisionNormal == glm::vec3(1.0f, 0.0f, 0.0f))  
         {
             player.velocityX = 0.0f;
-            player.mPosition = glm::vec3(b1.maxX + player.playerModel->ModelBoundingBox.getXExtent() + 0.001f, player.mPosition.y, player.mPosition.z); 
+            player.mPosition = glm::vec3(b1.maxX + player.playerModel->ModelBoundingBox.getXExtent() + 0.05f, player.mPosition.y, player. mPosition.z); 
         }
         // y normals
         else if (collisionNormal == glm::vec3(0.0f, -1.0f, 0.0f)) 
@@ -94,14 +94,21 @@ void Collision::resolveCollision(AABB& b1, Player& player)
         else if (collisionNormal == glm::vec3(0.0f, 0.0f, -1.0f)) 
         {
             player.velocityZ = 0.0f; 
-            player.mPosition = glm::vec3(player.mPosition.x, player.mPosition.y, b1.minZ - player.playerModel->ModelBoundingBox.getZExtent() - 0.001f);  
+            player.mPosition = glm::vec3(player.mPosition.x, player.mPosition.y, b1.minZ - player.playerModel->ModelBoundingBox.getZExtent() - 0.05f);  
         }
         else if (collisionNormal == glm::vec3(0.0f, 0.0f, 1.0f)) 
         {
             player.velocityZ = 0.0f; 
-            player.mPosition = glm::vec3(player.mPosition.x, player.mPosition.y, b1.maxZ + player.playerModel->ModelBoundingBox.getZExtent() + 0.001f);                           
+            player.mPosition = glm::vec3(player.mPosition.x, player.mPosition.y, b1.maxZ + player.playerModel->ModelBoundingBox.getZExtent() + 0.05f);                           
         } 
 }
+
+void Collision::resolveAutoJump(Player& player, glm::vec3 potentialBlockCoords) 
+{
+    AABB b1 = getVoxelBoundingBox(potentialBlockCoords); 
+    player.mPosition = glm::vec3(player.mPosition.x, b1.minY + 0.0001f, player.mPosition.z);  
+}
+
 
 float Collision::sweptAABB(Player& player, AABB& b2Static)  
 {
@@ -258,8 +265,12 @@ float Collision::sweptAABB(Player& player, AABB& b2Static)
 void Collision::sweptResponse(Player& player, AABB& b2Static) 
 {
     float collisiontime = sweptAABB(player, b2Static);  
+    
+
     player.mPosition.x += player.velocityX * collisiontime; 
     player.mPosition.y += player.velocityY * collisiontime; 
     player.mPosition.z += player.velocityZ * collisiontime; 
 }
+
+
 

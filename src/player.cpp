@@ -13,8 +13,7 @@ void Player::move(GLFWwindow* window, float deltaTime)
         currentSpeed = mSpeed; 
         velocityX += mForward.x * currentSpeed;
         velocityZ += mForward.z * currentSpeed; 
-        calculateAngle(); 
-
+        calculateAngle(deltaTime); 
     }
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // backward
@@ -22,7 +21,7 @@ void Player::move(GLFWwindow* window, float deltaTime)
         currentSpeed = mSpeed; 
         velocityX -= mForward.x * currentSpeed;
         velocityZ -= mForward.z * currentSpeed; 
-        calculateAngle(); 
+        calculateAngle(deltaTime); 
 
     }
 
@@ -31,7 +30,7 @@ void Player::move(GLFWwindow* window, float deltaTime)
         currentSpeed = mSpeed; 
         velocityX -= mRight.x * currentSpeed;
         velocityZ -= mRight.z * currentSpeed; 
-        calculateAngle(); 
+        calculateAngle(deltaTime); 
 
     }
 
@@ -40,7 +39,7 @@ void Player::move(GLFWwindow* window, float deltaTime)
         currentSpeed = mSpeed; 
         velocityX += mRight.x * currentSpeed;
         velocityZ += mRight.z * currentSpeed; 
-        calculateAngle(); 
+        calculateAngle(deltaTime); 
 
     }
 
@@ -48,16 +47,17 @@ void Player::move(GLFWwindow* window, float deltaTime)
     {
 
             currentSpeed = mSpeed; 
-            velocityY -= glm::vec3(0, 1, 0).y * currentSpeed * 0.01f;
+            velocityY -= glm::vec3(0, 1, 0).y * currentSpeed; 
     }
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // going up 
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // Jumping
     {
-        if (onGround)
+        if (onGround && jumpCooldown <= 0.0f)
         {
             currentSpeed = mSpeed;  
-            velocityY = 1.1f;     
+            velocityY = 1.8f;     
             onGround = false; 
+            jumpCooldown = jumpCooldownDuration;  
         }
     } 
 
@@ -76,34 +76,35 @@ void Player::move(GLFWwindow* window, float deltaTime)
         velocityZ = 0.0f; 
     }
 
-    
-    // calculate velocities 
-    calculateVelocity(deltaTime); 
+
 
     // if the player has taken a first movement 
     // we do this because the movement happens before the collision is updated 
     // not optimal but hey what can you do at this point there are tradeoffs with having the collision come first due to rendering problems 
     if (firstMove) 
     {
+        // calculate velocities 
+        calculateVelocity(deltaTime); 
         // finally moving the player after velocities are calculated 
         mPosition += glm::vec3(velocityX, velocityY, velocityZ);     
         playerModel->mPosition = mPosition; 
-
-
-        // recalculate AABB min and max data  
-        playerModel->ModelBoundingBox.translateValues(mPosition);   
-        playerModel->angle = angle; 
     }
+
+
+    getJumpCooldown(deltaTime);   // calculate jumpcooldown
 
     firstMove = true; 
 
+    // recalculate AABB min and max data  
+    playerModel->ModelBoundingBox.translateValues(mPosition);   
+    playerModel->angle = currentAngle;  
 
+    //printVelocity(); 
 } 
 
 void Player::printVelocity()   
 {
-    std::cout << velocityX << ' ' << velocityY << ' ' << velocityZ << std::endl;    
-    // std::cout << glm::to_string(calculateMaxVelocityVector()) << std::endl;   
+    // std::cout << velocityX << ' ' << velocityY << ' ' << velocityZ << std::endl;    
 }
 
 void Player::calculateVelocity(float deltaTime)      
@@ -113,7 +114,7 @@ void Player::calculateVelocity(float deltaTime)
     velocityX *= deltaTime; 
 
     // handling jumping limits and functionality 
-    if (!onGround) 
+    if (!onGround)   
         velocityY -= gravity * deltaTime; 
     else 
         velocityY *= deltaTime; 
@@ -138,11 +139,11 @@ void Player::limitVelocity()
 
     if (velocityY > velocityLimit)  
         velocityY = velocityLimit;  
-    else if (velocityY < -0.12)    
-        velocityY = -0.12;   
+    else if (velocityY < -0.2)    
+        velocityY = -0.2;   
 }
 
-void Player::calculateAngle() 
+void Player::calculateAngle(float deltaTime) 
 {
     glm::vec2 worldVec = glm::vec2(0, 1); // The 2D vector pointing to the positive z direction
     glm::vec2 mDir = glm::vec2(velocityX, velocityZ); // The 2D vector normalized to the xy plane that is sent out from the 3D forward xyz  vector
@@ -155,6 +156,45 @@ void Player::calculateAngle()
 
     angle = angleDeg;
 
-    std::cout << angle << std::endl;
+    interpolateAngle(deltaTime);  
+}
 
+void Player::interpolateAngle(float deltaTime)  
+{ // interpolate angle so that there is gradual movement to the target angle 
+     // Current angle (starting angle) starts with 0.0f and will be assigned angle at the end of the function 
+    float targetAngle = angle; // Target angle (calculated previously)
+    float duration = 0.1f; // Duration of the interpolation in seconds
+    float elapsedTime = 0.0f; // Elapsed time since interpolation started
+
+    // Calculate the difference between the angles
+    float angleDifference = targetAngle - currentAngle;
+
+    // Adjust the angle difference to take the shortest path
+    if (angleDifference > 180.0f) {
+        angleDifference -= 360.0f;
+    } else if (angleDifference < -180.0f) {
+        angleDifference += 360.0f;
+    }
+
+    elapsedTime += deltaTime; // deltaTime is the time since the last frame
+
+    if (elapsedTime >= duration) {
+        currentAngle = targetAngle; // Interpolation finished, set the angle to the target
+    } else {
+        float t = elapsedTime / duration; // Interpolation progress (between 0 and 1)
+        float interpolatedAngle = currentAngle + angleDifference * t; // Interpolate between current and target angle
+        currentAngle = glm::mod(interpolatedAngle, 360.0f); // Wrap the angle within the range [0, 360)
+    }
+}
+
+void Player::getJumpCooldown(float deltaTime) 
+{
+    if (jumpCooldown > 0.0f)
+    {
+        jumpCooldown -= deltaTime; // Reduce the cooldown time
+        if (jumpCooldown < 0.0f)
+        {
+            jumpCooldown = 0.0f; // Clamp the cooldown time to zero if it becomes negative
+        }
+    }
 }

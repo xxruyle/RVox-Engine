@@ -1,6 +1,7 @@
 #pragma once 
 #include <iostream> 
 #include <string> 
+#include <cmath> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
 #include <glm/glm.hpp>
@@ -18,6 +19,7 @@ public:
     glm::vec3 toMove; 
     glm::vec3 mRight; 
     glm::vec3 mForward;  
+    float currentAngle = 0.0f; 
     float angle; 
     PLYModel* playerModel;
     
@@ -28,8 +30,8 @@ public:
     Player(glm::vec3 position)   
     {
         mPosition = position; 
-        std::string const &path = "res/models/chr_human_default_armor.ply";    
-        this->playerModel = new PLYModel(path, mPosition, 0.8f);     
+        std::string const &path = "res/models/chr_human_default_armor.ply";           
+        this->playerModel = new PLYModel(path, mPosition, 0.8f);       
     }; 
 
     void move(GLFWwindow* window, float deltaTime);   
@@ -45,14 +47,21 @@ public:
     float velocityX = 0.0f; 
     float velocityY = 0.0f; 
     float velocityZ = 0.0f; 
-    float gravity = 10.8f;    
+    float gravity = 15.0f;     
+    // float gravity = 0.0f; 
     float velocityLimit = 20.0f; 
     glm::vec3 collisionNormal; 
 
 private: 
+    glm::vec3 previousPosition; 
     bool firstMove = false; 
     void calculateVelocity(float deltaTime);     
     void limitVelocity(); 
-    void calculateAngle(); 
+    void calculateAngle(float deltaTime); 
+    void interpolateAngle(float deltaTime);  
+
+    void getJumpCooldown(float deltaTime);  
+    float jumpCooldown; 
+    float jumpCooldownDuration = 0.4f;  
 
 }; 

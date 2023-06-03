@@ -26,7 +26,6 @@
 class ChunkManager
 { // class to manage, create, and send chunks to be rendered
 // TO DO: create chunk size variable  
-// TO DO: ADD FAST LOOKUP TO VOXEL COORDINATES ISNTEAD OF LOOPING OVER THEM AND CHECKING EACH TIME 
 public: 
     Render& renderer; 
     Camera& camera; 
@@ -40,15 +39,14 @@ public:
     std::vector<Chunk> chunks; // a vector cainting each chunk
     std::unordered_map<glm::vec3, Chunk> chunkMap;  // an unordered map containing the chunk space coordinates as a key and chunk as value 
     std::vector<glm::vec3> chunkBuffer; // buffer for loading the chunk coordinates that are near the player   
-    // glm::vec3 chunkBuffer[((renderDistance / 32) * 2) * ((renderDistance / 32) * 2)];    
 
-    
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
 
     void meshNeighbors(Chunk& chunk);  // gives chunks data about their neighbors 
 
     void checkCollision(Player& player); 
+    void checkAutoJump(Player& player, glm::vec3 collisionNormal); // checks for blocks that the player can auto jump and give collider this info   
     bool checkGround(Player& player); 
 
     glm::vec3 getChunkLocation(glm::vec3 coordinatePosition); // prints what chunk coorddinate the camera is in  
@@ -66,11 +64,8 @@ public:
 
     void spawnPlayer(glm::vec3 chunkCoord, Player& player);  
 
-    // initializing the prev outlined voxel for voxelOutline. Not the most elegant solution for the voxelOutline bug, but whatever lol 
-    Voxel* prevOutlinedVoxel = nullptr; 
-
 private: 
-    static const int renderDistance = 1000; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 700; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
