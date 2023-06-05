@@ -27,6 +27,13 @@ void Render::setShaders(Shader& shader)
     shader.setMat("projection", 1, GL_FALSE, projection);
 }
 
+void setDepthMapShaders(Shader& shader, glm::mat4& trans, glm::vec3 lightPos)  
+{
+    shader.setMat("lightSpaceMatrix", 1, GL_FALSE,  trans);     
+    shader.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);      
+    shader.setInt("shadowMap", 0);       
+}
+
 void Render::drawVoxelCubeMap(Shader& shader, Texture& texture, glm::vec3 position, float scale)  
 { // render a voxel to the screen in 3D 
     // texture.Bind(GL_TEXTURE_CUBE_MAP, GL_TEXTURE0); // binding the given texture so that we can draw other voxels 

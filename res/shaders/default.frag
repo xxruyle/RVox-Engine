@@ -64,7 +64,6 @@ uniform vec3 lightPos;
 // fog values 
 // const float fogDensity = 0.0025; // for 1000 block render distance 
 // const float fogDensity = 0.005; // for 500 block render distance 
-uniform float renderDistance; 
 const float fogDensity = .0025;  
 float fogGradient = 3.0; 
 
@@ -76,7 +75,7 @@ float farD = 1000.0;
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);  
 vec3 CalcSpotLight(SpotLight spotlight, vec3 normal, vec3 fragpos, vec3 viewDir); 
-float CalcFog(vec3 cameraPos, float renderDistance); 
+float CalcFog(vec3 cameraPos);  
 float LinearizeDepth(float depth); 
 float ShadowCalculation(vec4 fragPosLightSpace);   
 
@@ -85,16 +84,17 @@ void main()
 {
 	vec4 skyColor = vec4(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f);  
 
-/*     // properties
+    // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
 
     // phase 1: Directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir); */
+    vec3 result = CalcDirLight(dirLight, norm, viewDir);
 
-	float visibility = CalcFog(viewPos, renderDistance);  
+	float visibility = CalcFog(viewPos);   
 
-    vec3 normal = normalize(Normal); 
+	// shadow stuff 
+/*     vec3 normal = normalize(Normal); 
     vec3 lightColor = vec3(1.0);
     // ambient
     vec3 ambient = 0.15 * lightColor;
@@ -103,19 +103,16 @@ void main()
     float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = diff * lightColor;
 
-
     // calculate shadow
-    float shadow = ShadowCalculation(FragPosLightSpace);      
+    float shadow = ShadowCalculation(FragPosLightSpace);   */    
 
-	
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse)) * Color;      
-    
-    FragColor = vec4(lighting, 1.0);
-
-	// FragColor = mix(skyColor, FragColor, visibility); 
+    // vec3 lighting = (ambient + (1.0 - shadow) * (diffuse)) * Color;      
+    // FragColor = vec4(lighting, 1.0);
 
 
-//    FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color     
+	// regular lighting  output 
+	FragColor = mix(skyColor, FragColor, visibility);  
+	FragColor = vec4(Color, 0.0) * vec4(result, 1.0); //vec4 sun color      
 	
 }
 
@@ -199,7 +196,7 @@ vec3 CalcSpotLight(SpotLight spotlight, vec3 normal, vec3 fragpos, vec3 viewDir)
 	return (ambient + diffuse); 
 }
 
-float CalcFog(vec3 cameraPos, float renderDistance)    
+float CalcFog(vec3 cameraPos)     
 {
 	float distanceFromCamera =  length(FragPos - cameraPos);       
 

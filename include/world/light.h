@@ -16,7 +16,6 @@ public:
     glm::vec3 lightPos; 
 
 
-    Light(glm::vec3 lightPos) : lightPos(lightPos) {}; 
 
     void sunLightInit(Shader& shader, Camera& camera);  
     void setLightSource(Shader& shader, glm::vec3 position, int i);  

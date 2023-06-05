@@ -36,6 +36,7 @@ const unsigned int SCR_HEIGHT = 1000;
 Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
 OrthoCamera orthoCamera(glm::vec3(-30.0, 70.0, -30.0), 45.0, 0.0, 90.0f);  
 GameTime gTime;
+Light lighting;  
 Frustum frustum(gameCamera);  
 Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);  
 ChunkManager chunkManager(renderer, gameCamera, frustum);      
@@ -124,12 +125,12 @@ int main()
     DebugTools wireFrame; 
     wireFrame.getOutlineVertices(); 
 
-
+/* 
     DepthMap depthMap; 
 
 
     PLYModel light("res/models/debug.ply", glm::vec3(-2, 50, -1), 1.0f); 
-    PLYModel obstruction("res/models/monu1.ply", glm::vec3(4, 0, 4), 1.0f);  
+    PLYModel obstruction("res/models/monu1.ply", glm::vec3(4, 0, 4), 1.0f);   */
 
 
 
@@ -138,7 +139,7 @@ int main()
     {
 
 
-        glm::vec3 lightPos = light.mPosition;   
+/*         glm::vec3 lightPos = light.mPosition;   
         light.mPosition = glm::vec3(64.0f*cos(glfwGetTime()), 50, 64.0f*sin(glfwGetTime()));         
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -150,7 +151,7 @@ int main()
 
         chunkManager.renderChunks(depthMapProgram); 
         obstruction.Draw(depthMapProgram);  
-        depthMap.Unbind(); 
+        depthMap.Unbind();  */
 
 
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);    
@@ -169,22 +170,22 @@ int main()
         // shaderProgram.setFloat("renderDistance", 300); 
  
         // lighting 
-        // lighting.sunLightInit(shaderProgram, gameCamera); 
+        lighting.sunLightInit(shaderProgram, gameCamera);  
 
-        shaderProgram.setVec3("viewPos", gameCamera.mPosition.x, gameCamera.mPosition.y, gameCamera.mPosition.z);    
-/*         shaderProgram.setVec3("dirLight.ambient",  0.4f, 0.4f, 0.4f);       
-        shaderProgram.setVec3("dirLight.diffuse",  0.3f, 0.3f, 0.3f);    */
-
-
+        // shaderProgram.setVec3("viewPos", gameCamera.mPosition.x, gameCamera.mPosition.y, gameCamera.mPosition.z);    
+  
         // camera and frustum 
         // renderer.viewProject(gameCamera); // first pesron camera          
         renderer.playerViewProject(gameCamera, player);  // third person camera     
         // renderer.viewOrtho(orthoCamera); // orthographic camera   
+
         renderer.setShaders(shaderProgram); 
-        shaderProgram.setMat("lightSpaceMatrix", 1, GL_FALSE,  depthMap.lightSpaceMatrix);     
-        shaderProgram.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);     
-        depthMap.bindTexture(); 
-        shaderProgram.setInt("shadowMap", 0);     
+        // depth maps stuff 
+/*         depthMap.bindTexture(); 
+        renderer.setShaders(shaderProgram); 
+        renderer.setDepthMapShaders(shaderProgram, depthMap.lightSpaceMatrix, lightPos);    */  
+
+
 
         // setting up frustum  
         frustum.setCamInternals(); 
@@ -205,12 +206,12 @@ int main()
         // models 
         player.playerModel->Draw(shaderProgram); 
 
-        light.Draw(shaderProgram); 
-        obstruction.Draw(shaderProgram); 
+/*         light.Draw(shaderProgram); 
+        obstruction.Draw(shaderProgram);  */
 
 
         // for transparency
-/*         glEnable(GL_BLEND);
+        glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
         glDisable(GL_CULL_FACE); 
@@ -226,7 +227,7 @@ int main()
         // 2D Rendering 
         hud.DrawCrosshair(hudProgram);  
 
-        glDisable(GL_BLEND);  */
+        glDisable(GL_BLEND); 
 
 
         // The player movement is calculated in this function by way of the camera function being called 

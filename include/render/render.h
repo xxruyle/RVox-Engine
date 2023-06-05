@@ -33,6 +33,7 @@ public:
     void playerViewProject(Camera& camera, Player& player); 
     void viewOrtho(OrthoCamera& orthoCamera); 
     void setShaders(Shader& shader); 
+    void setDepthMapShaders(Shader& shader, glm::mat4& trans, glm::vec3 lightPos);      
 
     void drawVoxelCubeMap(Shader& shader, Texture& texture, glm::vec3 position, float scale); 
     void drawVoxel(Shader& shader, glm::vec3 position, glm::vec3 color, float scale); 
