@@ -71,7 +71,7 @@ void DebugTools::getOutlineVertices()
         vertices.push_back(v1);         
     } 
 
-    TextureMesh texMesh(vertices, indices, "res/textures/outline.png");  
+    TextureMesh texMesh(vertices, indices, "res/textures/transparent.png");   
     meshes.push_back(texMesh);  
 }
 
@@ -302,6 +302,6 @@ void DebugTools::getBoundingBoxVertices(AABB& boundingBox)
         vertices.push_back(v1);         
     } 
 
-    TextureMesh texMesh(vertices, indices, "res/textures/outline.png");  
+    TextureMesh texMesh(vertices, indices, "res/textures/outlinered.png");  
     meshes.push_back(texMesh);   
 }

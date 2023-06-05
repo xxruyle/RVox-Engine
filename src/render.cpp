@@ -24,7 +24,7 @@ void Render::viewOrtho(OrthoCamera& orthoCamera)
 void Render::setShaders(Shader& shader) 
 {
     shader.setMat("view", 1, GL_FALSE, view); 
-    shader.setMat("projection", 1, GL_FALSE, projection);  
+    shader.setMat("projection", 1, GL_FALSE, projection);
 }
 
 void Render::drawVoxelCubeMap(Shader& shader, Texture& texture, glm::vec3 position, float scale)  

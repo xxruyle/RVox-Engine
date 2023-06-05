@@ -30,7 +30,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 7.0f)));  
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));  
             heighestPoint = std::max(heighestPoint, height); 
             heighestLocation = glm::vec3(x, heighestPoint + stoneLimit, z);   
             noiseData[x][z] = height; // -40      
@@ -65,19 +65,85 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
 void Chunk::generateDebugChunk(int randSeed, int startX, int startZ) 
 { // 3D noise chunk 
+    const int xs = 33;
+    const int zs = 33;
+    float frequency = 0.005f; 
+
     FastNoiseLite noise; 
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);  
-    noise.SetFractalType(FastNoiseLite::FractalType_Ridged);
-    noise.SetFrequency(.08);  
+    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);  
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+    noise.SetFrequency(.009);  
+    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
+    noise.SetSeed(randSeed);  
+
+    FastNoiseLite mountain; 
+    mountain.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
+    mountain.SetFractalType(FastNoiseLite::FractalType_Ridged);  
+    mountain.SetFrequency(frequency); 
+    mountain.SetSeed(randSeed);   
+    mountain.SetFractalOctaves(4); 
+
+        // Gather noise data
+    int noiseData[xs][zs];
+    int stoneLimit = 20; 
+    int heighestPoint = -100000;  //  
+
+
+    for (int x = 0; x < xs; x++) 
+    {
+        for (int z = 0; z < zs; z++)  
+        {
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));  
+            heighestPoint = std::max(heighestPoint, height); 
+            heighestLocation = glm::vec3(x, heighestPoint + stoneLimit, z); 
+            noiseData[x][z] = height; // -40      
+        }
+    }
+
+    for (int i = 0; i < xs; i++) 
+    {
+        for (int j = 0; j < zs; j++) 
+        {
+            for (int k = 0; k <  stoneLimit + noiseData[i][j]; k++)   
+            {
+                int surface = stoneLimit + noiseData[i][j] - 2;
+
+                if (k > 60)   
+                {
+                    noise.SetFrequency(0.006); 
+                    float MultiNoise = noise.GetNoise((float)(startX + i), (float)(k), (float)(startZ + j));    
+                    MultiNoise > -0.008f ? voxels[i][k][j] = 3 : voxels[i][k][j] = 0;   
+                }
+                else if (k < 50 && k > 5)   
+                {
+                    noise.SetFrequency(0.0007); 
+                    float MultiNoise = noise.GetNoise((float)(startX + i), (float)(k), (float)(startZ + j));    
+                    MultiNoise > -0.008f ? voxels[i][k][j] = 2 : voxels[i][k][j] = 0;    
+                }    
+                else if (k < surface) { // stone
+                    voxels[i][k][j] = 2;
+                    
+                } else if (k < 80) { // grass 
+                    voxels[i][k][j] = 1;
+                } else { // snow mountains 
+                    voxels[i][k][j] = 3;
+                }
+            } 
+        }
+    }  
+
+
+/*     FastNoiseLite noise; 
+    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);  
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+    noise.SetFrequency(.005);  
     noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
     noise.SetSeed(randSeed);   
 
-        // Gather noise data
-    float noiseData[33][100][33];
 
     for (int x = 0; x < 33; x++) 
     {
-        for (int y = 0; y < 100; y++)
+        for (int y = 0; y < 33; y++)
         {
             for (int z = 0; z < 33; z++)  
             {
@@ -88,14 +154,14 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
 
     for (int x = 0; x < 33; x++) 
     {
-        for (int y = 0; y < 100; y++)
+        for (int y = 0; y < 33; y++)
         {
             for (int z = 0; z < 33; z++)  
             {
-                noiseData[x][y][z] > -0.71f ? voxels[x][y][z] = 1 : voxels[x][y][z] = 0;   
+                noiseData[x][y][z] > -0.008f ? voxels[x][y][z] = 1 : voxels[x][y][z] = 0;   
             }
         }
-    }
+    } */
 }
 
 
@@ -275,14 +341,13 @@ void Chunk::changeVoxelColor(glm::vec3 voxelCoord)
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(voxelVertex), &vertices[0], GL_STATIC_DRAW);  
 }
 
-void Chunk::draw(Shader& shader, Frustum& frustum, float renderDistance) 
+void Chunk::draw(Shader& shader, Frustum& frustum, float amount)  
 {
     // if (frustum.chunkInFrustum(position)) // if point is in frustum   
     // {  
         glm::mat4 model; 
         model = glm::mat4(1.0f); 
-        shader.setMat("model", 1, GL_FALSE, model);  
-        shader.setFloat("renderDistance", renderDistance);
+        shader.setMat("model", 1, GL_FALSE, model);   
          
 
         glBindVertexArray(VAO);  

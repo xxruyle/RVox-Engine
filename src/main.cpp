@@ -24,6 +24,8 @@
 #include "debug/debug_tools.h"
 #include "player/player.h" 
 
+#include "world/depth_map.h" 
+
 
 
 // global variables 
@@ -33,7 +35,6 @@ const unsigned int SCR_HEIGHT = 1000;
 // initializing helper classes 
 Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
 OrthoCamera orthoCamera(glm::vec3(-30.0, 70.0, -30.0), 45.0, 0.0, 90.0f);  
-Light lighting; 
 GameTime gTime;
 Frustum frustum(gameCamera);  
 Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);  
@@ -54,7 +55,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main() 
 {
-    srand(time(NULL));  
+    srand(time(NULL));  // random  
 
     glfwInit(); // initializes glfw 
 
@@ -62,6 +63,7 @@ int main()
     // 3 because we are using opengl 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_SAMPLES, 4); // for anti alias  
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
 
     //creating window and error handling 
@@ -94,6 +96,12 @@ int main()
     Shader outlineProgram("res/shaders/outline.vert", "res/shaders/outline.frag"); 
     outlineProgram.Activate(); 
 
+    Shader depthMapProgram("res/shaders/depthmap.vert", "res/shaders/depthmap.frag");  
+    depthMapProgram.Activate();  
+
+    Shader debugDepth("res/shaders/debugdepth.vert", "res/shaders/debugdepth.frag");   
+    debugDepth.Activate(); 
+
     hud.crossHairInit("res/textures/crosshairbox.png"); // initializes crosshair  
 
 
@@ -103,6 +111,7 @@ int main()
     // PLYModel plymodel("res/models/chr_skeleton.ply", glm::vec3(0, 0, 5), 1.1f);     
     // PLYModel plymodelPlayer("res/models/chr_player_default.ply", glm::vec3(0,0,0) , 1.0f);  
     // PLYModel xyzAxis("res/models/xyzAxis.ply", gameCamera.mPosition + gameCamera.mFront, 1.0f); 
+
 
 
     Player player(glm::vec3(0, 0, 0));       
@@ -115,39 +124,77 @@ int main()
     DebugTools wireFrame; 
     wireFrame.getOutlineVertices(); 
 
+
+    DepthMap depthMap; 
+
+
+    PLYModel light("res/models/debug.ply", glm::vec3(-2, 50, -1), 1.0f); 
+    PLYModel obstruction("res/models/monu1.ply", glm::vec3(4, 0, 4), 1.0f);  
+
+
+
     // The main render loop z
     while (!glfwWindowShouldClose(window)) 
     {
+
+
+        glm::vec3 lightPos = light.mPosition;   
+        light.mPosition = glm::vec3(64.0f*cos(glfwGetTime()), 50, 64.0f*sin(glfwGetTime()));         
+
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_TEST); 
+
+        depthMap.Render(depthMapProgram, lightPos, glm::vec3(4, 0, 4));            
+
+        chunkManager.renderChunks(depthMapProgram); 
+        obstruction.Draw(depthMapProgram);  
+        depthMap.Unbind(); 
+
+
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);    
         glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 
+
+        glEnable(GL_MULTISAMPLE);  // MSAA 
         glEnable(GL_CULL_FACE);  
         glCullFace(GL_BACK);  
 
         shaderProgram.Activate(); 
-        shaderProgram.setInt("material.diffuse", 0); 
-        shaderProgram.setInt("material.specular", 1); 
-        shaderProgram.setFloat("renderDistance", 300); 
+        // shaderProgram.setInt("material.diffuse", 0); 
+        // shaderProgram.setInt("material.specular", 1); 
+        // shaderProgram.setFloat("renderDistance", 300); 
  
         // lighting 
-        lighting.sunLightInit(shaderProgram, gameCamera); 
+        // lighting.sunLightInit(shaderProgram, gameCamera); 
+
+        shaderProgram.setVec3("viewPos", gameCamera.mPosition.x, gameCamera.mPosition.y, gameCamera.mPosition.z);    
+/*         shaderProgram.setVec3("dirLight.ambient",  0.4f, 0.4f, 0.4f);       
+        shaderProgram.setVec3("dirLight.diffuse",  0.3f, 0.3f, 0.3f);    */
 
 
         // camera and frustum 
-        // renderer.viewProject(gameCamera); // first pesron camera         
-        renderer.playerViewProject(gameCamera, player);  // third person camera    
+        // renderer.viewProject(gameCamera); // first pesron camera          
+        renderer.playerViewProject(gameCamera, player);  // third person camera     
         // renderer.viewOrtho(orthoCamera); // orthographic camera   
         renderer.setShaders(shaderProgram); 
-
+        shaderProgram.setMat("lightSpaceMatrix", 1, GL_FALSE,  depthMap.lightSpaceMatrix);     
+        shaderProgram.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);     
+        depthMap.bindTexture(); 
+        shaderProgram.setInt("shadowMap", 0);     
 
         // setting up frustum  
         frustum.setCamInternals(); 
         frustum.setCamDef();  
 
+        
         // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);        
-        chunkManager.checkCollision(player); 
+        chunkManager.renderChunks(shaderProgram);       
+        // chunkManager.checkCollision(player); 
+
 
 
         // time functions for deltaTime and fps 
@@ -158,10 +205,13 @@ int main()
         // models 
         player.playerModel->Draw(shaderProgram); 
 
+        light.Draw(shaderProgram); 
+        obstruction.Draw(shaderProgram); 
+
 
         // for transparency
+/*         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
     
         glDisable(GL_CULL_FACE); 
 
@@ -170,19 +220,24 @@ int main()
         renderer.setShaders(outlineProgram); 
         // chunkManager.voxelOutline(outlineProgram, wireFrame);       
 
-        debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);        
-        // std::cout << player.playerModel->ModelBoundingBox.minX << ' ' << player.playerModel->ModelBoundingBox.minY << ' ' << player.playerModel->ModelBoundingBox.minZ << std::endl;      
+        // debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);         
 
 
         // 2D Rendering 
         hud.DrawCrosshair(hudProgram);  
 
-        glDisable(GL_BLEND); 
+        glDisable(GL_BLEND);  */
 
 
         // The player movement is calculated in this function by way of the camera function being called 
         // probably not the best structure here but I don't know a better way lol...
-        processInput(window, player);   
+        processInput(window, player);      
+
+
+        // for debugging and viewing the ortho projection of the depthbuffer light source 
+/*         depthMap.bindTexture(); 
+        debugDepth.Activate();  
+        depthMap.DebugRender(debugDepth);   */
 
 
         glfwSwapBuffers(window); // swaps the color buffer which is used to render during each render iteration and show output to the screen 

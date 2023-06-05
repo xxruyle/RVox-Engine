@@ -7,6 +7,7 @@ void Player::move(GLFWwindow* window, float deltaTime)
 {
     velocityX = 0.0f; 
     velocityZ = 0.0f;  
+    velocityY = 0.0f; 
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
     {
@@ -46,19 +47,20 @@ void Player::move(GLFWwindow* window, float deltaTime)
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) // going down  
     {
 
-            currentSpeed = mSpeed; 
-            velocityY -= glm::vec3(0, 1, 0).y * currentSpeed; 
+            // currentSpeed = mSpeed; 
+            // velocityY -= glm::vec3(0, 1, 0).y * currentSpeed; 
+            velocityY = -1.2;    
     }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // Jumping
     {
-        if (onGround && jumpCooldown <= 0.0f)
-        {
+        // if (onGround)    
+        // { 
             currentSpeed = mSpeed;  
-            velocityY = 1.8f;     
             onGround = false; 
+            velocityY = 1.2;  
             jumpCooldown = jumpCooldownDuration;  
-        }
+        // }
     } 
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) // "sprint"
@@ -81,17 +83,20 @@ void Player::move(GLFWwindow* window, float deltaTime)
     // if the player has taken a first movement 
     // we do this because the movement happens before the collision is updated 
     // not optimal but hey what can you do at this point there are tradeoffs with having the collision come first due to rendering problems 
-    if (firstMove) 
-    {
+    if (firstMove)  
+    { 
+        getJumpCooldown(deltaTime);   // calculate jumpcooldown 
+
         // calculate velocities 
         calculateVelocity(deltaTime); 
-        // finally moving the player after velocities are calculated 
-        mPosition += glm::vec3(velocityX, velocityY, velocityZ);     
+        mPosition += glm::vec3(velocityX, velocityY, velocityZ);  
+
         playerModel->mPosition = mPosition; 
     }
 
+    sweptVelocity = (mPosition - prevPosition)  / deltaTime;  
+    prevPosition = mPosition; 
 
-    getJumpCooldown(deltaTime);   // calculate jumpcooldown
 
     firstMove = true; 
 
@@ -99,28 +104,28 @@ void Player::move(GLFWwindow* window, float deltaTime)
     playerModel->ModelBoundingBox.translateValues(mPosition);   
     playerModel->angle = currentAngle;  
 
-    //printVelocity(); 
+
 } 
 
 void Player::printVelocity()   
 {
     // std::cout << velocityX << ' ' << velocityY << ' ' << velocityZ << std::endl;    
+    std::cout << glm::to_string(sweptVelocity) << std::endl; 
 }
+
+
 
 void Player::calculateVelocity(float deltaTime)      
 {
     limitVelocity(); // handle velocity being too high 
-
-    velocityX *= deltaTime; 
-
+    
     // handling jumping limits and functionality 
-    if (!onGround)   
+    if (!onGround)       
         velocityY -= gravity * deltaTime; 
     else 
         velocityY *= deltaTime; 
 
-
-
+    velocityX *= deltaTime; 
     velocityZ *= deltaTime; 
 }
 
@@ -138,9 +143,9 @@ void Player::limitVelocity()
         velocityZ = -velocityLimit;  
 
     if (velocityY > velocityLimit)  
-        velocityY = velocityLimit;  
-    else if (velocityY < -0.2)    
-        velocityY = -0.2;   
+        velocityY = velocityLimit;     
+    else if (velocityY < -velocityLimit)    
+        velocityY = -velocityLimit;     
 }
 
 void Player::calculateAngle(float deltaTime) 

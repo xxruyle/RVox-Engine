@@ -6,14 +6,14 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 1; i++) 
+    for (int i = 0; i < 3; i++) 
     {
-        for (int j = 0; j < 1; j++)   
+        for (int j = 0; j < 3; j++)   
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
-            c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);     
-            // c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);  
+            // c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);        
+            c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);     
             c1.mesh(); 
             meshNeighbors(c1); 
         }
@@ -40,13 +40,13 @@ void ChunkManager::renderChunks(Shader& shader)
                 
             
 
-        }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+        }  /* else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.position = chunkBuffer[i]; 
-            c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
-            // c1.generateDebugChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);  
+            c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);     
+            // c1.generateDebugChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
             c1.mesh(); 
-        }
+        } */
     } 
 }
 
@@ -252,13 +252,13 @@ void ChunkManager::checkCollision(Player& player)
     int playerPosX = (int)player.mPosition.x; 
     int playerPosY = (int)player.mPosition.y; 
     int playerPosZ = (int)player.mPosition.z; 
-    glm::vec3 playerChunk = getChunkLocation(glm::vec3(playerPosX, playerPosY, playerPosZ));   
+    // glm::vec3 playerChunk = getChunkLocation(glm::vec3(playerPosX, playerPosY, playerPosZ));   
 
     for (int x = playerPosX - 4; x < playerPosX + 4; x++)  
     {
-        for (int y = 0; y < playerPosY + 4; y++)    
+        for (int y = playerPosY - 4; y < playerPosY + 4; y++)     
         {
-            for (int z = playerPosZ - 4; z < playerPosZ + 4; z++)    
+            for (int z = playerPosZ - 4; z < playerPosZ + 4; z++)        
             {
                 glm::vec3 playerChunk = getChunkLocation(glm::vec3(x, y, z));  
 
@@ -272,15 +272,14 @@ void ChunkManager::checkCollision(Player& player)
                     // we make sure to use world coordinates here for  the AABB min and max calculations    
                     AABB b1 = collisionTest.getVoxelBoundingBox(glm::vec3(x,y,z));  
 
-
                     if (collisionTest.AABBtoAABB(b1, player.playerModel->ModelBoundingBox)) 
                     {
                         glm::vec3 collisionNormal = collisionTest.calculateNormal(player, b1); 
                         collisionTest.resolveCollision(b1, player, collisionNormal);   
-                        if (!((collisionNormal == glm::vec3(0, 1, 0)) || (collisionNormal == glm::vec3(0, -1, 0)))) // if it is not a ground collision 
+/*                         if (!((collisionNormal == glm::vec3(0, 1, 0)) || (collisionNormal == glm::vec3(0, -1, 0)))) // if it is not a ground collision 
                         {
                             checkAutoJump(player, collisionNormal);  
-                        }
+                        } */
                     } 
                 }
   
@@ -292,6 +291,10 @@ void ChunkManager::checkCollision(Player& player)
         player.onGround = true;
     else 
         player.onGround = false; 
+
+/*     AABB b1 = collisionTest.getVoxelBoundingBox(glm::vec3(2,20,2)); 
+    collisionTest.sweptResponse(player, b1); */
+
 }
 
 glm::vec3 ChunkManager::getWorldCoordinates(glm::vec3 chunkCoordinates, glm::vec3 voxelPosition)  

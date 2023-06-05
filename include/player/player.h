@@ -30,7 +30,7 @@ public:
     Player(glm::vec3 position)   
     {
         mPosition = position; 
-        std::string const &path = "res/models/chr_human_default_armor.ply";           
+        std::string const &path = "res/models/chr_human_default_armor.ply";              
         this->playerModel = new PLYModel(path, mPosition, 0.8f);       
     }; 
 
@@ -44,24 +44,25 @@ public:
 
     float mSpeed = 0.5f; 
     float currentSpeed = 0.0f; 
+    glm::vec3 sweptVelocity; 
     float velocityX = 0.0f; 
     float velocityY = 0.0f; 
     float velocityZ = 0.0f; 
-    float gravity = 15.0f;     
-    // float gravity = 0.0f; 
+    float gravity = 0.0f;     
     float velocityLimit = 20.0f; 
     glm::vec3 collisionNormal; 
 
 private: 
-    glm::vec3 previousPosition; 
+    glm::vec3 prevPosition;  
     bool firstMove = false; 
     void calculateVelocity(float deltaTime);     
+    void calculateSweptVelocity(float deltaTime); 
     void limitVelocity(); 
     void calculateAngle(float deltaTime); 
-    void interpolateAngle(float deltaTime);  
+    void interpolateAngle(float deltaTime);
 
     void getJumpCooldown(float deltaTime);  
     float jumpCooldown; 
-    float jumpCooldownDuration = 0.4f;  
+    float jumpCooldownDuration = 1.0f;  
 
 }; 

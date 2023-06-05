@@ -10,8 +10,10 @@ void Light::sunLightInit(Shader& shader, Camera& camera)
     shader.setVec3("dirLight.direction", 0.0f, -1.0, 0.0);      
     shader.setVec3("dirLight.color", 250.0f/255.0f, 150.0f/255.0f, 27.0f/255.0f); 
     shader.setVec3("viewPos", camera.mPosition.x, camera.mPosition.y, camera.mPosition.z);  
-    shader.setVec3("dirLight.ambient",  0.3f, 0.3f, 0.3f);   
-    shader.setVec3("dirLight.diffuse",  0.5f, 0.5f, 0.5f);  
+    shader.setVec3("dirLight.ambient",  0.4f, 0.4f, 0.4f);      
+    // shader.setVec3("dirLight.ambient",  sin(glfwGetTime()) + 1.0f, sin(glfwGetTime()) + 1.0f, sin(glfwGetTime())+1.0f);   
+    shader.setVec3("dirLight.diffuse",  0.3f, 0.3f, 0.3f);     
+    // shader.setVec3("dirLight.diffuse",  sin(glfwGetTime()) + 1.0f, sin(glfwGetTime()) + 1.0f, sin(glfwGetTime())+1.0f); 
     shader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);  
 
     shader.setFloat("material.shininess", 32.0f); 
@@ -44,4 +46,5 @@ void Light::spotLightInit(Shader& shader,  Camera& camera)
     shader.setVec3("spotLight.diffuse",  0.8f, 0.8f, 0.8f);   
     shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);   
 }
+
 
