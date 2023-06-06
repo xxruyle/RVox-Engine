@@ -67,6 +67,9 @@ void PLYModel::readIn(std::string const &path, glm::vec3 position, float scale)
 
         v1.Color = vecColor; 
 
+        // placeholder for ambient occlusion value 
+        v1.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+
         // adding the vertex 
         vertices.push_back(v1); 
     }

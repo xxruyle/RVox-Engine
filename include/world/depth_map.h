@@ -28,7 +28,7 @@ public:
 private: 
 
     const unsigned int SHADOW_WIDTH = 1300, SHADOW_HEIGHT = 1000; // the screen space resolution  
-    float nearPlane = 0.1f, farPlane = 100.0f;     
+    float nearPlane = 0.1f, farPlane = 90.0f;     
 
 
 }; 

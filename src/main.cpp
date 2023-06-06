@@ -125,33 +125,31 @@ int main()
     DebugTools wireFrame; 
     wireFrame.getOutlineVertices(); 
 
-/* 
-    DepthMap depthMap; 
+
+/*     DepthMap depthMap; 
 
 
-    PLYModel light("res/models/debug.ply", glm::vec3(-2, 50, -1), 1.0f); 
-    PLYModel obstruction("res/models/monu1.ply", glm::vec3(4, 0, 4), 1.0f);   */
+    PLYModel light("res/models/debug.ply", glm::vec3(0, 40, 8), 1.0f);  
+    PLYModel obstruction("res/models/monu1.ply", glm::vec3(8, 10, 8), 1.0f);   */
 
 
 
     // The main render loop z
     while (!glfwWindowShouldClose(window)) 
     {
-
-
+        // depth map rendering 
 /*         glm::vec3 lightPos = light.mPosition;   
-        light.mPosition = glm::vec3(64.0f*cos(glfwGetTime()), 50, 64.0f*sin(glfwGetTime()));         
+        light.mPosition = glm::vec3(-20, 30, -20);               
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glEnable(GL_DEPTH_TEST); 
-
-        depthMap.Render(depthMapProgram, lightPos, glm::vec3(4, 0, 4));            
-
-        chunkManager.renderChunks(depthMapProgram); 
+        depthMap.Render(depthMapProgram, lightPos, glm::vec3(8, 0, 8));     
         obstruction.Draw(depthMapProgram);  
-        depthMap.Unbind();  */
+        chunkManager.renderChunks(depthMapProgram); 
+        player.playerModel->Draw(depthMapProgram);  
+        depthMap.Unbind(); */ 
 
 
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);    
@@ -160,7 +158,8 @@ int main()
         glEnable(GL_DEPTH_TEST); 
 
 
-        glEnable(GL_MULTISAMPLE);  // MSAA 
+        // MSAA 
+        glEnable(GL_MULTISAMPLE);  
         glEnable(GL_CULL_FACE);  
         glCullFace(GL_BACK);  
 
@@ -170,9 +169,7 @@ int main()
         // shaderProgram.setFloat("renderDistance", 300); 
  
         // lighting 
-        lighting.sunLightInit(shaderProgram, gameCamera);  
-
-        // shaderProgram.setVec3("viewPos", gameCamera.mPosition.x, gameCamera.mPosition.y, gameCamera.mPosition.z);    
+        lighting.setupDirLight(shaderProgram, gameCamera);    
   
         // camera and frustum 
         // renderer.viewProject(gameCamera); // first pesron camera          
@@ -181,9 +178,9 @@ int main()
 
         renderer.setShaders(shaderProgram); 
         // depth maps stuff 
-/*         depthMap.bindTexture(); 
-        renderer.setShaders(shaderProgram); 
-        renderer.setDepthMapShaders(shaderProgram, depthMap.lightSpaceMatrix, lightPos);    */  
+        // depthMap.bindTexture();  
+        // renderer.setShaders(shaderProgram); 
+        // renderer.setDepthMapShaders(shaderProgram, depthMap.lightSpaceMatrix, lightPos);      
 
 
 
@@ -226,7 +223,6 @@ int main()
 
         // 2D Rendering 
         hud.DrawCrosshair(hudProgram);  
-
         glDisable(GL_BLEND); 
 
 

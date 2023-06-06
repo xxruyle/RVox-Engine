@@ -15,11 +15,8 @@ class Light
 public: 
     glm::vec3 lightPos; 
 
-
-
-    void sunLightInit(Shader& shader, Camera& camera);  
-    void setLightSource(Shader& shader, glm::vec3 position, int i);  
-    void spotLightInit(Shader& shader, Camera& camera);   
+    void setupDirLight(Shader& shader, Camera& camera);   
+    void setupSunlight(Shader& shader, PLYModel& sun, Player& player);   
 
 
 private: 

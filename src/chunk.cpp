@@ -30,7 +30,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));  
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));   
             heighestPoint = std::max(heighestPoint, height); 
             heighestLocation = glm::vec3(x, heighestPoint + stoneLimit, z);   
             noiseData[x][z] = height; // -40      
@@ -191,6 +191,9 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
                             vertex.Normal = backNormals[i];   
                             vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+                            vertex.aoValue = glm::vec3(1, 1, 1);  
+
+
                             vertices.push_back(vertex);      
                         }
                     }   
@@ -209,6 +212,24 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
                             vertex.Normal = frontNormals[i];  
                             vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            if (i == 0)         
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);   
+                            } 
+                            else if (i == 1) 
+                            {
+                                vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f); 
+                            }
+                            else if (i == 3) 
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                            }
+                            else 
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                            }
+
+
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -227,6 +248,10 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
                             vertex.Normal = leftNormals[i]; 
                             vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            vertex.aoValue = glm::vec3(1, 1, 1);  
+
+
+                            
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -245,6 +270,25 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
                             vertex.Normal = rightNormals[i]; 
                             vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+
+                            if (i == 0)         
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);   
+                            } 
+                            else if (i == 1) 
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                            }
+                            else if (i == 3) 
+                            {
+                                vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f);  
+                            }
+                            else 
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                            }
+
+
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -264,6 +308,9 @@ void Chunk::mesh()
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
                             vertex.Normal = bottomNormals[i];    
                             vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            vertex.aoValue = glm::vec3(1, 1, 1);  
+
+
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -281,9 +328,26 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
                             vertex.Normal = topNormals[i];   
-                            // vertex.Color = voxelColors[x][y][z];   
-                            // vertex.Color = glm::vec3(75.0f/255.0f, 205.0f/255.0f, 50.0f/255.0f);  
                             vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+
+                            if (i == 0)         
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                            } 
+                            else if (i == 1) 
+                            {
+                                vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f); 
+                            }
+                            else if (i == 2) 
+                            {
+                                vertex.aoValue = glm::vec3(0.6f, 0.6f, 0.6f); 
+                            }
+                            else 
+                            {
+                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                            }
+
+
                             vertices.push_back(vertex);     
                         }
                     }   
@@ -324,6 +388,11 @@ void Chunk::setupMesh()
     // vertex colors
     glEnableVertexAttribArray(2);	
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(voxelVertex), (void*)offsetof(voxelVertex, Color)); 
+
+    //ambient occlusion value 
+    glEnableVertexAttribArray(3);	
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(voxelVertex), (void*)offsetof(voxelVertex, aoValue));  
+ 
     
 /*     // vertex texture coords
     glEnableVertexAttribArray(2);	

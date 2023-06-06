@@ -27,7 +27,7 @@ void Render::setShaders(Shader& shader)
     shader.setMat("projection", 1, GL_FALSE, projection);
 }
 
-void setDepthMapShaders(Shader& shader, glm::mat4& trans, glm::vec3 lightPos)  
+void Render::setDepthMapShaders(Shader& shader, glm::mat4& trans, glm::vec3 lightPos)   
 {
     shader.setMat("lightSpaceMatrix", 1, GL_FALSE,  trans);     
     shader.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);      

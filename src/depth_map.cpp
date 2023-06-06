@@ -33,7 +33,7 @@ void DepthMap::Render(Shader& shader, glm::vec3 lightPos, glm::vec3 target)
 
 void DepthMap::ConfigureShaderAndMatrices(Shader& shader, glm::vec3 lightPos, glm::vec3 target)
 {
-    glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, nearPlane, farPlane);      
+    glm::mat4 lightProjection = glm::ortho(-64.0f, 64.0f, -64.0f, 64.0f, nearPlane, farPlane);       
 
     glm::mat4 lightView = glm::lookAt(lightPos,     
                                   target, 
