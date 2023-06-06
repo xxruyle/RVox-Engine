@@ -37,6 +37,7 @@ struct voxelVertex {
 class Chunk
 { // stores local chunk voxel positions and chunk mesh 
 public: 
+
     glm::vec3 position; 
     char voxels[33][256][33];  // the voxel array     
 

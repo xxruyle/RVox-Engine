@@ -160,8 +160,8 @@ int main()
 
         // MSAA 
         glEnable(GL_MULTISAMPLE);  
-        glEnable(GL_CULL_FACE);  
-        glCullFace(GL_BACK);  
+        // glEnable(GL_CULL_FACE);  
+        // glCullFace(GL_BACK);  
 
         shaderProgram.Activate(); 
         // shaderProgram.setInt("material.diffuse", 0); 

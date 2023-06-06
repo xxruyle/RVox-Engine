@@ -12,10 +12,10 @@ void ChunkManager::createChunks(int randSeed)
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
-            c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);         
-            // c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);     
-            c1.mesh(); 
-            meshNeighbors(c1); 
+            // c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);          
+            c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);       
+            c1.mesh();  
+            // meshNeighbors(c1); 
         }
     }   
 }
@@ -40,13 +40,13 @@ void ChunkManager::renderChunks(Shader& shader)
                 
             
 
-        }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+        }  /* else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.position = chunkBuffer[i]; 
             c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);     
             // c1.generateDebugChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
             c1.mesh(); 
-        }
+        } */
     } 
 }
 
@@ -476,13 +476,14 @@ void ChunkManager::deleteVoxel()
     glm::vec3 chunkCoord = getChunkLocation(voxelPosition);   
     std::cout << chunkCoord.x << ' ' << chunkCoord.z << std::endl; // for debugging purposes
 
+    // getting chunk local space coordinates 
     int xCoord = (int)voxelPosition.x - (int)chunkMap[chunkCoord].position.x * 32; 
     int yCoord = (int)voxelPosition.y - (int)chunkMap[chunkCoord].position.y * 32; 
     int zCoord = (int)voxelPosition.z - (int)chunkMap[chunkCoord].position.z * 32;  
 
-    // std::cout << voxelPosition.x << ' ' << voxelPosition.y << ' ' << voxelPosition.z << std::endl; // for debugging purposes  
     std::cout << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; // for debugging purposes  
     chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] = 0;    
+
     chunkMap[chunkCoord].mesh();   
 
     if (xCoord == 0 || zCoord == 0 || xCoord == 32 || zCoord == 32)

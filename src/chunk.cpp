@@ -5,6 +5,7 @@
 
 void Chunk::generateSolidChunk(int randSeed, int startX, int startZ) 
 {
+    memset(voxels, 0, sizeof(voxels)); 
     const int xs = 33;
     const int zs = 33;
     float frequency = 0.005f; 
@@ -65,6 +66,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
 void Chunk::generateDebugChunk(int randSeed, int startX, int startZ) 
 { // 3D noise chunk 
+    memset(voxels, 0, sizeof(voxels)); 
     const int xs = 33;
     const int zs = 33;
     float frequency = 0.005f; 
@@ -108,7 +110,11 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
             {
                 int surface = stoneLimit + noiseData[i][j] - 2;
 
-                if (k > 60)   
+                if (i == 16) 
+                {
+                    voxels[i][k][j] = 0;  
+                }
+                else if (k > 60)    
                 {
                     noise.SetFrequency(0.006); 
                     float MultiNoise = noise.GetNoise((float)(startX + i), (float)(k), (float)(startZ + j));    
@@ -116,7 +122,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                 }
                 else if (k < 50 && k > 5)   
                 {
-                    noise.SetFrequency(0.0007); 
+                    noise.SetFrequency(0.007); 
                     float MultiNoise = noise.GetNoise((float)(startX + i), (float)(k), (float)(startZ + j));    
                     MultiNoise > -0.008f ? voxels[i][k][j] = 2 : voxels[i][k][j] = 0;    
                 }    
@@ -167,6 +173,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
 
 void Chunk::mesh()      
 { // checks interior voxels
+    indices.clear(); // clear the indices before each mesh! Very important to fix bug that causes overlapping triangles 
     Voxel voxel; 
     for ( int x = 0; x < 33; x++) 
     {
@@ -174,184 +181,182 @@ void Chunk::mesh()
         {
             for (int z = 0; z < 33; z++) 
             {   
-                if (voxels[x][y][z] > 0)
+                if (voxels[x][y][z] > 0) 
                 {
-
-                
-                if ((z+1 < 33) && (z+1 >= 0)) // back 
-                {
-                    if (voxels[x][y][z+1] == 0)  
+                    if ((z+1 < 33) && (z+1 >= 0)) // back 
                     {
-                        for (unsigned int i = 0; i < 6; i++) 
-                            indices.push_back(vertices.size() + backIndices[i]);   
-
-                        for (unsigned int i = 0; i < backFace.size(); i++) 
+                        if (voxels[x][y][z+1] == 0)  
                         {
-                            voxelVertex vertex; 
-                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
-                            vertex.Normal = backNormals[i];   
-                            vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
-                            vertex.aoValue = glm::vec3(1, 1, 1);  
+                            for (unsigned int i = 0; i < 6; i++) 
+                                indices.push_back(vertices.size() + backIndices[i]);   
+
+                            for (unsigned int i = 0; i < backFace.size(); i++) 
+                            {
+                                voxelVertex vertex; 
+                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
+                                vertex.Normal = backNormals[i];   
+                                vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+                                vertex.aoValue = glm::vec3(1, 1, 1);  
 
 
-                            vertices.push_back(vertex);      
-                        }
-                    }   
-                }
+                                vertices.push_back(vertex);      
+                            }
+                        }   
+                    }
 
-                if ((z-1 < 34) && (z-1 >= 0)) // front
-                {
-                    if (voxels[x][y][z-1] == 0)  
+                    if ((z-1 < 34) && (z-1 >= 0)) // front
                     {
-                        for (unsigned int i = 0; i < 6; i++) 
-                            indices.push_back(vertices.size() + frontIndices[i]); 
-
-                        for (unsigned int i = 0; i < frontFace.size(); i++) 
+                        if (voxels[x][y][z-1] == 0)  
                         {
-                            voxelVertex vertex; 
-                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
-                            vertex.Normal = frontNormals[i];  
-                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-                            if (i == 0)         
+                            for (unsigned int i = 0; i < 6; i++) 
+                                indices.push_back(vertices.size() + frontIndices[i]); 
+
+                            for (unsigned int i = 0; i < frontFace.size(); i++) 
                             {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);   
-                            } 
-                            else if (i == 1) 
-                            {
-                                vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f); 
-                            }
-                            else if (i == 3) 
-                            {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
-                            }
-                            else 
-                            {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
-                            }
+                                voxelVertex vertex; 
+                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
+                                vertex.Normal = frontNormals[i];  
+                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                                if (i == 0)         
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);   
+                                } 
+                                else if (i == 1) 
+                                {
+                                    vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f); 
+                                }
+                                else if (i == 3) 
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                }
+                                else 
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                }
 
 
-                            vertices.push_back(vertex);     
-                        }
-                    }   
-                }
+                                vertices.push_back(vertex);     
+                            }
+                        }   
+                    }
 
-                if ((x+1 < 33) && (x+1 >= 0)) // left 
-                {
-                    if (voxels[x+1][y][z] == 0)  
+                    if ((x+1 < 33) && (x+1 >= 0)) // left 
                     {
-                        for (unsigned int i = 0; i < 6; i++) 
-                            indices.push_back(vertices.size() + leftIndices[i]); 
-
-                        for (unsigned int i = 0; i < leftFace.size(); i++) 
+                        if (voxels[x+1][y][z] == 0)  
                         {
-                            voxelVertex vertex; 
-                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
-                            vertex.Normal = leftNormals[i]; 
-                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-                            vertex.aoValue = glm::vec3(1, 1, 1);  
+                            for (unsigned int i = 0; i < 6; i++) 
+                                indices.push_back(vertices.size() + leftIndices[i]); 
+
+                            for (unsigned int i = 0; i < leftFace.size(); i++) 
+                            {
+                                voxelVertex vertex; 
+                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
+                                vertex.Normal = leftNormals[i]; 
+                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                                vertex.aoValue = glm::vec3(1, 1, 1);  
 
 
-                            
-                            vertices.push_back(vertex);     
-                        }
-                    }   
-                }
 
-                if ((x-1 < 34) && (x-1 >= 0)) // right 
-                {
-                    if (voxels[x-1][y][z] == 0)  
+                                vertices.push_back(vertex);     
+                            }
+                        }   
+                    }
+
+                    if ((x-1 < 34) && (x-1 >= 0)) // right 
                     {
-                        for (unsigned int i = 0; i < 6; i++) 
-                            indices.push_back(vertices.size() + rightIndices[i]); 
-
-                        for (unsigned int i = 0; i < rightFace.size(); i++)  
+                        if (voxels[x-1][y][z] == 0)  
                         {
-                            voxelVertex vertex; 
-                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
-                            vertex.Normal = rightNormals[i]; 
-                            vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+                            for (unsigned int i = 0; i < 6; i++) 
+                                indices.push_back(vertices.size() + rightIndices[i]); 
 
-                            if (i == 0)         
+                            for (unsigned int i = 0; i < rightFace.size(); i++)  
                             {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);   
-                            } 
-                            else if (i == 1) 
-                            {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                voxelVertex vertex; 
+                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
+                                vertex.Normal = rightNormals[i]; 
+                                vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+
+                                if (i == 0)         
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);   
+                                } 
+                                else if (i == 1) 
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                }
+                                else if (i == 3) 
+                                {
+                                    vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f);  
+                                }
+                                else 
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                }
+
+
+                                vertices.push_back(vertex);     
                             }
-                            else if (i == 3) 
-                            {
-                                vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f);  
-                            }
-                            else 
-                            {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
-                            }
+                        }   
+                    }
 
 
-                            vertices.push_back(vertex);     
-                        }
-                    }   
-                }
-
-
-                if ((y-1 < 256) && (y-1 >= 0)) // bottom 
-                {
-                    if (voxels[x][y-1][z] == 0)  
+                    if ((y-1 < 256) && (y-1 >= 0)) // bottom 
                     {
-                        for (unsigned int i = 0; i < 6; i++) 
-                            indices.push_back(vertices.size() + bottomIndices[i]); 
-
-                        for (unsigned int i = 0; i < bottomFace.size(); i++)   
+                        if (voxels[x][y-1][z] == 0)  
                         {
-                            voxelVertex vertex; 
-                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
-                            vertex.Normal = bottomNormals[i];    
-                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-                            vertex.aoValue = glm::vec3(1, 1, 1);  
+                            for (unsigned int i = 0; i < 6; i++) 
+                                indices.push_back(vertices.size() + bottomIndices[i]); 
+
+                            for (unsigned int i = 0; i < bottomFace.size(); i++)   
+                            {
+                                voxelVertex vertex; 
+                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
+                                vertex.Normal = bottomNormals[i];    
+                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                                vertex.aoValue = glm::vec3(1, 1, 1);  
 
 
-                            vertices.push_back(vertex);     
-                        }
-                    }   
-                }
+                                vertices.push_back(vertex);     
+                            }
+                        }   
+                    }
 
-                if ((y+1 < 256) && (y+1 >= 0)) // top  
-                {
-                    if (voxels[x][y+1][z] == 0)  
+                    if ((y+1 < 256) && (y+1 >= 0)) // top  
                     {
-                        for (unsigned int i = 0; i < 6; i++) 
-                            indices.push_back(vertices.size() + topIndices[i]); 
-
-                        for (unsigned int i = 0; i < topFace.size(); i++)   
+                        if (voxels[x][y+1][z] == 0)  
                         {
-                            voxelVertex vertex; 
-                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
-                            vertex.Normal = topNormals[i];   
-                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            for (unsigned int i = 0; i < 6; i++) 
+                                indices.push_back(vertices.size() + topIndices[i]); 
 
-                            if (i == 0)         
+                            for (unsigned int i = 0; i < topFace.size(); i++)   
                             {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
-                            } 
-                            else if (i == 1) 
-                            {
-                                vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f); 
-                            }
-                            else if (i == 2) 
-                            {
-                                vertex.aoValue = glm::vec3(0.6f, 0.6f, 0.6f); 
-                            }
-                            else 
-                            {
-                                vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
-                            }
+                                voxelVertex vertex; 
+                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
+                                vertex.Normal = topNormals[i];   
+                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+
+                                if (i == 0)         
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                } 
+                                else if (i == 1) 
+                                {
+                                    vertex.aoValue = glm::vec3(0.1f, 0.1f, 0.1f); 
+                                }
+                                else if (i == 2) 
+                                {
+                                    vertex.aoValue = glm::vec3(0.6f, 0.6f, 0.6f); 
+                                }
+                                else 
+                                {
+                                    vertex.aoValue = glm::vec3(1.0f, 1.0f, 1.0f);  
+                                }
 
 
-                            vertices.push_back(vertex);     
-                        }
-                    }   
-                }
+                                vertices.push_back(vertex);     
+                            }
+                        }   
+                    }
                 }   
             }
         }

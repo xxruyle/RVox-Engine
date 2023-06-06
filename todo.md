@@ -2,7 +2,6 @@
 - [X] Need to meshing problem where deletion of chunks are not accepted by chunk neighbors (**COMPLETED**: May 22, 2023)
 - [X] Left chunk border problem when meshing (voxel color tied with it ?) (**COMPLETED**: May 22, 2023)
 - [X] Face culling and fixing the ebo indices setup (**COMPLETED**: May 22, 2023)
-- [ ] Chunk Loading problem where multiple triangles are drawn per voxel each time there is a mesh, memset the voxels array to 0 ? (this might cause problems with the memory) 
 - [ ] Chunk deletion problem where chunk corners do not mesh properly 
 - [X] Frustum culling chunks (**COMPLETED**: May 22, 2023)
 - [ ] Refactoring 
@@ -30,6 +29,7 @@
   - [X] AABB vs ABBB (**COMPLETED**: June 1, 2023)  
   - [ ] Swept AABB possibly? (Need to do this because original AABB vs AABB isn't good)   
   - [X] One block height autojump (use a normalized raycast and check if block exists?) 
+- [X] Chunk Loading problem where multiple triangles are drawn per voxel each time there is a mesh, memset the voxels array to 0 ? (this might cause problems with the memory) (**COMPLETED**: June 6, 2023, problem was that i wasn't clearing the indices vector) 
 - [ ] Make model mesh into a 3d array of blocks   
 - [ ] Model hiearchies, (Player's arms are seperate model but are still attached to the main player mody)
 - [ ] Model Animations  
