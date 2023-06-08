@@ -16,6 +16,7 @@ A Voxel Engine made from scratch using OpenGL
 ## Lighting 
 - Basic rudimentary lighting which is calculated using the normals of each voxel  
 - Fog 
+- Shadow Mapping using depth buffer pass 
 
 ## Physics 
 - AABB vs AABB collisions  

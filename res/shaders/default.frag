@@ -68,8 +68,7 @@ void main()
  */
 
 
-	float occlusion = CalcAmbientOcclusion();    
-	vec4 occlusionTint = vec4(occlusion, occlusion, occlusion, 1.0);    
+
 
 	// regular lighting  output 
 	FragColor = vec4(Color, 1.0) * vec4(result, 1.0); //vec4 sun   color           

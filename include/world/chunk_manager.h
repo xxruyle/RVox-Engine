@@ -42,6 +42,8 @@ public:
 
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
+    void generateChunk(int randSeed, glm::vec3 chunkCoord); // generates a chunk and the chunks around it 
+
 
     void meshNeighbors(Chunk& chunk);  // gives chunks data about their neighbors 
 
@@ -68,6 +70,9 @@ private:
     static const int renderDistance = 500; // the number of blocks the player can see radius wise  
     int currentRandomSeed; // the current random seed 
 
+
+    bool chunkExists(glm::vec3 chunkPos); 
+    bool chunkIsRenderable(glm::vec3 chunkPos); 
     bool isNearPlayer(glm::vec3 cameraPosition, glm::vec3 chunkPosition); // checks to see if chunk is within renderDistance 
 
 

@@ -7,7 +7,6 @@ void Player::move(GLFWwindow* window, float deltaTime)
 {
     velocityX = 0.0f; 
     velocityZ = 0.0f;  
-    velocityY = 0.0f; 
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // forward
     {
@@ -54,13 +53,13 @@ void Player::move(GLFWwindow* window, float deltaTime)
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // Jumping
     {
-        // if (onGround)    
-        // { 
+        if (onGround)    
+        { 
             currentSpeed = mSpeed;  
             onGround = false; 
-            velocityY = 1.2;  
+            velocityY = 0.3;   
             jumpCooldown = jumpCooldownDuration;  
-        // }
+        }
     } 
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) // "sprint"
@@ -144,8 +143,8 @@ void Player::limitVelocity()
 
     if (velocityY > velocityLimit)  
         velocityY = velocityLimit;     
-    else if (velocityY < -velocityLimit)    
-        velocityY = -velocityLimit;     
+    else if (velocityY < -0.03)    
+        velocityY = -0.03;     
 }
 
 void Player::calculateAngle(float deltaTime) 

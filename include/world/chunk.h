@@ -37,7 +37,7 @@ struct voxelVertex {
 class Chunk
 { // stores local chunk voxel positions and chunk mesh 
 public: 
-
+    bool renderable = false; // only renderable if all neighboring chunks are renderable 
     glm::vec3 position; 
     char voxels[33][256][33];  // the voxel array     
 
@@ -49,9 +49,15 @@ public:
 
     void generateSolidChunk(int randSeed, int startX, int startZ); 
     void generateDebugChunk(int randSeed, int startX, int startZ);   
-    void changeVoxelColor(glm::vec3 voxelCoord); 
-    void addLightSource(); 
 
+    void getVoxel(glm::vec3 coordinate);  
+
+
+    // pointers to neighboring chunks 
+    Chunk* mLeft;  
+    Chunk* mRight;  
+    Chunk* mUp;  
+    Chunk* mBot;  
 
     void mesh(); // checks each block for the chunk to see and assigns them to be interior accordingly.   
     void draw(Shader& shader, Frustum& frustum, float renderDistance); // draw the chunk    
@@ -59,20 +65,29 @@ public:
 private: 
     unsigned int VAO, VBO, EBO;
     void setupMesh(); 
+    glm::vec3 backAO(glm::vec3 vPos, unsigned int vertexIndex); // gets the ao value for the particular vertex  
+    glm::vec3 frontAO(glm::vec3 vPos, unsigned int vertexIndex);
+    glm::vec3 leftAO(glm::vec3 vPos, unsigned int vertexIndex);
+    glm::vec3 rightAO(glm::vec3 vPos, unsigned int vertexIndex); 
+    glm::vec3 bottomAO(glm::vec3 vPos, unsigned int vertexIndex); 
+    glm::vec3 topAO(glm::vec3 vPos, unsigned int vertexIndex);   
+    int getAOSides(char side1, char side2, char corner); // takes 3 different voxels[][][] coordinate positions depending on vertex index  
+    glm::vec3 getAOValue(int numSides); //takes in num of sides and returns an AO dark color value  
+
  
 
 std::vector<glm::vec3> backFace = {
     // Back face
-    glm::vec3(-0.5f, -0.5f, 0.5f),  
     glm::vec3(0.5f,  0.5f, 0.5f),  
+    glm::vec3(-0.5f,  0.5f, 0.5f),
+    glm::vec3(-0.5f, -0.5f, 0.5f),  
     glm::vec3(0.5f, -0.5f, 0.5f),  
-    glm::vec3(-0.5f,  0.5f, 0.5f) 
 }; 
 
 
 std::vector<unsigned int> backIndices = {
-    2, 1, 0, 
-    1, 3, 0 
+    0, 1, 2, 
+    0, 2, 3
 }; 
 
 std::vector<glm::vec3> backNormals = {
@@ -84,15 +99,15 @@ std::vector<glm::vec3> backNormals = {
 
 std::vector<glm::vec3> frontFace = {
     // Front face
-    glm::vec3(-0.5f, -0.5f,  -0.5f),
-    glm::vec3(0.5f, -0.5f,  -0.5f),
-    glm::vec3(0.5f,  0.5f,  -0.5f),
     glm::vec3(-0.5f,  0.5f,  -0.5f),
+    glm::vec3(0.5f,  0.5f,  -0.5f),
+    glm::vec3(0.5f, -0.5f,  -0.5f),
+    glm::vec3(-0.5f, -0.5f,  -0.5f),
 }; 
 
 std::vector<unsigned int> frontIndices = {
-    0, 2, 1, 
-    0, 3, 2 
+    0, 1, 2, 
+    0, 2, 3 
 }; 
 
 std::vector<glm::vec3> frontNormals = {
@@ -104,15 +119,15 @@ std::vector<glm::vec3> frontNormals = {
 
 std::vector<glm::vec3> leftFace = { 
     // Left face
-    glm::vec3(0.5f,  0.5f,  0.5f),
     glm::vec3(0.5f,  0.5f, -0.5f),
-    glm::vec3(0.5f, -0.5f, -0.5f),
+    glm::vec3(0.5f,  0.5f,  0.5f),
     glm::vec3(0.5f, -0.5f,  0.5f),
+    glm::vec3(0.5f, -0.5f, -0.5f),
 };
 
 std::vector<unsigned int> leftIndices = {
-    3, 1, 0, 
-    3, 2, 1, 
+    0, 1, 2, 
+    0, 2, 3
 }; 
 
 std::vector<glm::vec3> leftNormals = {
@@ -125,14 +140,14 @@ std::vector<glm::vec3> leftNormals = {
 std::vector<glm::vec3> rightFace = {
     // Right face
     glm::vec3(-0.5f,  0.5f,  0.5f), 
-    glm::vec3(-0.5f, -0.5f, -0.5f), 
     glm::vec3(-0.5f,  0.5f, -0.5f),       
+    glm::vec3(-0.5f, -0.5f, -0.5f), 
     glm::vec3(-0.5f, -0.5f,  0.5f)  
 };
 
 std::vector<unsigned int> rightIndices = {
-    0, 2, 1,
-    0, 1, 3 
+    0, 1, 2, 
+    0, 2, 3
 }; 
 
 std::vector<glm::vec3> rightNormals = {
@@ -166,16 +181,16 @@ std::vector<glm::vec3> bottomNormals = {
 
 std::vector<glm::vec3> topFace = {
     // Top face
-    glm::vec3(-0.5f,  0.5f, -0.5f),
+    glm::vec3(-0.5f,  0.5f,  0.5f),
     glm::vec3(0.5f,  0.5f,  0.5f),
     glm::vec3(0.5f,  0.5f, -0.5f),
+    glm::vec3(-0.5f,  0.5f, -0.5f),
 
-    glm::vec3(-0.5f,  0.5f,  0.5f)
 };
 
 std::vector<unsigned int> topIndices = {
-    1, 2, 0,
-    3, 1, 0
+    0, 1, 2, 
+    0, 2, 3, 
 }; 
 
 std::vector<glm::vec3> topNormals = {

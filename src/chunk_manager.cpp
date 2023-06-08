@@ -1,21 +1,76 @@
 #include "world/chunk_manager.h"  
 
 
+void ChunkManager::generateChunk(int randSeed, glm::vec3 chunkCoord)
+{
+    // the chunk that we are intending to generate 
+    Chunk& cMiddle = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z)];   
+    cMiddle.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z));   
+    cMiddle.generateSolidChunk(randSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);    
+
+
+    if (!chunkExists(chunkCoord)) // if the chunk doesn't already exist generate it 
+    {
+        Chunk& cLeft = chunkMap[glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)];  
+        cLeft.position = glm::vec3(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z));  
+        cLeft.generateSolidChunk(randSeed, cLeft.position.x * 32, cLeft.position.z * 32);  
+
+        cMiddle.mLeft = &cLeft;    
+    }
+
+
+
+    if (!chunkExists(chunkCoord))
+    {
+        Chunk& cRight = chunkMap[glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)]; 
+        cRight.position = glm::vec3(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z));  
+        cRight.generateSolidChunk(randSeed, cRight.position.x * 32, cRight.position.z * 32);   
+
+        cMiddle.mRight = &cRight;  
+    }
+
+
+    if (!chunkExists(chunkCoord))
+    {
+        Chunk& cUp = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)];    
+        cUp.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1));    
+        cUp.generateSolidChunk(randSeed, cUp.position.x * 32, cUp.position.z * 32);    
+
+        cMiddle.mUp = &cUp;  
+    }
+
+    if (!chunkExists(chunkCoord)) 
+    {
+        Chunk& cBottom = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
+        cBottom.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1));    
+        cBottom.generateSolidChunk(randSeed, cBottom.position.x * 32, cBottom.position.z * 32);     
+
+        cMiddle.mBot = &cBottom; 
+    }
+
+    cMiddle.mesh(); 
+}
+
+bool ChunkManager::chunkExists(glm::vec3 chunkPos)  
+{
+    return (chunkMap.count(chunkPos)); 
+}
+
 void ChunkManager::createChunks(int randSeed) 
 { // creates chunks and makes them generate a chunk 
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 1; i++) 
+    for (int i = 0; i < 2; i++) 
     {
         for (int j = 0; j < 1; j++)    
         {
             Chunk& c1 = chunkMap[glm::vec3(i, 0, j)]; 
             c1.position = glm::vec3(i, 0, j);  
-            // c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);          
-            c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);       
+            c1.generateSolidChunk(randSeed, c1.position.x * 32, c1.position.z * 32);            
+            // c1.generateDebugChunk(randSeed, c1.position.x * 32, c1.position.z * 32);        
             c1.mesh();  
-            // meshNeighbors(c1); 
+            meshNeighbors(c1);  
         }
     }   
 }

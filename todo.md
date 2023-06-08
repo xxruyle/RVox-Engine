@@ -30,6 +30,7 @@
   - [ ] Swept AABB possibly? (Need to do this because original AABB vs AABB isn't good)   
   - [X] One block height autojump (use a normalized raycast and check if block exists?) 
 - [X] Chunk Loading problem where multiple triangles are drawn per voxel each time there is a mesh, memset the voxels array to 0 ? (this might cause problems with the memory) (**COMPLETED**: June 6, 2023, problem was that i wasn't clearing the indices vector) 
+- [ ] Fix chunk borders once and for all. Have each chunk have a pointer to its neighbors. This will fix ambient occlusion problems and other annoyances
 - [ ] Make model mesh into a 3d array of blocks   
 - [ ] Model hiearchies, (Player's arms are seperate model but are still attached to the main player mody)
 - [ ] Model Animations  
