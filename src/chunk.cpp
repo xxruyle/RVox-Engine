@@ -6,8 +6,8 @@
 void Chunk::generateSolidChunk(int randSeed, int startX, int startZ) 
 {
     memset(voxels, 0, sizeof(voxels)); 
-    const int xs = 33;
-    const int zs = 33;
+    const int xs = 32;
+    const int zs = 32;
     float frequency = 0.005f; 
 
     FastNoiseLite mountain; 
@@ -65,8 +65,8 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 void Chunk::generateDebugChunk(int randSeed, int startX, int startZ) 
 { // 3D noise chunk 
     memset(voxels, 0, sizeof(voxels)); 
-    const int xs = 33;
-    const int zs = 33;
+    const int xs = 32;
+    const int zs = 32;
     float frequency = 0.005f; 
 
     FastNoiseLite noise; 
@@ -138,139 +138,103 @@ void Chunk::mesh()
 { // checks interior voxels
     indices.clear(); // clear the indices before each mesh! Very important to fix bug that causes overlapping triangles 
     Voxel voxel; // allows for voxel color info  
-    for ( int x = 0; x < 33; x++)  
+    for ( int x = 0; x < 32; x++)  
     {
         for (int y = 0; y < 256; y++) 
         {
-            for (int z = 0; z < 33; z++)   
+            for (int z = 0; z < 32; z++)    
             {   
-                if (voxels[x][y][z] > 0) 
+                if (isSolid(getVoxel(glm::vec3(x,y,z))))  
                 {
-                    if ((z+1 < 33) && (z+1 >= 0)) // back 
+
+                    if (!isSolid(getVoxel(glm::vec3(x, y, z+1)))) // back
                     {
-                        if (voxels[x][y][z+1] == 0)  
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + backIndices[i]);   
+                        for (unsigned int i = 0; i < backFace.size(); i++) 
                         {
-                            for (unsigned int i = 0; i < 6; i++) 
-                                indices.push_back(vertices.size() + backIndices[i]);   
-
-                            for (unsigned int i = 0; i < backFace.size(); i++) 
-                            {
-                                voxelVertex vertex; 
-                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
-                                vertex.Normal = backNormals[i];   
-                                vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
-                                vertex.aoValue = backAO(glm::vec3(x,y,z), i); 
-
-
-                                vertices.push_back(vertex);      
-                            }
-                        }   
-                    }
-
-                    if ((z-1 < 34) && (z-1 >= 0)) // front
+                            voxelVertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
+                            vertex.Normal = backNormals[i];   
+                            vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+                            vertex.aoValue = backAO(glm::vec3(x,y,z), i); 
+                            vertices.push_back(vertex);      
+                        }
+                    }   
+                
+                    if (!isSolid(getVoxel(glm::vec3(x, y, z-1)))) // front 
                     {
-                        if (voxels[x][y][z-1] == 0)  
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + frontIndices[i]); 
+                        for (unsigned int i = 0; i < frontFace.size(); i++) 
                         {
-                            for (unsigned int i = 0; i < 6; i++) 
-                                indices.push_back(vertices.size() + frontIndices[i]); 
-
-                            for (unsigned int i = 0; i < frontFace.size(); i++) 
-                            {
-                                voxelVertex vertex; 
-                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
-                                vertex.Normal = frontNormals[i];  
-                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-                                vertex.aoValue = frontAO(glm::vec3(x,y,z), i);  
-
-                                vertices.push_back(vertex);     
-                            }
-                        }   
-                    }
-
-                    if ((x+1 < 33) && (x+1 >= 0)) // left 
+                            voxelVertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
+                            vertex.Normal = frontNormals[i];  
+                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            vertex.aoValue = frontAO(glm::vec3(x,y,z), i);  
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                
+                    if (!isSolid(getVoxel(glm::vec3(x+1, y, z)))) // left 
                     {
-                        if (voxels[x+1][y][z] == 0)  
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + leftIndices[i]); 
+                        for (unsigned int i = 0; i < leftFace.size(); i++) 
                         {
-                            for (unsigned int i = 0; i < 6; i++) 
-                                indices.push_back(vertices.size() + leftIndices[i]); 
-
-                            for (unsigned int i = 0; i < leftFace.size(); i++) 
-                            {
-                                voxelVertex vertex; 
-                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
-                                vertex.Normal = leftNormals[i]; 
-                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-                                vertex.aoValue = leftAO(glm::vec3(x,y,z), i); 
-
-                                vertices.push_back(vertex);     
-                            }
-                        }   
-                    }
-
-                    if ((x-1 < 34) && (x-1 >= 0)) // right 
+                            voxelVertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
+                            vertex.Normal = leftNormals[i]; 
+                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            vertex.aoValue = leftAO(glm::vec3(x,y,z), i); 
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                
+                    if (!isSolid(getVoxel(glm::vec3(x-1, y, z)))) // right
                     {
-                        if (voxels[x-1][y][z] == 0)  
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + rightIndices[i]); 
+                        for (unsigned int i = 0; i < rightFace.size(); i++)  
                         {
-                            for (unsigned int i = 0; i < 6; i++) 
-                                indices.push_back(vertices.size() + rightIndices[i]); 
-
-                            for (unsigned int i = 0; i < rightFace.size(); i++)  
-                            {
-                                voxelVertex vertex; 
-                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
-                                vertex.Normal = rightNormals[i]; 
-                                vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
-
-                                vertex.aoValue = rightAO(glm::vec3(x,y,z), i); 
-
-
-                                vertices.push_back(vertex);     
-                            }
-                        }   
-                    }
-
-
-                    if ((y-1 < 256) && (y-1 >= 0)) // bottom 
+                            voxelVertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
+                            vertex.Normal = rightNormals[i]; 
+                            vertex.Color = voxel.voxelColors[voxels[x][y][z]]; 
+                            vertex.aoValue = rightAO(glm::vec3(x,y,z), i); 
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                    if (!isSolid(getVoxel(glm::vec3(x, y-1, z))))  // bottom 
                     {
-                        if (voxels[x][y-1][z] == 0)  
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + bottomIndices[i]); 
+                        for (unsigned int i = 0; i < bottomFace.size(); i++)   
                         {
-                            for (unsigned int i = 0; i < 6; i++) 
-                                indices.push_back(vertices.size() + bottomIndices[i]); 
-
-                            for (unsigned int i = 0; i < bottomFace.size(); i++)   
-                            {
-                                voxelVertex vertex; 
-                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
-                                vertex.Normal = bottomNormals[i];    
-                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-                                vertex.aoValue = bottomAO(glm::vec3(x, y, z), i); 
-
-                                vertices.push_back(vertex);     
-                            }
-                        }   
-                    }
-
-                    if ((y+1 < 256) && (y+1 >= 0)) // top  
+                            voxelVertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
+                            vertex.Normal = bottomNormals[i];    
+                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            vertex.aoValue = bottomAO(glm::vec3(x, y, z), i); 
+                            vertices.push_back(vertex);     
+                        }
+                    }   
+                    if (!isSolid(getVoxel(glm::vec3(x, y+1, z)))) 
                     {
-                        if (voxels[x][y+1][z] == 0)  
+                        for (unsigned int i = 0; i < 6; i++) 
+                            indices.push_back(vertices.size() + topIndices[i]); 
+                        for (unsigned int i = 0; i < topFace.size(); i++)   
                         {
-                            for (unsigned int i = 0; i < 6; i++) 
-                                indices.push_back(vertices.size() + topIndices[i]); 
-
-                            for (unsigned int i = 0; i < topFace.size(); i++)   
-                            {
-                                voxelVertex vertex; 
-                                vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
-                                vertex.Normal = topNormals[i];   
-                                vertex.Color = voxel.voxelColors[voxels[x][y][z]];
-
-                                
-                                vertex.aoValue = topAO(glm::vec3(x,y,z), i); 
-
-                                vertices.push_back(vertex);     
-                            }
-                        }   
-                    }
+                            voxelVertex vertex; 
+                            vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
+                            vertex.Normal = topNormals[i];   
+                            vertex.Color = voxel.voxelColors[voxels[x][y][z]];
+                            
+                            vertex.aoValue = topAO(glm::vec3(x,y,z), i); 
+                            vertices.push_back(vertex);     
+                        }
+                    }   
                 }   
             }
         }
@@ -314,13 +278,6 @@ void Chunk::setupMesh()
     glBindVertexArray(0);   
 }
 
-void Chunk::getVoxel(glm::vec3 coordinate) 
-{
-    if (coordinate.x > 32)
-    {
-        
-    }
-}
 
 
 // gets the AO value given a vertex index
@@ -330,33 +287,35 @@ glm::vec3 Chunk::topAO(glm::vec3 vPos, unsigned int vertexIndex)
     switch (vertexIndex) 
     {
         case 0: 
-            if ((vPos.x-1) > 0 && (vPos.z+1) <= 32 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)vPos.z], voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z+1)], voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z+1))
+                ); 
             break;
         case 1: 
-            if ((vPos.x+1) <= 32 && (vPos.z+1) <= 32 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z+1)], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)vPos.z], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z+1))
+                );             
             break;
         case 2: 
-            if ((vPos.x+1) <= 32 && (vPos.z-1) >= 0 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x+1][(int)(vPos.y+1)][(int)(vPos.z)], voxels[(int)(vPos.x)][(int)(vPos.y+1)][(int)vPos.z-1], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z-1))
+                );      
             break;
         default:  
-            if ((vPos.x-1) >= 0 && (vPos.z-1) >= 0 && vPos.y+1 <= 256) 
-            {   
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z-1)], voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)vPos.z],    voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z-1))
+                );               
             break; 
     }
 
-    if (vPos.x == 32 || vPos.z == 32)   
-        return glm::vec3(1.0f, 1.0f, 1.0f); 
 
     return getAOValue(sideCount);  
 }
@@ -368,28 +327,32 @@ glm::vec3 Chunk::frontAO(glm::vec3 vPos, unsigned int vertexIndex)
     switch (vertexIndex) 
     {
         case 0: 
-            if ((vPos.x-1) >= 0 && (vPos.z-1) >= 0 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)(vPos.x-1)][(int)(vPos.y)][(int)vPos.z-1], voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z-1)], voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z-1))
+                );             
             break;
         case 1: 
-            if ((vPos.x+1) <= 33 && (vPos.z-1) >= 0 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z-1)], voxels[(int)(vPos.x+1)][(int)(vPos.y)][(int)vPos.z-1], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z-1))
+                );    
             break;
         case 2: 
-            if ((vPos.x+1) <= 33 && (vPos.z-1) >= 0 && vPos.y-1 >= 0)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x+1][(int)(vPos.y)][(int)(vPos.z-1)], voxels[(int)(vPos.x)][(int)(vPos.y-1)][(int)vPos.z-1], voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z-1))
+                );
             break;
         default:  
-            if ((vPos.x-1) >= 0 && (vPos.z-1) >= 0 && (vPos.y-1) >= 0) 
-            {   
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y-1)][(int)(vPos.z-1)], voxels[(int)(vPos.x-1)][(int)(vPos.y)][(int)vPos.z-1],    voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z-1))
+                );
             break; 
     }
 
@@ -402,28 +365,32 @@ glm::vec3 Chunk::rightAO(glm::vec3 vPos, unsigned int vertexIndex)
     switch (vertexIndex) 
     {
         case 0: 
-            if ((vPos.x-1) >= 0 && (vPos.z+1) <= 33 && (vPos.y+1) <= 256) 
-            {
-            sideCount = getAOSides(voxels[(int)(vPos.x-1)][(int)(vPos.y)][(int)vPos.z+1], voxels[(int)vPos.x-1][(int)(vPos.y+1)][(int)(vPos.z)], voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z+1))
+                );
             break;
         case 1: 
-            if ((vPos.x-1) >= 0 && (vPos.z-1) >= 0 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x-1][(int)(vPos.y+1)][(int)(vPos.z)], voxels[(int)(vPos.x-1)][(int)(vPos.y)][(int)vPos.z-1], voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z-1))
+                );
             break;
         case 2: 
-            if ((vPos.x-1) >= 0 && (vPos.z-1) >= 0 && vPos.y-1 >= 0)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x-1][(int)(vPos.y)][(int)(vPos.z-1)], voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)vPos.z], voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z-1))
+                );
             break;
         default:  
-            if ((vPos.x-1) >= 0 && (vPos.z+1) <= 33 && (vPos.y-1) >= 0) 
-            {   
-            sideCount = getAOSides(voxels[(int)vPos.x-1][(int)(vPos.y-1)][(int)(vPos.z)], voxels[(int)(vPos.x-1)][(int)(vPos.y)][(int)vPos.z+1],    voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z+1))
+                );            
             break; 
     }
 
@@ -436,31 +403,34 @@ glm::vec3 Chunk::backAO(glm::vec3 vPos, unsigned int vertexIndex)
     switch (vertexIndex) 
     {
         case 0: 
-            if ((vPos.x+1) <= 33 && (vPos.z+1) <= 33 && (vPos.y+1) <= 256) 
-            {
-            sideCount = getAOSides(voxels[(int)(vPos.x+1)][(int)(vPos.y)][(int)vPos.z+1], voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z+1)], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z+1))
+                );               
             break;
         case 1: 
-            if ((vPos.x-1) >= 0 && (vPos.z+1) <= 33 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y+1)][(int)(vPos.z+1)], voxels[(int)(vPos.x-1)][(int)(vPos.y)][(int)vPos.z+1], voxels[(int)(vPos.x-1)][(int)(vPos.y+1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y+1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y+1, vPos.z+1))
+                ); 
             break;
         case 2: 
-            if ((vPos.x-1) >= 0 && (vPos.z+1) <= 33 && vPos.y-1 >= 0)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x-1][(int)(vPos.y)][(int)(vPos.z+1)], voxels[(int)(vPos.x)][(int)(vPos.y-1)][(int)vPos.z+1], voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z+1))
+                ); 
             break;
         default:  
-            if ((vPos.x-1) >= 0 && (vPos.z+1) <= 33 && (vPos.y-1) >= 0) 
-            {   
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y-1)][(int)(vPos.z+1)], voxels[(int)(vPos.x+1)][(int)(vPos.y)][(int)vPos.z+1],    voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)(vPos.z+1)]); 
-            }
+              sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z+1))
+                ); 
             break; 
     }
-
     return getAOValue(sideCount);  
 }
 
@@ -471,28 +441,32 @@ glm::vec3 Chunk::leftAO(glm::vec3 vPos, unsigned int vertexIndex)
     switch (vertexIndex) 
     {
         case 0: 
-            if ((vPos.x+1) <= 33 && (vPos.z-1) >= 0 && (vPos.y+1) <= 256) 
-            {
-            sideCount = getAOSides(voxels[(int)(vPos.x+1)][(int)(vPos.y)][(int)vPos.z-1], voxels[(int)vPos.x+1][(int)(vPos.y+1)][(int)(vPos.z)], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z-1))
+                ); 
             break;
         case 1: 
-            if ((vPos.x+1) <= 33 && (vPos.z+1) <= 33 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x+1][(int)(vPos.y+1)][(int)(vPos.z)], voxels[(int)(vPos.x+1)][(int)(vPos.y)][(int)vPos.z+1], voxels[(int)(vPos.x+1)][(int)(vPos.y+1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y+1, vPos.z+1))
+                ); 
             break;
         case 2: 
-            if ((vPos.x+1) <= 33 && (vPos.z+1) <= 33 && vPos.y-1 >= 0)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x+1][(int)(vPos.y)][(int)(vPos.z+1)], voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)vPos.z], voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z+1))
+                ); 
             break;
         default:  
-            if ((vPos.x+1) <= 33 && (vPos.z-1) >= 0 && (vPos.y-1) >= 0) 
-            {   
-            sideCount = getAOSides(voxels[(int)vPos.x+1][(int)(vPos.y-1)][(int)(vPos.z)], voxels[(int)(vPos.x+1)][(int)(vPos.y)][(int)vPos.z-1],    voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z-1))
+                ); 
             break; 
     }
 
@@ -505,28 +479,32 @@ glm::vec3 Chunk::bottomAO(glm::vec3 vPos, unsigned int vertexIndex)
     switch (vertexIndex) 
     {
         case 0: 
-            if ((vPos.x-1) >= 0 && (vPos.z-1) >= 0 && (vPos.y-1) >= 0) 
-            {
-            sideCount = getAOSides(voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)vPos.z], voxels[(int)vPos.x][(int)(vPos.y-1)][(int)(vPos.z-1)], voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z-1))
+                ); 
             break;
         case 1: 
-            if ((vPos.x+1) <= 33 && (vPos.z+1) <= 33 && vPos.y+1 <= 256)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y-1)][(int)(vPos.z-1)], voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)vPos.z], voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)(vPos.z-1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z-1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z-1))
+                ); 
             break;
         case 2: 
-            if ((vPos.x+1) <= 33 && (vPos.z+1) <= 33 && vPos.y-1 >= 0)
-            {
-            sideCount = getAOSides(voxels[(int)vPos.x+1][(int)(vPos.y-1)][(int)(vPos.z)], voxels[(int)(vPos.x)][(int)(vPos.y-1)][(int)vPos.z+1], voxels[(int)(vPos.x+1)][(int)(vPos.y-1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x+1, vPos.y-1, vPos.z+1))
+                );             
             break;
         default:  
-            if ((vPos.x-1) >= 0 && (vPos.z+1) <= 33 && (vPos.y-1) >= 0)  
-            {   
-            sideCount = getAOSides(voxels[(int)vPos.x][(int)(vPos.y-1)][(int)(vPos.z+1)], voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)vPos.z],    voxels[(int)(vPos.x-1)][(int)(vPos.y-1)][(int)(vPos.z+1)]); 
-            }
+            sideCount = getAOSides(
+                getVoxel(glm::vec3(vPos.x, vPos.y-1, vPos.z+1)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z)), 
+                getVoxel(glm::vec3(vPos.x-1, vPos.y-1, vPos.z+1))
+                );  
             break; 
     }
 
@@ -549,16 +527,74 @@ glm::vec3 Chunk::getAOValue(int numSides)
     switch (numSides) 
     {
         case 0: 
-            return glm::vec3(0.3f, 0.3f, 0.3f); 
+            return glm::vec3(0.4f, 0.4f, 0.4f); 
         case 1: 
-            return glm::vec3(0.7f, 0.7f, 0.7f);  
+            return glm::vec3(0.55f, 0.55f, 0.55f);  
         case 2: 
-            return glm::vec3(0.85f, 0.85f, 0.85f);  
+            return glm::vec3(0.8f, 0.8f, 0.8f);   
         default:  
             return glm::vec3(1.0f, 1.0f, 1.0f); 
     }
 }    
 
+
+// returns data of the coordinate regardless if the coordinate is in the chunk or not, accesses chunk neighbors if outside chunk 
+char Chunk::getVoxel(glm::vec3 coordinate)  
+{
+    // if the voxels exist within the chunk 
+    if (coordinate.x < 32 && coordinate.x >= 0 && coordinate.z < 32 && coordinate.z >= 0 && coordinate.y >= 0 && coordinate.y <= 256)   
+        return voxels[(int)coordinate.x][(int)coordinate.y][(int)coordinate.z];
+
+    // convert coordinates to world coordinates 
+    float xPos = (position.x * 32) + coordinate.x;  
+    float yPos = (position.y * 32) + coordinate.y;   
+    float zPos = (position.z * 32) + coordinate.z;    
+
+    // converting to world coordinates 
+    int xChunkPos = floor(xPos / 32); 
+    int zChunkPos = floor(zPos / 32);  
+
+    // getting chunk coordiinate world coordinate 
+    glm::vec3 chunkLocation = glm::vec3(xChunkPos, 0, zChunkPos);  
+
+    // converting world coordinates of voxels to chunk coordinates  
+    int xCoord = xPos - chunkLocation.x * 32; 
+    int yCoord = yPos - chunkLocation.y * 32; 
+    int zCoord = zPos - chunkLocation.z * 32;  
+
+    // left 
+    if (glm::vec3(position.x + 1, 0, position.z) == chunkLocation && mLeft != nullptr)  
+    {
+        return mLeft->voxels[xCoord][yCoord][zCoord]; 
+    }
+
+    // right
+    if (glm::vec3(position.x - 1, 0, position.z) == chunkLocation && mRight != nullptr)  
+    {
+        return mRight->voxels[xCoord][yCoord][zCoord];
+    }
+
+    // up 
+    if (glm::vec3(position.x, 0, position.z+1) == chunkLocation && mUp != nullptr)  
+    {
+        return mUp->voxels[xCoord][yCoord][zCoord];
+    }
+
+
+    // bottom  
+    if (glm::vec3(position.x, 0, position.z-1) == chunkLocation && mBot != nullptr)    
+    {
+        return mBot->voxels[xCoord][yCoord][zCoord]; 
+    }
+
+    // if no voxel was found 
+    return '0';  
+}
+
+bool Chunk::isSolid(char voxelValue) 
+{
+    return (voxelValue > 0); 
+}
 
 void Chunk::draw(Shader& shader, Frustum& frustum, float amount)  
 {

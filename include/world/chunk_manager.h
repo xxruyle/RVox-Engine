@@ -42,10 +42,10 @@ public:
 
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
-    void generateChunk(int randSeed, glm::vec3 chunkCoord); // generates a chunk and the chunks around it 
+    void generateChunk(glm::vec3 chunkCoord); // generates a chunk and the chunks around it  
 
 
-    void meshNeighbors(Chunk& chunk);  // gives chunks data about their neighbors 
+    void meshAfterDeletion(Chunk& chunk, glm::vec3 deletedVoxelCoord);  // mesh neigboring chunks if deletion was at their border 
 
     void checkCollision(Player& player); 
     void checkAutoJump(Player& player, glm::vec3 collisionNormal); // checks for blocks that the player can auto jump and give collider this info   
@@ -67,7 +67,7 @@ public:
     void spawnPlayer(glm::vec3 chunkCoord, Player& player);  
 
 private: 
-    static const int renderDistance = 500; // the number of blocks the player can see radius wise  
+    static const int renderDistance = 700; // the number of blocks the player can see radius wise   
     int currentRandomSeed; // the current random seed 
 
 

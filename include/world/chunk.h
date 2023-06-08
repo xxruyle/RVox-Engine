@@ -39,7 +39,7 @@ class Chunk
 public: 
     bool renderable = false; // only renderable if all neighboring chunks are renderable 
     glm::vec3 position; 
-    char voxels[33][256][33];  // the voxel array     
+    char voxels[32][256][32];  // the voxel array      
 
     glm::vec3 heighestLocation; 
 
@@ -50,7 +50,8 @@ public:
     void generateSolidChunk(int randSeed, int startX, int startZ); 
     void generateDebugChunk(int randSeed, int startX, int startZ);   
 
-    void getVoxel(glm::vec3 coordinate);  
+    char getVoxel(glm::vec3 coordinate);   
+    bool isSolid(char voxelValue); 
 
 
     // pointers to neighboring chunks 

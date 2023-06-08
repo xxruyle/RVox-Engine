@@ -1,54 +1,72 @@
 #include "world/chunk_manager.h"  
 
 
-void ChunkManager::generateChunk(int randSeed, glm::vec3 chunkCoord)
+void ChunkManager::generateChunk(glm::vec3 chunkCoord) 
 {
     // the chunk that we are intending to generate 
     Chunk& cMiddle = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z)];   
     cMiddle.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z));   
-    cMiddle.generateSolidChunk(randSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);    
+    cMiddle.generateSolidChunk(currentRandomSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);     
 
 
-    if (!chunkExists(chunkCoord)) // if the chunk doesn't already exist generate it 
+    if (!chunkExists(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z))) // if the chunk doesn't already exist generate it 
     {
         Chunk& cLeft = chunkMap[glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)];  
         cLeft.position = glm::vec3(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z));  
-        cLeft.generateSolidChunk(randSeed, cLeft.position.x * 32, cLeft.position.z * 32);  
+        cLeft.generateSolidChunk(currentRandomSeed, cLeft.position.x * 32, cLeft.position.z * 32);  
 
         cMiddle.mLeft = &cLeft;    
+    } else {
+        cMiddle.mLeft = &chunkMap[glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)]; 
     }
 
 
-
-    if (!chunkExists(chunkCoord))
+    if (!chunkExists(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)))
     {
         Chunk& cRight = chunkMap[glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)]; 
         cRight.position = glm::vec3(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z));  
-        cRight.generateSolidChunk(randSeed, cRight.position.x * 32, cRight.position.z * 32);   
+        cRight.generateSolidChunk(currentRandomSeed, cRight.position.x * 32, cRight.position.z * 32);   
 
         cMiddle.mRight = &cRight;  
+    } else {
+        cMiddle.mRight = &chunkMap[glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)];
     }
 
 
-    if (!chunkExists(chunkCoord))
+    if (!chunkExists(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)))
     {
         Chunk& cUp = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)];    
         cUp.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1));    
-        cUp.generateSolidChunk(randSeed, cUp.position.x * 32, cUp.position.z * 32);    
+        cUp.generateSolidChunk(currentRandomSeed, cUp.position.x * 32, cUp.position.z * 32);    
 
         cMiddle.mUp = &cUp;  
+    } else {
+        cMiddle.mUp = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)]; 
     }
 
-    if (!chunkExists(chunkCoord)) 
+    if (!chunkExists(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1))) 
     {
         Chunk& cBottom = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
         cBottom.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1));    
-        cBottom.generateSolidChunk(randSeed, cBottom.position.x * 32, cBottom.position.z * 32);     
+        cBottom.generateSolidChunk(currentRandomSeed, cBottom.position.x * 32, cBottom.position.z * 32);      
 
         cMiddle.mBot = &cBottom; 
+    } else {
+        cMiddle.mBot = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
     }
 
     cMiddle.mesh(); 
+    cMiddle.renderable = true; 
+}
+
+bool ChunkManager::chunkIsRenderable(glm::vec3 chunkPos) 
+{
+    return (
+        chunkMap[chunkPos].mLeft != nullptr &&
+        chunkMap[chunkPos].mRight != nullptr &&
+        chunkMap[chunkPos].mUp != nullptr &&
+        chunkMap[chunkPos].mBot != nullptr 
+    ); 
 }
 
 bool ChunkManager::chunkExists(glm::vec3 chunkPos)  
@@ -61,7 +79,7 @@ void ChunkManager::createChunks(int randSeed)
     chunkMap.clear(); 
 
     currentRandomSeed = randSeed; 
-    for (int i = 0; i < 2; i++) 
+/*     for (int i = 0; i < 2; i++) 
     {
         for (int j = 0; j < 1; j++)    
         {
@@ -72,7 +90,7 @@ void ChunkManager::createChunks(int randSeed)
             c1.mesh();  
             meshNeighbors(c1);  
         }
-    }   
+    }    */
 }
 
 
@@ -86,106 +104,49 @@ void ChunkManager::renderChunks(Shader& shader)
 
     for (unsigned int i = 0; i < chunkBuffer.size(); i++) 
     {
-        if (chunkMap.count(chunkBuffer[i])) // if the coordinates exist in the world    
+        if (chunkMap.count(chunkBuffer[i]) && chunkMap[chunkBuffer[i]].renderable) // if the coordinates exist in the world     
         {
-            if (isNearPlayer(camera.mPosition, chunkBuffer[i]))  
+            if (isNearPlayer(camera.mPosition, chunkBuffer[i]))   
             {
                 chunkMap[chunkBuffer[i]].draw(shader, frustum, renderDistance);
             }
                 
             
 
-        }  /* else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
-            Chunk& c1 = chunkMap[chunkBuffer[i]]; 
+        }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
+/*             Chunk& c1 = chunkMap[chunkBuffer[i]]; 
             c1.position = chunkBuffer[i]; 
             c1.generateSolidChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);     
             // c1.generateDebugChunk(currentRandomSeed, c1.position.x * 32, c1.position.z * 32);   
-            c1.mesh(); 
-        } */
+            c1.mesh();  */
+            generateChunk(chunkBuffer[i]); 
+        }
     } 
 }
 
 
-void ChunkManager::meshNeighbors(Chunk& chunk) 
+void ChunkManager::meshAfterDeletion(Chunk& chunk, glm::vec3 deletedVoxelCoord)  
 {
-    // top neighbor 
-    if (chunkMap.count(glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z + 1))) // z remains constant 
+    if (deletedVoxelCoord.x == 0) // right 
     {
-        // give chunkmap chunk border info 
-        for (unsigned int x = 0; x < 33; x++)   
-        {
-            for (unsigned int y = 0; y < 256; y++) 
-            {   
-                chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z + 1)].voxels[x][y][0] = chunk.voxels[x][y][32]; // the index for the block that needs to be changed is chunk size + 1 - 1 (which is chunk size duh)       // update chunk's  neighbor's border  
-            }
-        }
-        
-
- 
-        chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z + 1)].mesh(); 
+        chunk.mRight->mesh(); 
     }
 
-    // left neighbor 
-    if (chunkMap.count(glm::vec3(chunk.position.x + 1, chunk.position.y, chunk.position.z))) // x remains constant 
+    if (deletedVoxelCoord.x == 31) // left  
     {
-        // give chunkmap chunk border info 
-        for (unsigned int z = 0; z < 33; z++)   
-        {
-            for (unsigned int y = 0; y < 256; y++) 
-            {   
-                chunkMap[glm::vec3(chunk.position.x + 1, chunk.position.y, chunk.position.z)].voxels[0][y][z] = chunk.voxels[32][y][z];    // update chunk's  neighbor's border 
-            }
-        }
-        
-        chunkMap[glm::vec3(chunk.position.x + 1, chunk.position.y, chunk.position.z)].mesh(); 
-
-
-
+        chunk.mLeft->mesh(); 
     }
 
-
-
-    // right neighbor 
-    if (chunkMap.count(glm::vec3(chunk.position.x - 1, chunk.position.y, chunk.position.z))) // using the given chunks current position to find its neighbors  
+    if (deletedVoxelCoord.z == 0) // bottom 
     {
-        // give chunkmap chunk border info 
-        for (unsigned int z = 0; z < 33; z++) // only need to go over the z axis since the x axis remains constant  
-        {
-            for (unsigned int y = 0; y < 256; y++) 
-            {   
-                int val = chunk.voxels[0][y][z]; 
-                chunkMap[glm::vec3(chunk.position.x - 1, chunk.position.y, chunk.position.z)].voxels[32][y][z] = val;       // update chunk's  neighbor's border  
-            }
-        }
-        
-
-        // and then mesh the right neighbor as well 
-        chunkMap[glm::vec3(chunk.position.x - 1, chunk.position.y, chunk.position.z)].mesh(); 
-
-        // finally, we mesh the chunk itself 
-
+        chunk.mBot->mesh(); 
     }
 
-    // bottom neighbor  
-    if (chunkMap.count(glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z - 1))) // z remains constant 
+    if (deletedVoxelCoord.z == 31) // top 
     {
-        // give chunkmap chunk border info 
-        for (unsigned int x = 0; x < 33; x++)   
-        {
-            for (unsigned int y = 0; y < 256; y++) 
-            {   
-                chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z - 1)].voxels[x][y][32] = chunk.voxels[x][y][0];     // update chunk's  neighbor's border 
-            }
-        }
-        
-
-        // finally, we mesh the chunk itself 
-        // and then mesh the right neighbor as well 
-        chunkMap[glm::vec3(chunk.position.x, chunk.position.y, chunk.position.z - 1)].mesh(); 
+        chunk.mUp->mesh(); 
     }
 
-    // mesh the chunk itself 
-    chunk.mesh(); 
 }
 
 
@@ -346,9 +307,6 @@ void ChunkManager::checkCollision(Player& player)
         player.onGround = true;
     else 
         player.onGround = false; 
-
-/*     AABB b1 = collisionTest.getVoxelBoundingBox(glm::vec3(2,20,2)); 
-    collisionTest.sweptResponse(player, b1); */
 
 }
 
@@ -515,8 +473,6 @@ void ChunkManager::voxelOutline(Shader& shader, DebugTools& debugTools)
         int yCoord = (int)voxelPosition.y - (int)chunkMap[chunkCoord].position.y * 32; 
         int zCoord = (int)voxelPosition.z - (int)chunkMap[chunkCoord].position.z * 32; 
 
-        // std::cout << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; // for debugging purposes  
-
 
         if (chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] > 0) 
             debugTools.drawVoxelOutline(shader, glm::vec3(voxelPosition.x, voxelPosition.y, voxelPosition.z), glm::vec3(1.001f, 1.001f, 1.001f));            
@@ -540,8 +496,5 @@ void ChunkManager::deleteVoxel()
     chunkMap[chunkCoord].voxels[xCoord][yCoord][zCoord] = 0;    
 
     chunkMap[chunkCoord].mesh();   
-
-    if (xCoord == 0 || zCoord == 0 || xCoord == 32 || zCoord == 32)
-        meshNeighbors(chunkMap[chunkCoord]); 
-
+    meshAfterDeletion(chunkMap[chunkCoord], glm::vec3(xCoord, yCoord, zCoord)); // mesh neighbors if deleted voxel was on the chunk border
 }
