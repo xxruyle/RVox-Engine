@@ -116,7 +116,7 @@ int main()
 
 
     Player player(glm::vec3(0, 0, 0));       
-    chunkManager.spawnPlayer(glm::vec3(0, 0, 0), player); 
+    // chunkManager.spawnPlayer(glm::vec3(0, 0, 0), player); 
 
 
     DebugTools debugTools; 
@@ -191,7 +191,7 @@ int main()
         
         // drawing the chunk manager chunks 
         chunkManager.renderChunks(shaderProgram);       
-        // chunkManager.checkCollision(player);  
+        // chunkManager.checkCollision(player);   
 
 
 

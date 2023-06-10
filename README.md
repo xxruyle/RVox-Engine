@@ -6,7 +6,7 @@
 
 
 ## Procedural Infinite Generation
-- ![1000 block render distance](res/screenshots/proceduralInfinite.png) 
+- ![1000 block render distance](res/screenshots/proceduralInfinite2.jpg) 
 
 ## Optimizations   
 - World is made up of chunks 
@@ -19,6 +19,8 @@
 - Fog 
 - Shadow Mapping using depth buffer pass 
 - Voxel Ambient Occlusion 
+
+![Ambient Occlusion](res/screenshots/ambient%20occlusion.png)
 
 ## Physics 
 - AABB vs AABB collisions  

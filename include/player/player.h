@@ -48,7 +48,7 @@ public:
     float velocityX = 0.0f; 
     float velocityY = 0.0f; 
     float velocityZ = 0.0f; 
-    float gravity = 0.0f;     
+    float gravity = 0.0f;      
     float velocityLimit = 20.0f; 
     glm::vec3 collisionNormal; 
 

@@ -3,6 +3,7 @@
 #include <cmath> 
 #include <vector> 
 #include <string> 
+#include <thread> 
 #include <unordered_map> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
@@ -37,21 +38,22 @@ struct voxelVertex {
 class Chunk
 { // stores local chunk voxel positions and chunk mesh 
 public: 
+    bool meshed = false; 
     bool renderable = false; // only renderable if all neighboring chunks are renderable 
     glm::vec3 position; 
-    char voxels[32][256][32];  // the voxel array      
+    char voxelArray[262144];  // the flat voxel array 32*32*256
 
-    glm::vec3 heighestLocation; 
 
     std::vector<voxelVertex> vertices; // for the chunk mesh    
     std::vector<unsigned int> indices;
     
-
     void generateSolidChunk(int randSeed, int startX, int startZ); 
     void generateDebugChunk(int randSeed, int startX, int startZ);   
 
     char getVoxel(glm::vec3 coordinate);   
+    int getVoxelIndex(glm::vec3 coordinate);  // returns an int index to access the flat voxel array 
     bool isSolid(char voxelValue); 
+    bool isAir(char voxelValue); 
 
 
     // pointers to neighboring chunks 
@@ -61,8 +63,9 @@ public:
     Chunk* mBot;  
 
     void mesh(); // checks each block for the chunk to see and assigns them to be interior accordingly.   
-    void draw(Shader& shader, Frustum& frustum, float renderDistance); // draw the chunk    
-    
+    void draw(Shader& shader, Frustum& frustum); // draw the chunk    
+
+    void finishMeshing(); 
 private: 
     unsigned int VAO, VBO, EBO;
     void setupMesh(); 
@@ -76,7 +79,6 @@ private:
     glm::vec3 getAOValue(int numSides); //takes in num of sides and returns an AO dark color value  
 
  
-
 std::vector<glm::vec3> backFace = {
     // Back face
     glm::vec3(0.5f,  0.5f, 0.5f),  
@@ -91,12 +93,7 @@ std::vector<unsigned int> backIndices = {
     0, 2, 3
 }; 
 
-std::vector<glm::vec3> backNormals = {
-    glm::vec3(0.0f,  0.0f, -1.0f), 
-    glm::vec3(0.0f,  0.0f, -1.0f), 
-    glm::vec3(0.0f,  0.0f, -1.0f), 
-    glm::vec3(0.0f,  0.0f, -1.0f), 
-}; 
+
 
 std::vector<glm::vec3> frontFace = {
     // Front face
@@ -111,12 +108,6 @@ std::vector<unsigned int> frontIndices = {
     0, 2, 3 
 }; 
 
-std::vector<glm::vec3> frontNormals = {
-    glm::vec3(0.0f,  0.0f, 1.0f),  
-    glm::vec3(0.0f,  0.0f, 1.0f),  
-    glm::vec3(0.0f,  0.0f, 1.0f),  
-    glm::vec3(0.0f,  0.0f, 1.0f),  
-};
 
 std::vector<glm::vec3> leftFace = { 
     // Left face
@@ -129,13 +120,6 @@ std::vector<glm::vec3> leftFace = {
 std::vector<unsigned int> leftIndices = {
     0, 1, 2, 
     0, 2, 3
-}; 
-
-std::vector<glm::vec3> leftNormals = {
-    glm::vec3(-1.0f,  0.0f,  0.0f),
-    glm::vec3(-1.0f,  0.0f,  0.0f),
-    glm::vec3(-1.0f,  0.0f,  0.0f),
-    glm::vec3(-1.0f,  0.0f,  0.0f),
 }; 
 
 std::vector<glm::vec3> rightFace = {
@@ -151,14 +135,6 @@ std::vector<unsigned int> rightIndices = {
     0, 2, 3
 }; 
 
-std::vector<glm::vec3> rightNormals = {
-    glm::vec3(1.0f,  0.0f,  0.0f),
-    glm::vec3(1.0f,  0.0f,  0.0f),
-    glm::vec3(1.0f,  0.0f,  0.0f),
-    glm::vec3(1.0f,  0.0f,  0.0f),
-
-}; 
-
 std::vector<glm::vec3> bottomFace = {
     // Bottom face
     glm::vec3(-0.5f, -0.5f, -0.5f), 
@@ -170,14 +146,6 @@ std::vector<glm::vec3> bottomFace = {
 std::vector<unsigned int> bottomIndices = {
     0, 1, 2, 
     0, 2, 3 
-}; 
-
-std::vector<glm::vec3> bottomNormals = {
-    glm::vec3(0.0f, -1.0f,  0.0f),
-    glm::vec3(0.0f, -1.0f,  0.0f),
-    glm::vec3(0.0f, -1.0f,  0.0f),
-    glm::vec3(0.0f, -1.0f,  0.0f),
-
 }; 
 
 std::vector<glm::vec3> topFace = {
@@ -192,12 +160,5 @@ std::vector<glm::vec3> topFace = {
 std::vector<unsigned int> topIndices = {
     0, 1, 2, 
     0, 2, 3, 
-}; 
-
-std::vector<glm::vec3> topNormals = {
-    glm::vec3(0.0f,  1.0f,  0.0f),
-    glm::vec3(0.0f,  1.0f,  0.0f),
-    glm::vec3(0.0f,  1.0f,  0.0f),
-    glm::vec3(0.0f,  1.0f,  0.0f),
 }; 
 }; 

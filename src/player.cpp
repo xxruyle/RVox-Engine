@@ -57,7 +57,7 @@ void Player::move(GLFWwindow* window, float deltaTime)
         { 
             currentSpeed = mSpeed;  
             onGround = false; 
-            velocityY = 0.3;   
+            velocityY = 1.2;     
             jumpCooldown = jumpCooldownDuration;  
         }
     } 
