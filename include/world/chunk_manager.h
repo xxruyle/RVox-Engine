@@ -5,7 +5,7 @@
 #include <string> 
 #include <chrono> // for timing debugs
 #include <thread> 
-#include <future> 
+#include <mutex> 
 #include <unordered_map> 
 #include <unordered_set> 
 #include <glad/glad.h> 
@@ -39,13 +39,13 @@ public:
     ChunkManager(Render& renderer, Camera& camera, Frustum& frustum) : renderer(renderer), camera(camera), frustum(frustum) {};        
     
 
-    std::vector<std::thread> threadVec; 
-
+    std::vector<std::thread> threadVec;       
 
     std::unordered_set<glm::vec3> chunkSet; 
     std::vector<Chunk> chunks; // a vector cainting each chunk
     std::unordered_map<glm::vec3, Chunk> chunkMap;  // an unordered map containing the chunk space coordinates as a key and chunk as value 
     std::vector<glm::vec3> chunkBuffer; // buffer for loading the chunk coordinates that are near the player   
+
 
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
@@ -75,7 +75,7 @@ public:
     void spawnPlayer(glm::vec3 chunkCoord, Player& player);  
 
 private: 
-    static const int renderDistance = 400; // the number of blocks the player can see radius wise        
+    static const int renderDistance = 400; // the number of blocks the player can see radius wise                  
     int currentRandomSeed; // the current random seed 
 
 

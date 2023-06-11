@@ -1,6 +1,12 @@
 #include "world/chunk.h" 
 
 
+void Chunk::generateAndMesh() 
+{
+    startedThread = true; 
+    meshFuture = std::async(std::launch::async, &Chunk::mesh, this);     
+}
+
 int Chunk::getVoxelIndex(glm::vec3 coordinate)  
 { // allows access of the flat array using 3D coordinates  
     return coordinate.x + (coordinate.y * 32) + (coordinate.z * 32 * 256);   
@@ -31,7 +37,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 5.5f)));    
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));       
             noiseData[x][z] = height; // -40      
         }
     }
@@ -54,7 +60,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 2; 
                         // voxels[i][k][j] = 2;
                         
-                    } else if (y < 80) { // grass 
+                    } else if (y < 60) { // grass  
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 
                         // voxels[i][k][j] = 1;
                     } else { // snow mountains 
@@ -76,7 +82,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     FastNoiseLite noise; 
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);  
     noise.SetFractalType(FastNoiseLite::FractalType_Ridged);
-    noise.SetFractalOctaves(1); 
+    noise.SetFractalOctaves(2);  
     noise.SetFrequency(.01);  
     noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
     noise.SetSeed(randSeed);  
@@ -97,12 +103,12 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));  
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 3.5f)));   
             noiseData[x][z] = height; // -40      
         }
     }
 
-    for (int i = 0; i < xs; i++) 
+/*     for (int i = 0; i < xs; i++) 
     {
         for (int j = 0; j < zs; j++) 
         {
@@ -128,12 +134,41 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                 }
             } 
         }
-    }  
+    }   */
+
+    for (int x = 0; x < xs; x++) 
+    {
+        for (int y = 0; y < 256; y++) 
+        {
+            for (int z = 0; z < zs; z++) 
+            {
+                if (y < stoneLimit + noiseData[x][z])   
+                {
+                    int surface = stoneLimit + noiseData[x][z] - 2;    
+
+                    if (y < surface) { // stone 
+                        noise.SetFrequency(0.01);    
+                        float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));     
+                        MultiNoise < 0.8f ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 0;    
+                        
+                    } else if (y < 80) { // grass 
+                        voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 
+                        // voxels[i][k][j] = 1;
+                    } else { // snow mountains 
+                        voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 3;    
+                        // voxels[i][k][j] = 3;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
 void Chunk::mesh()      
 { // checks interior voxels
+    // std::lock_guard<std::mutex> lock(vLock); 
+
     indices.clear(); // clear the indices before each mesh! Very important to fix bug that causes overlapping triangles 
     Voxel voxel; // allows for voxel color info  
     for ( int x = 0; x < 32; x++)  
@@ -236,18 +271,21 @@ void Chunk::mesh()
             }
         }
     }    
-    meshed = true; 
 }
 
 void Chunk::finishMeshing() 
 {
     setupMesh(); 
+    // std::lock_guard<std::mutex> lock(vLock); 
+
     vertices.clear(); 
     renderable = true; 
 }
 
 void Chunk::setupMesh() 
 {
+    std::lock_guard<std::mutex> lock(vLock); 
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO); 

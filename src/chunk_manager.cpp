@@ -7,7 +7,7 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
     Chunk& cMiddle = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z)];   
     chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z)); 
     cMiddle.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z));   
-    cMiddle.generateSolidChunk(currentRandomSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);      
+    cMiddle.generateSolidChunk(currentRandomSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);       
 
 /*     using namespace std::chrono;
     auto start = high_resolution_clock::now();
@@ -64,11 +64,9 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
         cMiddle.mBot = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
     }
 
-
-/*     std::thread mesher(&Chunk::mesh, std::ref(cMiddle)); 
-    mesher.detach();  */
-    threadVec.emplace_back(&Chunk::mesh, std::ref(cMiddle));         
-    // cMiddle.mesh();     
+    cMiddle.generateAndMesh(); // multithreading  
+/*     cMiddle.mesh(); 
+    cMiddle.finishMeshing();  */
 }
 
 bool ChunkManager::chunkIsRenderable(glm::vec3 chunkPos) 
@@ -98,30 +96,26 @@ void ChunkManager::renderChunks(Shader& shader)
 { // renders the existing chunks 
 
     // looping over chunks that are within camera area  
-    chunkBuffer.clear(); 
+    chunkBuffer.clear();  
     getNearChunks(); 
-
-    for (auto& thread: threadVec) 
-    {
-        if (thread.joinable()) 
-        {
-            thread.join(); 
-        }
-    }
 
     for (unsigned int i = 0; i < chunkBuffer.size(); i++) 
     {
-        if (chunkExists(chunkBuffer[i]) && chunkMap[chunkBuffer[i]].renderable && chunkMap[chunkBuffer[i]].meshed) // if the coordinates exist in the world       
+        glm::vec3 chunkPos = chunkBuffer[i]; 
+        if (chunkExists(chunkPos) && chunkMap[chunkPos].renderable) // if the coordinates exist in the world           
         {
-            if (isNearPlayer(camera.mPosition, chunkBuffer[i]))   
-            {
-                chunkMap[chunkBuffer[i]].draw(shader, frustum); 
+            if (isNearPlayer(camera.mPosition, chunkPos))  
+            {     
+                chunkMap[chunkPos].draw(shader, frustum);  
             }
                 
-        } else if (chunkMap[chunkBuffer[i]].meshed) { 
-            chunkMap[chunkBuffer[i]].finishMeshing(); 
-        }  else if ((isNearPlayer(camera.mPosition, chunkBuffer[i]))){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)  
-            generateChunk(chunkBuffer[i]); 
+        } else if (chunkMap[chunkPos].startedThread) { 
+            if (chunkMap[chunkPos].meshFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)   
+            {
+                chunkMap[chunkPos].finishMeshing(); 
+            }
+        }  else if (isNearPlayer(camera.mPosition, chunkPos)){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)    
+            generateChunk(chunkPos);  
         }
     } 
 }
@@ -186,7 +180,8 @@ void ChunkManager::getNearChunks()
     {
         for (int j = -maxDistance; j < maxDistance; j++) // going from bottom to top of the grid 
         {
-            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
+
+            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j));  
         }
     }
 }
