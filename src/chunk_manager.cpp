@@ -3,23 +3,28 @@
 
 void ChunkManager::generateChunk(glm::vec3 chunkCoord) 
 {
+
+            using namespace std::chrono;
+            auto start = high_resolution_clock::now();
+
+
     // the chunk that we are intending to generate 
     Chunk& cMiddle = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z)];   
     chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z)); 
     cMiddle.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z));   
-    cMiddle.generateSolidChunk(currentRandomSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);       
+    // cMiddle.generateSolidChunk(currentRandomSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);       
+    cMiddle.generate(currentRandomSeed, cMiddle.position.x * 32, cMiddle.position.z * 32);  
 
-/*     using namespace std::chrono;
-    auto start = high_resolution_clock::now();
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(stop - start);   
-    std::cout << duration.count() << std::endl; */
-     if (!chunkExists(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z))) // if the chunk doesn't already exist generate it 
+
+
+
+
+/*      if (!chunkExists(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z))) // if the chunk doesn't already exist generate it 
     {
         Chunk& cLeft = chunkMap[glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)];  
         chunkSet.insert(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)); 
         cLeft.position = glm::vec3(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z));  
-        cLeft.generateSolidChunk(currentRandomSeed, cLeft.position.x * 32, cLeft.position.z * 32);  
+        cLeft.generate(currentRandomSeed, cLeft.position.x * 32, cLeft.position.z * 32);   
 
         cMiddle.mLeft = &cLeft;    
     } else {
@@ -32,7 +37,7 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
         Chunk& cRight = chunkMap[glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)]; 
         chunkSet.insert(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z));  
         cRight.position = glm::vec3(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z));  
-        cRight.generateSolidChunk(currentRandomSeed, cRight.position.x * 32, cRight.position.z * 32);   
+        cRight.generate(currentRandomSeed, cRight.position.x * 32, cRight.position.z * 32);   
 
         cMiddle.mRight = &cRight;  
     } else {
@@ -45,7 +50,7 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
         Chunk& cUp = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)];    
         chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)); 
         cUp.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1));    
-        cUp.generateSolidChunk(currentRandomSeed, cUp.position.x * 32, cUp.position.z * 32);    
+        cUp.generate(currentRandomSeed, cUp.position.x * 32, cUp.position.z * 32);    
 
         cMiddle.mUp = &cUp;  
     } else {
@@ -57,14 +62,22 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
         Chunk& cBottom = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
         chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)); 
         cBottom.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1));    
-        cBottom.generateSolidChunk(currentRandomSeed, cBottom.position.x * 32, cBottom.position.z * 32);      
+        cBottom.generate(currentRandomSeed, cBottom.position.x * 32, cBottom.position.z * 32);      
 
         cMiddle.mBot = &cBottom; 
     } else {
         cMiddle.mBot = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
-    }
+    } */
 
-    cMiddle.generateAndMesh(); // multithreading  
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);   
+    std::cout << duration.count() << std::endl;
+
+
+
+
+    // cMiddle.generateAndMesh(); // multithreading  
+
 /*     cMiddle.mesh(); 
     cMiddle.finishMeshing();  */
 }
@@ -110,12 +123,17 @@ void ChunkManager::renderChunks(Shader& shader)
             }
                 
         } else if (chunkMap[chunkPos].startedThread) { 
-            if (chunkMap[chunkPos].meshFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)   
+            std::future_status status = chunkMap[chunkPos].meshFuture.wait_for(std::chrono::milliseconds(0));  
+            if (status == std::future_status::ready)    
             {
                 chunkMap[chunkPos].finishMeshing(); 
             }
         }  else if (isNearPlayer(camera.mPosition, chunkPos)){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)    
+        
+
+
             generateChunk(chunkPos);  
+
         }
     } 
 }

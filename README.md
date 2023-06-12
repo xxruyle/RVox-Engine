@@ -9,10 +9,10 @@
 - ![1000 block render distance](res/screenshots/proceduralInfinite2.jpg) 
 
 ## Optimizations   
-- World is made up of chunks 
-- Each chunk is meshed before hand 
-- Interior voxels are culled for performance 
+- World is split up into 32x256x32 chunks
+- Each chunk has its own mesh where voxel faces not surrounded by air are culled  
 - Chunks are culled when out of frustum 
+- Meshing and chunk generation is multithreaded using std::async  
   
 ## Lighting 
 - Basic rudimentary lighting which is calculated using the normals of each voxel  

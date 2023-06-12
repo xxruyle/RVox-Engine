@@ -189,6 +189,9 @@ int main()
         frustum.setCamDef();  
 
         
+
+
+
         // drawing the chunk manager chunks 
         chunkManager.renderChunks(shaderProgram);       
         // chunkManager.checkCollision(player);   

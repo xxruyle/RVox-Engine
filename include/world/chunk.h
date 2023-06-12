@@ -51,6 +51,11 @@ public:
     std::mutex vLock; 
 
 
+    void generate(int randSeed, int startX, int startZ); 
+    void generateAndMesh(int randSeed, int startX, int startZ);  
+
+
+
     void generateSolidChunk(int randSeed, int startX, int startZ); 
     void generateDebugChunk(int randSeed, int startX, int startZ);   
 
@@ -67,7 +72,6 @@ public:
     Chunk* mBot;  
 
 
-    void generateAndMesh(); 
     void mesh(); // checks each block for the chunk to see and assigns them to be interior accordingly.   
     void draw(Shader& shader, Frustum& frustum); // draw the chunk    
 

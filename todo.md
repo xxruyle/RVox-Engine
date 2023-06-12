@@ -33,6 +33,8 @@
 - [X] Fix chunk borders once and for all. Have each chunk have a pointer to its neighbors. This will fix ambient occlusion problems and other annoyances
 - [X] Ambient Occlusion
 - [ ] Multithreading
+  - [ ]  meshing 
+  - [ ] generating chunks 
 - [ ] Fix chunk loading performance issues  
 - [ ] anisotropic filtering fix 
 - [ ] Make model mesh into a 3d array of blocks   

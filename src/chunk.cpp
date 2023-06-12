@@ -1,10 +1,17 @@
 #include "world/chunk.h" 
 
 
-void Chunk::generateAndMesh() 
+void Chunk::generate(int randSeed, int startX, int startZ)  
 {
     startedThread = true; 
-    meshFuture = std::async(std::launch::async, &Chunk::mesh, this);     
+    meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);   
+} 
+
+void Chunk::generateAndMesh(int randSeed, int startX, int startZ)  
+{
+    startedThread = true; 
+    generateSolidChunk(randSeed, startX, startZ);  
+    mesh(); 
 }
 
 int Chunk::getVoxelIndex(glm::vec3 coordinate)  
@@ -103,7 +110,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 3.5f)));   
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));   
             noiseData[x][z] = height; // -40      
         }
     }
@@ -148,7 +155,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
 
                     if (y < surface) { // stone 
                         noise.SetFrequency(0.01);    
-                        float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));     
+                        float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));       
                         MultiNoise < 0.8f ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 0;    
                         
                     } else if (y < 80) { // grass 
