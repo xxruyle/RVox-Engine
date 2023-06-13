@@ -1,18 +1,24 @@
 #include "world/chunk.h" 
 
 
-void Chunk::generate(int randSeed, int startX, int startZ)  
+void Chunk::generate(int randSeed)   
 {
-    startedThread = true; 
-    meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);   
+    startedGeneration = true; 
+    // meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);
+    generateFuture = std::async(std::launch::async, &Chunk::generateSolidChunk, this, randSeed, position.x * 32, position.z * 32);    
 } 
 
-void Chunk::generateAndMesh(int randSeed, int startX, int startZ)  
+
+void Chunk::threadedMesh() 
 {
-    startedThread = true; 
-    generateSolidChunk(randSeed, startX, startZ);  
-    mesh(); 
+    if (!startedMesh)  
+    {
+        startedMesh = true; 
+        meshFuture = std::async(std::launch::async, &Chunk::mesh, this); 
+    }
 }
+
+
 
 int Chunk::getVoxelIndex(glm::vec3 coordinate)  
 { // allows access of the flat array using 3D coordinates  

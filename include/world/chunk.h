@@ -39,7 +39,8 @@ struct voxelVertex {
 class Chunk
 { // stores local chunk voxel positions and chunk mesh 
 public: 
-    bool startedThread = false; 
+    bool startedGeneration = false; 
+    bool startedMesh = false; 
     bool renderable = false; // only renderable if all neighboring chunks are renderable 
     glm::vec3 position; 
     char voxelArray[262144];  // the flat voxel array 32*32*256
@@ -47,12 +48,17 @@ public:
 
     std::vector<voxelVertex> vertices; // for the chunk mesh    
     std::vector<unsigned int> indices;
+
+    // futures for multithreading compeletion checks   
+    std::future<void> generateFuture; 
     std::future<void> meshFuture; 
+
     std::mutex vLock; 
 
 
-    void generate(int randSeed, int startX, int startZ); 
-    void generateAndMesh(int randSeed, int startX, int startZ);  
+    void generate(int randSeed);  
+    // void generateAndMesh(int randSeed, int startX, int startZ);  
+    void threadedMesh(); 
 
 
 

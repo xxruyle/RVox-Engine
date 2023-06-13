@@ -10,6 +10,8 @@
 
 ## Optimizations   
 - World is split up into 32x256x32 chunks
+  - ![Chunks](res/screenshots/chunks.png) 
+
 - Each chunk has its own mesh where voxel faces not surrounded by air are culled  
 - Chunks are culled when out of frustum 
 - Meshing and chunk generation is multithreaded using std::async  

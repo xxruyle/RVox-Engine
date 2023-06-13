@@ -31,7 +31,7 @@ public:
     {
         mPosition = position; 
         std::string const &path = "res/models/chr_human_default_armor.ply";              
-        this->playerModel = new PLYModel(path, mPosition, 0.8f);       
+        this->playerModel = new PLYModel(path, mPosition, 0.7f);       
     }; 
 
     void move(GLFWwindow* window, float deltaTime);   
@@ -48,7 +48,7 @@ public:
     float velocityX = 0.0f; 
     float velocityY = 0.0f; 
     float velocityZ = 0.0f; 
-    float gravity = 0.0f;      
+    float gravity = 10.0f;       
     float velocityLimit = 20.0f; 
     glm::vec3 collisionNormal; 
 
