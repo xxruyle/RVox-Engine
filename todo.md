@@ -9,7 +9,7 @@
   - [ ] camera and orthocamera 
   - [ ] chunkmanager and chunk
   - [X] world (deleted) 
-  - [X] vao, vbo ebo
+  - [X] vao, vbo ebo (deleted)
   - [ ] renderer and chunk draw functions 
   - [ ] Entity superclass over player 
   - [ ] ChunkManager
@@ -31,12 +31,13 @@
   - [X] One block height autojump (use a normalized raycast and check if block exists?) 
 - [X] Chunk Loading problem where multiple triangles are drawn per voxel each time there is a mesh, memset the voxels array to 0 ? (this might cause problems with the memory) (**COMPLETED**: June 6, 2023, problem was that i wasn't clearing the indices vector) 
 - [X] Fix chunk borders once and for all. Have each chunk have a pointer to its neighbors. This will fix ambient occlusion problems and other annoyances
-- [X] Ambient Occlusion
-- [ ] Multithreading
-  - [ ]  meshing 
-  - [ ] generating chunks 
-- [ ] Fix chunk loading performance issues  
+- [X] Ambient Occlusion (**COMPLETED**: June 8, 2023)
+- [X] Multithreading (**COMPLETED**: June 13, 2023)
+  - [X]  meshing 
+  - [X] generating chunks 
+- [ ] Fix chunk loading performance issues   
 - [ ] anisotropic filtering fix 
+- [ ] Bullet Physics Engine 
 - [ ] Make model mesh into a 3d array of blocks   
 - [ ] Model hiearchies, (Player's arms are seperate model but are still attached to the main player mody)
 - [ ] Model Animations  
@@ -50,7 +51,7 @@
 - [ ] Make gradient across voxel surface like Cube World
 - [ ] Save data 
 
-## More Game Specific 
+# More Game Specific 
 - [ ] Better terrain generation 
   - [ ] 3D noise 
   - [ ] Lakes 
