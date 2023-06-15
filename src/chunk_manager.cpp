@@ -3,12 +3,6 @@
 
 void ChunkManager::generateChunk(glm::vec3 chunkCoord) 
 {
-/*     using namespace std::chrono;
-            auto start = high_resolution_clock::now();
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(stop - start);     
-    std::cout << duration.count() << std::endl; */
-
     // the chunk that we are intending to generate 
     Chunk& cMiddle = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z)];   
     chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z)); 
@@ -67,23 +61,6 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
         cMiddle.mBot = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
     }
 
-
-
-    // cMiddle.generateAndMesh(); // multithreading  
-
-/*     cMiddle.mesh(); 
-    cMiddle.finishMeshing();  */
-}
-
-
-bool ChunkManager::chunkHasPointers(glm::vec3 chunkPos) 
-{
-    return ( 
-        chunkMap[chunkPos].mLeft != nullptr &&
-        chunkMap[chunkPos].mRight != nullptr &&
-        chunkMap[chunkPos].mUp != nullptr &&
-        chunkMap[chunkPos].mBot != nullptr 
-    ); 
 }
 
 bool ChunkManager::chunkIsMeshable(glm::vec3 chunkPos)  
@@ -96,7 +73,8 @@ bool ChunkManager::chunkIsMeshable(glm::vec3 chunkPos)
             !chunkMap[chunkPos].mRight->startedGeneration ||   
             !chunkMap[chunkPos].mUp->startedGeneration ||    
             !chunkMap[chunkPos].mBot->startedGeneration   
-        ) { 
+        ) 
+        { 
             return false;  
         } 
 
@@ -107,20 +85,18 @@ bool ChunkManager::chunkIsMeshable(glm::vec3 chunkPos)
         std::future_status mBotStatus = chunkMap[chunkPos].mBot->generateFuture.wait_for(std::chrono::milliseconds(0));     
 
 
-
-    
-            if ( 
-                mLeftStatus == std::future_status::ready &&  
-                mRightStatus == std::future_status::ready &&
-                mUpStatus == std::future_status::ready &&
-                mBotStatus == std::future_status::ready  
-            )
-            {
-                return true; 
-            }
-    } else {
-        return false; 
+        if ( 
+            mLeftStatus == std::future_status::ready &&  
+            mRightStatus == std::future_status::ready &&
+            mUpStatus == std::future_status::ready &&
+            mBotStatus == std::future_status::ready  
+        )
+        {
+            return true; 
+        }
     } 
+
+    return false; 
 
 }
 
@@ -128,6 +104,18 @@ bool ChunkManager::chunkisFinishable(glm::vec3 chunkPos)
 {
     std::future_status meshStatus = chunkMap[chunkPos].meshFuture.wait_for(std::chrono::milliseconds(0));   
     return (meshStatus == std::future_status::ready); 
+}
+
+
+
+bool ChunkManager::chunkHasPointers(glm::vec3 chunkPos) 
+{
+    return ( 
+        chunkMap[chunkPos].mLeft != nullptr &&
+        chunkMap[chunkPos].mRight != nullptr &&
+        chunkMap[chunkPos].mUp != nullptr &&
+        chunkMap[chunkPos].mBot != nullptr 
+    ); 
 }
 
 bool ChunkManager::chunkExists(glm::vec3 chunkPos)  
@@ -147,11 +135,8 @@ void ChunkManager::renderChunks(Shader& shader)
 { // renders the existing chunks 
 
     // looping over chunks that are within camera area  
-
     chunkBuffer.clear();  
     getNearChunks(); 
-
-
 
 
     for (unsigned int i = 0; i < chunkBuffer.size(); i++) 
@@ -172,7 +157,6 @@ void ChunkManager::renderChunks(Shader& shader)
             chunkMap[chunkPos].threadedMesh();  
         }  else if (isNearPlayer(camera.mPosition, chunkPos)){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)    
             generateChunk(chunkPos);  
-
         }
     } 
 }
@@ -182,42 +166,26 @@ void ChunkManager::meshAfterDeletion(Chunk& chunk, glm::vec3 deletedVoxelCoord)
 {
     if (deletedVoxelCoord.x == 0) // right 
     {
-        if (chunk.mRight != nullptr)
-        {
-            chunk.mRight->mesh(); 
-            chunk.mRight->finishMeshing(); 
-        }
-
+        chunk.mRight->mesh(); 
+        chunk.mRight->finishMeshing(); 
     }
 
     if (deletedVoxelCoord.x == 31) // left  
     {
-        if (chunk.mLeft != nullptr) 
-        {
-            chunk.mLeft->mesh();  
-            chunk.mLeft->finishMeshing();  
-        }
-
+        chunk.mLeft->mesh(); 
+        chunk.mLeft->finishMeshing(); 
     }
 
     if (deletedVoxelCoord.z == 0) // bottom 
     {
-        if (chunk.mBot != nullptr) 
-        {
-            chunk.mBot->mesh();  
-            chunk.mBot->finishMeshing();  
-        }
-        
-        
+        chunk.mBot->mesh(); 
+        chunk.mBot->finishMeshing(); 
     }
 
     if (deletedVoxelCoord.z == 31) // top 
     {
-        if (chunk.mUp != nullptr) 
-        {
-            chunk.mUp->mesh();  
-            chunk.mUp->finishMeshing();  
-        }
+        chunk.mUp->mesh(); 
+        chunk.mUp->finishMeshing(); 
     }
 
 }
@@ -253,8 +221,7 @@ void ChunkManager::getNearChunks()
     {
         for (int j = -maxDistance; j < maxDistance; j++) // going from bottom to top of the grid 
         {
-
-            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j));  
+            chunkBuffer.push_back(glm::vec3(xPos + i, 0, zPos + j)); 
         }
     }
 }
@@ -348,24 +315,24 @@ void ChunkManager::checkCollision(Player& player)
 
     for (int x = playerPosX - 4; x < playerPosX + 4; x++)  
     {
-        for (int y = 0; y < playerPosY + 4; y++)      
+        for (int y = playerPosY - 4; y < playerPosY + 4; y++)     
         {
-            for (int z = playerPosZ - 4; z < playerPosZ + 4; z++)         
+            for (int z = playerPosZ - 4; z < playerPosZ + 4; z++)        
             {
-                 glm::vec3 playerChunk = getChunkLocation(glm::vec3(x, y, z));  
+                glm::vec3 playerChunk = getChunkLocation(glm::vec3(x, y, z));  
 
-/*                 // converting world coordinates of voxels to chunk coordinates  
+                // converting world coordinates of voxels to chunk coordinates  
                 int xCoord = x - (int)chunkMap[playerChunk].position.x * 32; 
                 int yCoord = y - (int)chunkMap[playerChunk].position.y * 32; 
-                int zCoord = z - (int)chunkMap[playerChunk].position.z * 32;   */
-                glm::vec3 chunkCoords = getChunkCoordinates(glm::vec3(x, y, z));  
+                int zCoord = z - (int)chunkMap[playerChunk].position.z * 32; 
 
-                int voxelIndex = chunkMap[playerChunk].getVoxelIndex(chunkCoords);  
+
+                int voxelIndex = chunkMap[playerChunk].getVoxelIndex(glm::vec3(xCoord, yCoord, zCoord)); 
                 if (chunkMap[playerChunk].voxelArray[voxelIndex] > 0) 
                 {
-
                     // we make sure to use world coordinates here for  the AABB min and max calculations    
                     AABB b1 = collisionTest.getVoxelBoundingBox(glm::vec3(x,y,z));  
+
                     if (collisionTest.AABBtoAABB(b1, player.playerModel->ModelBoundingBox)) 
                     {
                         glm::vec3 collisionNormal = collisionTest.calculateNormal(player, b1); 
@@ -554,24 +521,20 @@ void ChunkManager::deleteVoxel()
 {
     glm::vec3 voxelPosition = brensenCast(); 
 
-    if (voxelPosition != glm::vec3(0, 1000, 0))  
-    {
-        glm::vec3 chunkCoord = getChunkLocation(voxelPosition);    
-        std::cout << chunkCoord.x << ' ' << chunkCoord.z << std::endl; // for debugging purposes
+    glm::vec3 chunkCoord = getChunkLocation(voxelPosition);   
+    std::cout << chunkCoord.x << ' ' << chunkCoord.z << std::endl; // for debugging purposes
 
-        // getting chunk local space coordinates 
-        int xCoord = (int)voxelPosition.x - (int)chunkMap[chunkCoord].position.x * 32; 
-        int yCoord = (int)voxelPosition.y - (int)chunkMap[chunkCoord].position.y * 32; 
-        int zCoord = (int)voxelPosition.z - (int)chunkMap[chunkCoord].position.z * 32;  
+    // getting chunk local space coordinates 
+    int xCoord = (int)voxelPosition.x - (int)chunkMap[chunkCoord].position.x * 32; 
+    int yCoord = (int)voxelPosition.y - (int)chunkMap[chunkCoord].position.y * 32; 
+    int zCoord = (int)voxelPosition.z - (int)chunkMap[chunkCoord].position.z * 32;  
 
-        std::cout << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; // for debugging purposes  
-        int voxelIndex = chunkMap[chunkCoord].getVoxelIndex(glm::vec3(xCoord, yCoord, zCoord)); 
+    std::cout << xCoord << ' ' << yCoord << ' ' << zCoord << std::endl; // for debugging purposes  
+    int voxelIndex = chunkMap[chunkCoord].getVoxelIndex(glm::vec3(xCoord, yCoord, zCoord)); 
 
-        if (voxelIndex < 262144) 
-            chunkMap[chunkCoord].voxelArray[voxelIndex] = 0;     
+    chunkMap[chunkCoord].voxelArray[voxelIndex] = 0;     
 
-        chunkMap[chunkCoord].mesh(); 
-        chunkMap[chunkCoord].finishMeshing(); 
-        meshAfterDeletion(chunkMap[chunkCoord], glm::vec3(xCoord, yCoord, zCoord)); // mesh neighbors if deleted voxel was on the chunk border
-    }
+    chunkMap[chunkCoord].mesh(); 
+    chunkMap[chunkCoord].finishMeshing(); 
+    meshAfterDeletion(chunkMap[chunkCoord], glm::vec3(xCoord, yCoord, zCoord)); // mesh neighbors if deleted voxel was on the chunk border
 }

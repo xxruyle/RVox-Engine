@@ -31,7 +31,7 @@ public:
     {
         mPosition = position; 
         std::string const &path = "res/models/chr_human_default_armor.ply";              
-        this->playerModel = new PLYModel(path, mPosition, 0.7f);       
+        this->playerModel = new PLYModel(path, mPosition, 0.8f);       
     }; 
 
     void move(GLFWwindow* window, float deltaTime);   

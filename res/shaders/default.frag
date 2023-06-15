@@ -73,7 +73,7 @@ void main()
 	// regular lighting  output 
 	FragColor = vec4(Color, 1.0) * vec4(result, 1.0); //vec4 sun   color           
 	FragColor = FragColor * vec4(AOValue, 1.0);  
- 	// FragColor = mix(skyColor, FragColor, visibility);   
+ 	FragColor = mix(skyColor, FragColor, visibility);   
 
 
 	// calculate shadow

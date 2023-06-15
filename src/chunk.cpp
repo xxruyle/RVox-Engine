@@ -5,7 +5,7 @@ void Chunk::generate(int randSeed)
 {
     startedGeneration = true; 
     // meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);
-    generateFuture = std::async(std::launch::async, &Chunk::generateSolidChunk, this, randSeed, position.x * 32, position.z * 32);    
+    generateFuture = std::async(std::launch::async, &Chunk::generateDebugChunk, this, randSeed, position.x * 32, position.z * 32);       
 } 
 
 
@@ -17,7 +17,6 @@ void Chunk::threadedMesh()
         meshFuture = std::async(std::launch::async, &Chunk::mesh, this); 
     }
 }
-
 
 
 int Chunk::getVoxelIndex(glm::vec3 coordinate)  
@@ -50,7 +49,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));       
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 5.5f)));    
             noiseData[x][z] = height; // -40      
         }
     }
@@ -73,7 +72,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 2; 
                         // voxels[i][k][j] = 2;
                         
-                    } else if (y < 60) { // grass  
+                    } else if (y < 80) { // grass 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 
                         // voxels[i][k][j] = 1;
                     } else { // snow mountains 
@@ -121,33 +120,6 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
         }
     }
 
-/*     for (int i = 0; i < xs; i++) 
-    {
-        for (int j = 0; j < zs; j++) 
-        {
-            for (int k = 0; k <  stoneLimit + noiseData[i][j]; k++)   
-            {
-                int surface = stoneLimit + noiseData[i][j] - 2;
-
-                if (k > 30)     
-                {
-                    voxelArray[getVoxelIndex(glm::vec3(i,k,j))] = 1;
-                }
-                else if (k < 30 && k > 5)   
-                {
-                    noise.SetFrequency(0.01);    
-                    float MultiNoise = noise.GetNoise((float)(startX + i), (float)(k), (float)(startZ + j));    
-                    MultiNoise < 0.8f ? voxelArray[getVoxelIndex(glm::vec3(i,k,j))] = 2 : voxelArray[getVoxelIndex(glm::vec3(i,k,j))] = 0;     
-                }    
-                else if (k < surface) { // stone
-                    voxelArray[getVoxelIndex(glm::vec3(i,k,j))] = 2;
-                    
-                } else { // snow mountains 
-                    voxelArray[getVoxelIndex(glm::vec3(i,k,j))] = 3;  
-                }
-            } 
-        }
-    }   */
 
     for (int x = 0; x < xs; x++) 
     {
@@ -175,13 +147,12 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
             }
         }
     }
+
 }
 
 
 void Chunk::mesh()      
 { // checks interior voxels
-    // std::lock_guard<std::mutex> lock(vLock); 
-
     indices.clear(); // clear the indices before each mesh! Very important to fix bug that causes overlapping triangles 
     Voxel voxel; // allows for voxel color info  
     for ( int x = 0; x < 32; x++)  
@@ -289,8 +260,6 @@ void Chunk::mesh()
 void Chunk::finishMeshing() 
 {
     setupMesh(); 
-    // std::lock_guard<std::mutex> lock(vLock); 
-
     vertices.clear(); 
     renderable = true; 
 }
@@ -298,6 +267,7 @@ void Chunk::finishMeshing()
 void Chunk::setupMesh() 
 {
     std::lock_guard<std::mutex> lock(vLock); 
+
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);

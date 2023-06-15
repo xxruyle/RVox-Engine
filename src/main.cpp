@@ -33,7 +33,7 @@ const unsigned int SCR_WIDTH = 1300;
 const unsigned int SCR_HEIGHT = 1000;
 
 // initializing helper classes 
-Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);       
+Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
 OrthoCamera orthoCamera(glm::vec3(-30.0, 70.0, -30.0), 45.0, 0.0, 90.0f);  
 GameTime gTime;
 Light lighting;  
@@ -115,7 +115,7 @@ int main()
 
 
 
-    Player player(glm::vec3(0, 0, 0));            
+    Player player(glm::vec3(0, 0, 0));       
     // chunkManager.spawnPlayer(glm::vec3(0, 0, 0), player); 
 
 
@@ -189,15 +189,16 @@ int main()
         frustum.setCamDef();  
 
         
+        // drawing the chunk manager chunks 
+        chunkManager.renderChunks(shaderProgram);       
+        chunkManager.checkCollision(player);    
+
+
 
         // time functions for deltaTime and fps 
         gTime.getFPS(window); 
         gTime.getDeltaTime();
 
-
-        // drawing the chunk manager chunks 
-        chunkManager.renderChunks(shaderProgram);       
-        chunkManager.checkCollision(player);    
 
         // models 
         player.playerModel->Draw(shaderProgram); 
@@ -217,7 +218,7 @@ int main()
         renderer.setShaders(outlineProgram); 
         // chunkManager.voxelOutline(outlineProgram, wireFrame);       
 
-        debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);          
+        // debugTools.DrawBoundingBox(outlineProgram, player.playerModel->mPosition);         
 
 
         // 2D Rendering 

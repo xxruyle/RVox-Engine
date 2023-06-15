@@ -3,8 +3,7 @@
 #include <cmath> 
 #include <vector> 
 #include <string> 
-#include <future>  
-#include <mutex> 
+#include <future> 
 #include <unordered_map> 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h> 
@@ -41,6 +40,7 @@ class Chunk
 public: 
     bool startedGeneration = false; 
     bool startedMesh = false; 
+    
     bool renderable = false; // only renderable if all neighboring chunks are renderable 
     glm::vec3 position; 
     char voxelArray[262144];  // the flat voxel array 32*32*256
@@ -48,7 +48,7 @@ public:
 
     std::vector<voxelVertex> vertices; // for the chunk mesh    
     std::vector<unsigned int> indices;
-
+    
     // futures for multithreading compeletion checks   
     std::future<void> generateFuture; 
     std::future<void> meshFuture; 
@@ -56,14 +56,14 @@ public:
     std::mutex vLock; 
 
 
+
+    void generateSolidChunk(int randSeed, int startX, int startZ); 
+    void generateDebugChunk(int randSeed, int startX, int startZ);   
+
     void generate(int randSeed);  
     // void generateAndMesh(int randSeed, int startX, int startZ);  
     void threadedMesh(); 
 
-
-
-    void generateSolidChunk(int randSeed, int startX, int startZ); 
-    void generateDebugChunk(int randSeed, int startX, int startZ);   
 
     char getVoxel(glm::vec3 coordinate);   
     int getVoxelIndex(glm::vec3 coordinate);  // returns an int index to access the flat voxel array 
@@ -76,7 +76,6 @@ public:
     Chunk* mRight;  
     Chunk* mUp;  
     Chunk* mBot;  
-
 
     void mesh(); // checks each block for the chunk to see and assigns them to be interior accordingly.   
     void draw(Shader& shader, Frustum& frustum); // draw the chunk    
