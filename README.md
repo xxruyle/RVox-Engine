@@ -39,9 +39,9 @@
 
 
 ## Libraries Used 
-- <a src="https://github.com/Auburn/FastNoiseLite">FastNoiseLite</a> - Procedural terrain  generation 
-- <a src="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image</a> - Image loading for textures  
-- <a src="https://github.com/nmwsharp/happly">happly</a> - Parsing .ply files for model loading 
-- <a src="https://glad.dav1d.de/">GLAD</a> - OpenGL  functionality  
-- <a src="https://github.com/g-truc/glm">GLM</a> - Math library for OpenGL use 
-- <a src="https://www.glfw.org/">GLFW</a> - Window management
+- <a href="https://github.com/Auburn/FastNoiseLite">FastNoiseLite</a> - Procedural terrain  generation  
+- <a href="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image</a> - Image loading for textures   
+- <a href="https://github.com/nmwsharp/happly">happly</a> - Parsing .ply files for model loading  
+- <a href="https://glad.dav1d.de/">GLAD</a> - OpenGL  functionality   
+- <a href="https://github.com/g-truc/glm">GLM</a> - Math library for OpenGL use  
+- <a href="https://www.glfw.org/">GLFW</a> - Window management 
