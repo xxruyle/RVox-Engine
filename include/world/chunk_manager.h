@@ -72,7 +72,7 @@ public:
     void spawnPlayer(glm::vec3 chunkCoord, Player& player);  
 
 private: 
-    static const int renderDistance = 400; // the number of blocks the player can see radius wise        
+    static const int renderDistance = 500; // the number of blocks the player can see radius wise         
     int currentRandomSeed; // the current random seed 
 
     bool chunkIsMeshable(glm::vec3 chunkPos);  

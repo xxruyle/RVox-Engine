@@ -153,7 +153,8 @@ int main()
 
 
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);    
-        glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
+        // glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
+        glClearColor(80.0f/255.0f, 58.0f/255.0f, 75.0f/255.0f, 1.0f);   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         glEnable(GL_DEPTH_TEST); 
 

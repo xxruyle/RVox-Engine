@@ -26,10 +26,10 @@ uniform vec3 lightPos;
 
 
 // fog values 
-// const float fogDensity = 0.0025; // for 1000 block render distance 
-// const float fogDensity = 0.005; // for 500 block render distance 
-const float fogDensity = .0025;   
-float fogGradient = 3.0; 
+// const float fogDensity = 0.0025; // for 1000 block render distance  
+const float fogDensity = 0.0035; // for 500 block render distance    
+// const float fogDensity = .0020;     
+float fogGradient = 3.0;  
 
 // frustum values for depth buffer 
 float nearD = 0.1; 
@@ -45,7 +45,7 @@ float ShadowCalculation(vec4 fragPosLightSpace);
 
 void main()
 {
-	vec4 skyColor = vec4(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f);  
+	vec4 skyColor = vec4(80.0f/255.0f, 58.0f/255.0f, 75.0f/255.0f, 1.0f);   
 
     // properties
     vec3 norm = normalize(Normal); 

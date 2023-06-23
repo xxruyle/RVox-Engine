@@ -5,7 +5,7 @@ void Chunk::generate(int randSeed)
 {
     startedGeneration = true; 
     // meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);
-    generateFuture = std::async(std::launch::async, &Chunk::generateDebugChunk, this, randSeed, position.x * 32, position.z * 32);       
+    generateFuture = std::async(std::launch::async, &Chunk::generateSolidChunk, this, randSeed, position.x * 32, position.z  * 32);         
 } 
 
 
@@ -49,7 +49,7 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 5.5f)));    
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.7f)));      
             noiseData[x][z] = height; // -40      
         }
     }
@@ -99,6 +99,13 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
     noise.SetSeed(randSeed);  
 
+    FastNoiseLite cliffs; 
+    cliffs.SetNoiseType(FastNoiseLite::NoiseType_Cellular); 
+    cliffs.SetFractalType(FastNoiseLite::FractalType_FBm);   
+    cliffs.SetFrequency(.005);  
+    cliffs.SetSeed(randSeed);   
+    cliffs.SetFractalOctaves(3);  
+
     FastNoiseLite mountain; 
     mountain.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
     mountain.SetFractalType(FastNoiseLite::FractalType_Ridged);  
@@ -129,19 +136,32 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
             {
                 if (y < stoneLimit + noiseData[x][z])   
                 {
-                    int surface = stoneLimit + noiseData[x][z] - 2;    
+                    int surface = stoneLimit + noiseData[x][z] - 4;     
 
-                    if (y < surface) { // stone 
+                    if (y > 50)  { 
+                        float cliffNoise = cliffs.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));
+                        cliffNoise < -0.44 ?  voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 1 : voxelArray[getVoxelIndex  (glm::vec3(x,y,z))] = 0; 
+                    
+                    } else if (y >= surface) {
+                        if (y - 1 >= 0) 
+                        {
+                            if (voxelArray[getVoxelIndex(glm::vec3(x,y-1,z))] == 0) { 
+                                voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 0; 
+                            } else if (y <= surface + 2) {     
+                                voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 4;   
+                            } else {
+                                voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 1;    
+                            }
+                        }
+                    } else if (y < surface) { // stone   
                         noise.SetFrequency(0.01);    
                         float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));       
-                        MultiNoise < 0.8f ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 0;    
+                        MultiNoise < 0.9f ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 0;    
                         
                     } else if (y < 80) { // grass 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 
-                        // voxels[i][k][j] = 1;
                     } else { // snow mountains 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 3;    
-                        // voxels[i][k][j] = 3;
                     }
                 }
             }
@@ -555,7 +575,7 @@ glm::vec3 Chunk::getAOValue(int numSides)
         case 1: 
             return glm::vec3(0.55f, 0.55f, 0.55f);  
         case 2: 
-            return glm::vec3(0.8f, 0.8f, 0.8f);   
+            return glm::vec3(0.65f, 0.65f, 0.65f);    
         default:  
             return glm::vec3(1.0f, 1.0f, 1.0f); 
     }
