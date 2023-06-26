@@ -29,7 +29,7 @@ uniform vec3 lightPos;
 // const float fogDensity = 0.0025; // for 1000 block render distance  
 const float fogDensity = 0.0035; // for 500 block render distance    
 // const float fogDensity = .0020;     
-float fogGradient = 3.0;  
+float fogGradient = 5.0;   
 
 // frustum values for depth buffer 
 float nearD = 0.1; 
@@ -73,7 +73,7 @@ void main()
 	// regular lighting  output 
 	FragColor = vec4(Color, 1.0) * vec4(result, 1.0); //vec4 sun   color           
 	FragColor = FragColor * vec4(AOValue, 1.0);  
- 	// FragColor = mix(skyColor, FragColor, visibility);   
+ 	FragColor = mix(skyColor, FragColor, visibility);    
 
 
 	// calculate shadow

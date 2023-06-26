@@ -36,7 +36,8 @@
   - [X]  meshing 
   - [X] generating chunks 
 - [ ] Fix chunk loading performance issues   
-- [ ] anisotropic filtering fix 
+  - [X] semi fixed  (**COMPLETED** June 26, 2023) 
+- [ ] anisotropic filtering fix for voxel ambient occlusion
 - [ ] Bullet Physics Engine 
 - [ ] Make model mesh into a 3d array of blocks   
 - [ ] Model hiearchies, (Player's arms are seperate model but are still attached to the main player mody)
@@ -44,6 +45,7 @@
 - [ ] Placing blocks 
 - [ ] Day Night Cycle 
 - [ ] Shadow Mapping 
+- [ ] Lighting 
 - [ ] Water, liquids 
 - [ ] Memory management (Run-length encoding (RLE) ?) 
 - [ ] Entities (npcs) 

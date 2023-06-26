@@ -87,6 +87,10 @@ void Chunk::generateSolidChunk(int randSeed, int startX, int startZ)
 
 void Chunk::generateDebugChunk(int randSeed, int startX, int startZ) 
 { // 3D noise chunk 
+
+
+
+
     const int xs = 32;
     const int zs = 32;
     float frequency = 0.005f; 
@@ -96,7 +100,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     FastNoiseLite noise; 
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);  
     noise.SetFractalType(FastNoiseLite::FractalType_Ridged);  
-    noise.SetFractalOctaves(2);  
+    noise.SetFractalOctaves(rand() % 3 + 1);     
     noise.SetFrequency(.01);  
     noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
     noise.SetSeed(randSeed);  
@@ -117,11 +121,23 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
 
         // Gather noise data
     int noiseData[xs][zs];
-    int stoneLimit = 100;  
-    float randFloat = (((float) rand()) / (float) RAND_MAX);  
-    float diff = 1.0f - 0.5f; 
-    float r = randFloat * diff;  
-    float randomThreshold = 0.5f + r;   
+    int stoneLimit = 150;   
+    float randomThreshold; 
+
+    int randVal = rand() % 3 + 1; 
+
+    if (randVal == 3)  
+        randomThreshold = 0.8f; 
+    else if (randVal == 2) 
+        randomThreshold = 0.75f; 
+    else if (randVal == 1) 
+        randomThreshold = 0.7f;   
+    else 
+        randomThreshold = 0.95f;  
+
+
+
+
 
 
     for (int x = 0; x < xs; x++) 
@@ -143,10 +159,14 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                 if (y < stoneLimit + noiseData[x][z])   
                 {
                     int surface = stoneLimit + noiseData[x][z] - 4;     
-                    
 
 
-                    if (y >= surface) {
+
+
+
+
+
+                    if (y >= surface) {  
                         if (y - 1 >= 0) 
                         {
                             if (voxelArray[getVoxelIndex(glm::vec3(x,y-1,z))] == 0) { 
@@ -157,10 +177,14 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                                 voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 1;    
                             }
                         }
-                    } else if (y < surface) { // stone   
-                        noise.SetFrequency(0.01);    
+                    } else if (y < surface) { // stone    
+                        noise.SetFrequency(0.01);  
+
+                        char stoneType;  
+                        int randomStone = rand() % 500;      
+                        (randomStone > 490) ? stoneType = 5 : stoneType = 2;     
                         float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));       
-                        MultiNoise < randomThreshold ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] =  0;      
+                        MultiNoise < randomThreshold ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = stoneType : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] =  0;      
                         
                     } else if (y < 80 && y > 1) { // grass 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 

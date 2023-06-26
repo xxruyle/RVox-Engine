@@ -11,6 +11,7 @@ struct Voxel {
         {2, glm::vec3(130.0f/255.0f, 136.0f/255.0f, 134.0f/255.0f)}, // stone
         {3, glm::vec3(236.0f/255.0f, 255.0f/255.0f, 253.0f/255.0f)}, // snow 
         {4, glm::vec3(247.0f/255.0f, 196.0f/255.0f, 105.0f/255.0f)}, // dirt     
+        {5, glm::vec3(179.0f/255.0f, 19.0f/255.0f, 18.0f/255.0f)}, // ore      
     }; 
 
 /*     glm::vec3 calculateColor(int height)  
