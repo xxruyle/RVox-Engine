@@ -1,6 +1,35 @@
 #include "world/chunk_manager.h"  
 
 
+void ChunkManager::getPointers(glm::vec3 chunkPos) 
+{
+
+    Chunk* cMiddle = &chunkMap[chunkPos];  
+
+    if (chunkExists(glm::vec3(chunkPos.x + 1, 0, chunkPos.z))) // if the chunk doesn't already exist generate it    
+    {
+        cMiddle->mLeft = &chunkMap[glm::vec3(chunkPos.x + 1, 0, chunkPos.z)];  
+    }
+
+
+    if (chunkExists(glm::vec3(chunkPos.x - 1, 0, chunkPos.z)))
+    {
+        cMiddle->mRight = &chunkMap[glm::vec3(chunkPos.x - 1, 0, chunkPos.z)]; 
+    }
+
+
+    if (chunkExists(glm::vec3(chunkPos.x, 0, chunkPos.z+1)))
+    {
+        cMiddle->mUp = &chunkMap[glm::vec3(chunkPos.x, 0, chunkPos.z+1)];   
+    } 
+
+    if (chunkExists(glm::vec3(chunkPos.x, 0, chunkPos.z-1)))  
+    {
+        cMiddle->mBot = &chunkMap[glm::vec3(chunkPos.x, 0, chunkPos.z-1)];  
+    } 
+}
+
+
 void ChunkManager::generateChunk(glm::vec3 chunkCoord) 
 {
     // the chunk that we are intending to generate 
@@ -11,55 +40,7 @@ void ChunkManager::generateChunk(glm::vec3 chunkCoord)
 
 
 
-    if (!chunkExists(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z))) // if the chunk doesn't already exist generate it  
-    {
-        Chunk& cLeft = chunkMap[glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)];  
-        cMiddle.mLeft = &cLeft;    
-        chunkSet.insert(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)); 
-        cLeft.position = glm::vec3(glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z));  
-        cLeft.generate(currentRandomSeed);    
 
-    } else {
-        cMiddle.mLeft = &chunkMap[glm::vec3(chunkCoord.x + 1, 0, chunkCoord.z)]; 
-    }
-
-
-    if (!chunkExists(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)))
-    {
-        Chunk& cRight = chunkMap[glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)]; 
-        cMiddle.mRight = &cRight;  
-        chunkSet.insert(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z));  
-        cRight.position = glm::vec3(glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z));  
-        cRight.generate(currentRandomSeed);    
-
-    } else {
-        cMiddle.mRight = &chunkMap[glm::vec3(chunkCoord.x - 1, 0, chunkCoord.z)];
-    }
-
-
-    if (!chunkExists(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)))
-    {
-        Chunk& cUp = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)];    
-        cMiddle.mUp = &cUp;  
-        chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)); 
-        cUp.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z+1));    
-        cUp.generate(currentRandomSeed);     
-
-    } else {
-        cMiddle.mUp = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z+1)]; 
-    }
-
-    if (!chunkExists(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1))) 
-    {
-        Chunk& cBottom = chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
-        cMiddle.mBot = &cBottom; 
-        chunkSet.insert(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)); 
-        cBottom.position = glm::vec3(glm::vec3(chunkCoord.x, 0, chunkCoord.z-1));    
-        cBottom.generate(currentRandomSeed);       
-
-    } else {
-        cMiddle.mBot = &chunkMap[glm::vec3(chunkCoord.x, 0, chunkCoord.z-1)]; 
-    }
 
 }
 
@@ -133,7 +114,6 @@ void ChunkManager::createChunks(int randSeed)
 
 void ChunkManager::renderChunks(Shader& shader)  
 { // renders the existing chunks 
-
     // looping over chunks that are within camera area  
     chunkBuffer.clear();  
     getNearChunks(); 
@@ -142,23 +122,41 @@ void ChunkManager::renderChunks(Shader& shader)
     for (unsigned int i = 0; i < chunkBuffer.size(); i++) 
     {
         glm::vec3 chunkPos = chunkBuffer[i]; 
-        if (chunkExists(chunkPos) && chunkMap[chunkPos].renderable) // if the coordinates exist in the world           
+        if (chunkExists(chunkPos) && chunkMap[chunkPos].renderable ) // if the coordinates exist in the world            
         {
 
         
-            if (isNearPlayer(camera.mPosition, chunkPos))  
+            if (isNearPlayer(camera.mPosition, chunkPos) )   
             {     
                 chunkMap[chunkPos].draw(shader, frustum);  
             }
 
-        } else if (chunkMap[chunkPos].startedMesh && chunkisFinishable(chunkPos)  && chunkIsMeshable(chunkPos)) {  
+        
+        } else if (chunkMap[chunkPos].startedMesh && chunkisFinishable(chunkPos)  && chunkIsMeshable(chunkPos) && !chunkMap[chunkPos].renderable) {  
             chunkMap[chunkPos].finishMeshing();   
         } else if (chunkMap[chunkPos].startedGeneration && chunkIsMeshable(chunkPos) && !chunkMap[chunkPos].renderable) {  
             chunkMap[chunkPos].threadedMesh();  
-        }  else if (isNearPlayer(camera.mPosition, chunkPos)){ // if coordinate's do not already exist in the world, keep generating. (Allows for "infinite" terrain generation)    
+        }  else if (isNearPlayer(camera.mPosition, chunkPos) && !chunkMap[chunkPos].startedGeneration){ // if coordinate's do not already exist in the  world, keep generating. (Allows for "infinite" terrain generation)      
+
+/*             using namespace std::chrono;
+            auto start = high_resolution_clock::now();
+
+            auto stop = high_resolution_clock::now(); 
+            auto duration = duration_cast<milliseconds>(stop - start);      
+            std::cout << duration.count() << std::endl;  */
+
             generateChunk(chunkPos);  
+
+
+        } 
+        if (!chunkHasPointers(chunkPos)){   
+            getPointers(chunkPos); 
         }
     } 
+
+
+
+
 }
 
 
@@ -187,7 +185,6 @@ void ChunkManager::meshAfterDeletion(Chunk& chunk, glm::vec3 deletedVoxelCoord)
         chunk.mUp->mesh(); 
         chunk.mUp->finishMeshing(); 
     }
-
 }
 
 

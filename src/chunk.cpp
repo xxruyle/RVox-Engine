@@ -5,7 +5,7 @@ void Chunk::generate(int randSeed)
 {
     startedGeneration = true; 
     // meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);
-    generateFuture = std::async(std::launch::async, &Chunk::generateSolidChunk, this, randSeed, position.x * 32, position.z  * 32);         
+    generateFuture = std::async(std::launch::async, &Chunk::generateDebugChunk, this, randSeed, position.x * 32, position.z  * 32);            
 } 
 
 
@@ -91,20 +91,22 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     const int zs = 32;
     float frequency = 0.005f; 
 
+
+
     FastNoiseLite noise; 
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);  
-    noise.SetFractalType(FastNoiseLite::FractalType_Ridged);
+    noise.SetFractalType(FastNoiseLite::FractalType_Ridged);  
     noise.SetFractalOctaves(2);  
     noise.SetFrequency(.01);  
     noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);   
     noise.SetSeed(randSeed);  
 
-    FastNoiseLite cliffs; 
+/*     FastNoiseLite cliffs; 
     cliffs.SetNoiseType(FastNoiseLite::NoiseType_Cellular); 
     cliffs.SetFractalType(FastNoiseLite::FractalType_FBm);   
     cliffs.SetFrequency(.005);  
     cliffs.SetSeed(randSeed);   
-    cliffs.SetFractalOctaves(3);  
+    cliffs.SetFractalOctaves(3);   */
 
     FastNoiseLite mountain; 
     mountain.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
@@ -115,7 +117,11 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
 
         // Gather noise data
     int noiseData[xs][zs];
-    int stoneLimit = 20; 
+    int stoneLimit = 100;  
+    float randFloat = (((float) rand()) / (float) RAND_MAX);  
+    float diff = 1.0f - 0.5f; 
+    float r = randFloat * diff;  
+    float randomThreshold = 0.5f + r;   
 
 
     for (int x = 0; x < xs; x++) 
@@ -137,12 +143,10 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                 if (y < stoneLimit + noiseData[x][z])   
                 {
                     int surface = stoneLimit + noiseData[x][z] - 4;     
-
-                    if (y > 50)  { 
-                        float cliffNoise = cliffs.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));
-                        cliffNoise < -0.44 ?  voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 1 : voxelArray[getVoxelIndex  (glm::vec3(x,y,z))] = 0; 
                     
-                    } else if (y >= surface) {
+
+
+                    if (y >= surface) {
                         if (y - 1 >= 0) 
                         {
                             if (voxelArray[getVoxelIndex(glm::vec3(x,y-1,z))] == 0) { 
@@ -156,13 +160,18 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                     } else if (y < surface) { // stone   
                         noise.SetFrequency(0.01);    
                         float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));       
-                        MultiNoise < 0.9f ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 0;    
+                        MultiNoise < randomThreshold ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 2 : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] =  0;      
                         
-                    } else if (y < 80) { // grass 
+                    } else if (y < 80 && y > 1) { // grass 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 
                     } else { // snow mountains 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 3;    
                     }
+
+                    if (y == 0) { // bedrock 
+                        voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = 3;  
+                    }
+
                 }
             }
         }

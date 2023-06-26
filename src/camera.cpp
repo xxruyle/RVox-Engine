@@ -62,8 +62,8 @@ void Camera::processInput(GLFWwindow* window, float deltaTime, Player& player)
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) // "sprint"
         {
             mSpeed += 20.0f;  
-            if (mSpeed > 200.0f)  
-                mSpeed = 200.0f; 
+            if (mSpeed > 100.0f)   
+                mSpeed = 100.0f; 
         }
         else
         {
@@ -162,12 +162,16 @@ glm::mat4 Camera::getProjectionMatrix()
 
 void Camera::zoom(double xoffset, double yoffset)
 {
-/*     mFov -= yoffset;
+    if (!isThirdPerson) 
+    {
+    mFov -= yoffset * 3; 
     if (mFov < 1.0f)
         mFov = 1.0f;  
 
     if (mFov > 90.0f) 
-        mFov = 90.0f;  */
+        mFov = 90.0f; 
+    }
+
     distanceFromPlayer -= yoffset * 1.5;  
 
     if (distanceFromPlayer < 3.5) 

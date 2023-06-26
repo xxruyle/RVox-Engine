@@ -19,7 +19,7 @@ void Hud::DrawCrosshair(Shader& shader)
 
     glBindVertexArray(VAO); 
 
-    renderer.draw2D(shader, glm::vec2(((float)1300 / 2) - 5.0f, ((float)1000/ 2) - 5.0f), 10.0f);    
+    renderer.draw2D(shader, glm::vec2(((float)SCR_WIDTH / 2) - 5.0f, ((float)SCR_HEIGHT/ 2) - 5.0f), 10.0f);     
     glBindVertexArray(0);
     texture.Unbind(); 
 }

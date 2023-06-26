@@ -31,6 +31,7 @@ class ChunkManager
 { // class to manage, create, and send chunks to be rendered
 // TO DO: create chunk size variable  
 public: 
+    int renderDistance = 200; // the number of blocks the player can see radius wise                     
     Render& renderer; 
     Camera& camera; 
     Frustum& frustum; 
@@ -43,6 +44,8 @@ public:
     std::vector<Chunk> chunks; // a vector cainting each chunk
     std::unordered_map<glm::vec3, Chunk> chunkMap;  // an unordered map containing the chunk space coordinates as a key and chunk as value 
     std::vector<glm::vec3> chunkBuffer; // buffer for loading the chunk coordinates that are near the player   
+
+
 
     void createChunks(int randSeed); // creates the chunks and adds to the map 
     void renderChunks(Shader& shader); // renders the valid chunks in the map 
@@ -72,12 +75,14 @@ public:
     void spawnPlayer(glm::vec3 chunkCoord, Player& player);  
 
 private: 
-    static const int renderDistance = 500; // the number of blocks the player can see radius wise         
     int currentRandomSeed; // the current random seed 
 
     bool chunkIsMeshable(glm::vec3 chunkPos);  
     bool chunkisFinishable(glm::vec3 chunkPos); 
     bool chunkHasPointers(glm::vec3 chunkPos); 
+
+    void getPointers(glm::vec3 chunkPos);  
+
 
 
     bool chunkExists(glm::vec3 chunkPos); 

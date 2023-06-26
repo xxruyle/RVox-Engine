@@ -19,8 +19,8 @@ private:
 
 public: 
     bool isThirdPerson = true; 
-    float SCR_WIDTH = 1300; 
-    float SCR_HEIGHT = 1000; 
+    float SCR_WIDTH = 1920; 
+    float SCR_HEIGHT = 1080; 
     
     glm::vec3 mDirection; 
     glm::vec3 mPlayerDirection; 
@@ -56,7 +56,7 @@ public:
     }; 
 
     // player variables 
-    float distanceFromPlayer = 20; 
+    float distanceFromPlayer = 20;   
     float angleAroundPlayer = 0; 
 
     glm::mat4 getViewMatrix(); 

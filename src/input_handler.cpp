@@ -22,10 +22,16 @@ void InputHandler::handleKeyCallbackInput(GLFWwindow* window, int button, int ac
     if (button == GLFW_KEY_3 && action == GLFW_PRESS)  // prints how many cubes there are 
         chunkManager.printTotalVoxels();  
 
-    if (button == GLFW_KEY_4 && action == GLFW_PRESS) 
+    if (button == GLFW_KEY_UP && action == GLFW_PRESS) 
     {
-        chunkManager.chunkMap.erase(glm::vec3(0,0,0));   
-    }
+        chunkManager.renderDistance += 32;  
+    } 
+
+    if (button == GLFW_KEY_DOWN && action == GLFW_PRESS) 
+    {
+        if (chunkManager.renderDistance > 32) 
+            chunkManager.renderDistance -= 32;    
+    } 
 
     if (button == GLFW_KEY_5 && action == GLFW_PRESS) 
     {

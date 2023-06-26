@@ -18,7 +18,7 @@ class Hud
 public: 
     Render& renderer; 
 
-    Hud(Render& renderer) : renderer(renderer) {}; 
+    Hud(Render& renderer, float SCR_WIDTH, float SCR_HEIGHT) : renderer(renderer), SCR_WIDTH(SCR_WIDTH), SCR_HEIGHT(SCR_HEIGHT) {};    
     void crossHairInit(const char* textureFilePath);   
 
     void DrawCrosshair(Shader& shader);   
@@ -26,6 +26,9 @@ public:
 
 
 private: 
+    float SCR_WIDTH; 
+    float SCR_HEIGHT;  
+
     unsigned int VAO, VBO; 
     Texture texture; 
     void setupMesh();    

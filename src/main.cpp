@@ -29,11 +29,11 @@
 
 
 // global variables 
-const unsigned int SCR_WIDTH = 1300;
-const unsigned int SCR_HEIGHT = 1000;
+const unsigned int SCR_WIDTH = 1980;
+const unsigned int SCR_HEIGHT = 1060;
 
 // initializing helper classes 
-Camera gameCamera(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);   
+Camera gameCamera(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);    
 OrthoCamera orthoCamera(glm::vec3(-30.0, 70.0, -30.0), 45.0, 0.0, 90.0f);  
 GameTime gTime;
 Light lighting;  
@@ -41,7 +41,7 @@ Frustum frustum(gameCamera);
 Render renderer(SCR_WIDTH, SCR_HEIGHT, frustum);  
 ChunkManager chunkManager(renderer, gameCamera, frustum);      
 InputHandler inputHandler(gameCamera, chunkManager);   
-Hud hud(renderer); 
+Hud hud(renderer, SCR_WIDTH, SCR_HEIGHT);  
 
 
 
@@ -115,7 +115,7 @@ int main()
 
 
 
-    Player player(glm::vec3(0, 0, 0));       
+    Player player(glm::vec3(0, 0, 0));         
     // chunkManager.spawnPlayer(glm::vec3(0, 0, 0), player); 
 
 
@@ -137,6 +137,7 @@ int main()
     // The main render loop z
     while (!glfwWindowShouldClose(window)) 
     {
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // updates window size
         // depth map rendering 
 /*         glm::vec3 lightPos = light.mPosition;   
         light.mPosition = glm::vec3(-20, 30, -20);               
@@ -152,7 +153,7 @@ int main()
         depthMap.Unbind(); */ 
 
 
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);    
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);   
         // glClearColor(255.0f/255.0f, 193.0f/255.0f, 142.0f/255.0f, 1.0f); // sky color 
         glClearColor(80.0f/255.0f, 58.0f/255.0f, 75.0f/255.0f, 1.0f);   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
