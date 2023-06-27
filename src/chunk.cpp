@@ -5,7 +5,7 @@ void Chunk::generate(int randSeed)
 {
     startedGeneration = true; 
     // meshFuture = std::async(std::launch::async, &Chunk::generateAndMesh, this, randSeed, startX, startZ);
-    generateFuture = std::async(std::launch::async, &Chunk::generateDebugChunk, this, randSeed, position.x * 32, position.z  * 32);            
+    generateFuture = std::async(std::launch::async, &Chunk::generateDebugChunk, this, randSeed, position.x * 32, position.z  * 32);              
 } 
 
 
@@ -121,7 +121,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
 
         // Gather noise data
     int noiseData[xs][zs];
-    int stoneLimit = 150;   
+    int stoneLimit = 20;    
     float randomThreshold; 
 
     int randVal = rand() % 3 + 1; 
@@ -187,7 +187,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                         MultiNoise < randomThreshold ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = stoneType : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] =  0;      
                         
                     } else if (y < 80 && y > 1) { // grass 
-                        voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1; 
+                        voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 1;  
                     } else { // snow mountains 
                         voxelArray[getVoxelIndex(glm::vec3(x, y, z))] = 3;    
                     }
@@ -225,7 +225,10 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + backFace[i];  
                             vertex.Normal = glm::vec3(0.0f,  0.0f, -1.0f);    
-                            vertex.Color = voxel.voxelColors[voxelArray[getVoxelIndex(glm::vec3(x, y, z))]]; 
+
+                            glm::vec3 worldCoord = calculateWorldCoordinates(x, y, z); 
+                            vertex.Color = voxel.calculateColor(voxelArray[getVoxelIndex(glm::vec3(x, y, z))], worldCoord.x, worldCoord.z); 
+
                             vertex.aoValue = backAO(glm::vec3(x,y,z), i); 
                             vertices.push_back(vertex);      
                         }
@@ -240,7 +243,11 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + frontFace[i];    
                             vertex.Normal = glm::vec3(0.0f,  0.0f, 1.0f);  
-                            vertex.Color = voxel.voxelColors[voxelArray[getVoxelIndex(glm::vec3(x, y, z))]];
+
+
+                            glm::vec3 worldCoord = calculateWorldCoordinates(x, y, z); 
+                            vertex.Color = voxel.calculateColor(voxelArray[getVoxelIndex(glm::vec3(x, y, z))], worldCoord.x, worldCoord.z); 
+
                             vertex.aoValue = frontAO(glm::vec3(x,y,z), i);  
                             vertices.push_back(vertex);     
                         }
@@ -255,7 +262,10 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + leftFace[i];    
                             vertex.Normal = glm::vec3(-1.0f,  0.0f,  0.0f); 
-                            vertex.Color = voxel.voxelColors[voxelArray[getVoxelIndex(glm::vec3(x, y, z))]];
+
+                            glm::vec3 worldCoord = calculateWorldCoordinates(x, y, z); 
+                            vertex.Color = voxel.calculateColor(voxelArray[getVoxelIndex(glm::vec3(x, y, z))], worldCoord.x, worldCoord.z); 
+
                             vertex.aoValue = leftAO(glm::vec3(x,y,z), i); 
                             vertices.push_back(vertex);     
                         }
@@ -270,7 +280,10 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + rightFace[i];    
                             vertex.Normal = glm::vec3(1.0f,  0.0f,  0.0f); 
-                            vertex.Color = voxel.voxelColors[voxelArray[getVoxelIndex(glm::vec3(x, y, z))]]; 
+
+                            glm::vec3 worldCoord = calculateWorldCoordinates(x, y, z); 
+                            vertex.Color = voxel.calculateColor(voxelArray[getVoxelIndex(glm::vec3(x, y, z))], worldCoord.x, worldCoord.z); 
+
                             vertex.aoValue = rightAO(glm::vec3(x,y,z), i); 
                             vertices.push_back(vertex);     
                         }
@@ -284,7 +297,10 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + bottomFace[i];    
                             vertex.Normal = glm::vec3(0.0f, -1.0f,  0.0f);  
-                            vertex.Color = voxel.voxelColors[voxelArray[getVoxelIndex(glm::vec3(x, y, z))]];
+
+                            glm::vec3 worldCoord = calculateWorldCoordinates(x, y, z); 
+                            vertex.Color = voxel.calculateColor(voxelArray[getVoxelIndex(glm::vec3(x, y, z))], worldCoord.x, worldCoord.z); 
+
                             vertex.aoValue = bottomAO(glm::vec3(x, y, z), i); 
                             vertices.push_back(vertex);     
                         }
@@ -298,7 +314,9 @@ void Chunk::mesh()
                             voxelVertex vertex; 
                             vertex.Position = glm::vec3(position.x * 32, 0, position.z * 32) + glm::vec3(x,y,z) + topFace[i];    
                             vertex.Normal = glm::vec3(0.0f,  1.0f,  0.0f);    
-                            vertex.Color = voxel.voxelColors[voxelArray[getVoxelIndex(glm::vec3(x, y, z))]];
+
+                            glm::vec3 worldCoord = calculateWorldCoordinates(x, y, z); 
+                            vertex.Color = voxel.calculateColor(voxelArray[getVoxelIndex(glm::vec3(x, y, z))], worldCoord.x, worldCoord.z);  
                             
                             vertex.aoValue = topAO(glm::vec3(x,y,z), i); 
                             vertices.push_back(vertex);     
@@ -686,6 +704,14 @@ bool Chunk::isSolid(char voxelValue)
 bool Chunk::isAir(char voxelValue) 
 {
     return (voxelValue == 0); 
+}
+
+glm::vec3 Chunk::calculateWorldCoordinates(int x, int y, int z) 
+{
+    int xPos = (position.x * 32) + x;   
+    int yPos = (position.y * 32) + y;   
+    int zPos = (position.z * 32) + z;     
+    return glm::vec3(xPos, yPos, zPos); 
 }
 
 void Chunk::draw(Shader& shader, Frustum& frustum)  

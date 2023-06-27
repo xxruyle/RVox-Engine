@@ -29,7 +29,7 @@ uniform vec3 lightPos;
 // const float fogDensity = 0.0025; // for 1000 block render distance  
 const float fogDensity = 0.0035; // for 500 block render distance    
 // const float fogDensity = .0020;     
-float fogGradient = 5.0;   
+float fogGradient = 10.0;    
 
 // frustum values for depth buffer 
 float nearD = 0.1; 

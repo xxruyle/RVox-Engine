@@ -83,6 +83,7 @@ public:
     void finishMeshing(); 
 private: 
     unsigned int VAO, VBO, EBO;
+    glm::vec3 calculateWorldCoordinates(int x, int y, int z);    
     void setupMesh(); 
     glm::vec3 backAO(glm::vec3 vPos, unsigned int vertexIndex); // gets the ao value for the particular vertex  
     glm::vec3 frontAO(glm::vec3 vPos, unsigned int vertexIndex);
