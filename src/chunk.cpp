@@ -135,6 +135,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     else 
         randomThreshold = 0.95f;  
 
+    float tempThreshold = randomThreshold; 
 
 
 
@@ -144,7 +145,7 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
     {
         for (int z = 0; z < zs; z++)  
         {
-            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 6.5f)));   
+            int height = static_cast<int>((pow(mountain.GetNoise((float)(startX + x), (float)(startZ + z)) + 1.0f, 7.5f)));   
             noiseData[x][z] = height; // -40      
         }
     }
@@ -183,7 +184,13 @@ void Chunk::generateDebugChunk(int randSeed, int startX, int startZ)
                         char stoneType;  
                         int randomStone = rand() % 500;      
                         (randomStone > 490) ? stoneType = 5 : stoneType = 2;     
-                        float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));       
+                        float MultiNoise = noise.GetNoise((float)(startX + x), (float)(y), (float)(startZ + z));      
+                        if (y > 100 - (MultiNoise * 10))       
+                        {
+                            randomThreshold = 0.4f;   
+                        } else {
+                            randomThreshold = tempThreshold; 
+                        }
                         MultiNoise < randomThreshold ? voxelArray[getVoxelIndex(glm::vec3(x,y,z))] = stoneType : voxelArray[getVoxelIndex(glm::vec3(x,y,z))] =  0;      
                         
                     } else if (y < 80 && y > 1) { // grass 

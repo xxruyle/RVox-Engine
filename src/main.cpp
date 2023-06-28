@@ -29,8 +29,8 @@
 
 
 // global variables 
-const unsigned int SCR_WIDTH = 1980;
-const unsigned int SCR_HEIGHT = 1060;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080; 
 
 // initializing helper classes 
 Camera gameCamera(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0f, 0.0f, -1.0f), 90.0f, 0.0f, 90.0f, 10.0f, 0.1f);    
